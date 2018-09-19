@@ -1,0 +1,22 @@
+公共样式文件common.css命名规范：
+
+1、字体颜色以rzl_fc_开头，后面跟对应此颜色的英文名称
+如：  
+浅蓝色： .rzl_fc_lightBlue{
+          color: #4642FF;
+         }
+
+2、背景颜色以rzl_bc_开头，后面跟对应此颜色的英文名称
+如：
+浅蓝色背景： .rzl_bc_lightBlue{
+              background-color: #4642FF;
+            }
+
+
+3、边框颜色以rzl_bd_开头，后面跟对应此颜色的英文名称
+如：
+浅蓝色边框: .rzl_bd_lightBlue {
+             border-color: #4642FF
+           }
+
+注意： 添加之前先拉取最新的代码，核对是否已经存在此颜色，添加完之后及时提交此文件的代码。

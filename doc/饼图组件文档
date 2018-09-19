@@ -1,0 +1,58 @@
+
+饼图组件文档
+
+一.组件存放目录
+
+  组件目录:src/components/common/ZCChartsPie.vue
+
+  组件demo目录:src/components/test/ZCChartsPieDemo.vue
+
+
+二.组件使用方法
+
+  参数
+  data:    必传:是    类型:数组     含义:饼图数据数组
+  label:   必传:是    类型:字符串   含义:当前饼图类目名称
+  prop:    必传:是    类型:字符串   含义:当前饼图类目对应的值
+  id:      必传:是    类型:字符串    含义:饼图唯一id
+
+
+  实例
+
+      <zcPie :data="pieData" label="create_time" prop="read_num"></zcPie>
+
+        this.pieData = [
+          {
+            "comprehensive_num": 0,
+            "read_num": 335,
+            "trans_num": 2,
+            "comment_num": 3,
+            "click_num": 3,
+            "create_time": "网站"
+          },
+          {
+            "comprehensive_num": 3,
+             "read_num": 310,
+             "trans_num": 3,
+             "comment_num": 4,
+             "click_num": 9,
+             "create_time": "微信"
+          },
+          {
+              "comprehensive_num": 8,
+              "read_num": 274,
+              "trans_num": 4,
+              "comment_num": 5,
+              "click_num": 6,
+              "create_time": "微博"
+          },
+              ......
+        ];
+
+
+
+
+
+
+
+

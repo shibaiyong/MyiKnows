@@ -1,0 +1,49 @@
+
+柱状图组件文档
+
+一.组件存放目录
+
+  组件目录:src/components/common/ZCChartsBar.vue
+
+  组件demo目录:src/components/test/ZCChartsBarDemo.vue
+
+
+二.组件使用方法
+
+  参数
+  data:       必传:是    类型:数组     含义:柱状图数据数组
+  category:   必传:是    类型:数组     含义:用于表示当前柱状图的个数的数组
+  axis:       必传:是    类型:字符串   含义:横坐标字典值
+  id:         必传:是    类型:字符串    含义:柱状图唯一id
+
+
+  实例
+
+      <zcBar :data="barData" axis="create_time" :category="category"></zcBar>
+
+        this.barData = [
+          {
+            "comprehensive_num": 0,
+            "read_num": 1,
+            "trans_num": 2,
+            "comment_num": 3,
+            "click_num":3,
+            "create_time": "01/01"
+          },
+          ......
+        ];
+
+        this.category = [
+          {prop: 'trans_num', label: '网站'},
+          {prop: 'comment_num', label: '微信'},
+          {prop: 'read_num', label: '微博'},
+          {prop: 'comprehensive_num', label: 'APP'},
+          {prop: 'click_num', label: '数字报'},
+          ......
+        ],
+
+
+
+
+
+

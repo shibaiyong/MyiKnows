@@ -1,0 +1,190 @@
+/*
+* 存储公共样式: 如颜色统一定义在此页面
+*/
+#app{
+  height:100%;
+}
+/* 输入框背景强制为白色 */
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  box-shadow: 0 0 0px 1000px white inset !important;
+  outline: none !important;
+}
+/* 所有页面的最底层背景色 */
+.rzl_fc_undercoat{
+  color: #f5f5f5;
+}
+.rzl_bc_undercoat{
+  background-color: #f5f5f5;
+}
+.rzl_bd_darkgray {
+  border-color: #f5f5f5;
+}
+/* 提示、警告信息 */
+.rzl_fc_errRed{
+  color: #D62828;
+}
+.rzl_bc_errRed {
+  background-color: #D62828;
+}
+/* 按钮字体颜色, 按钮背景色 */
+.rzl_fc_navy{
+  color: #1D2088;
+}
+.rzl_bc_navy {
+  background-color: #1D2088;
+}
+.rzl_bd_navy {
+  border-color: #1d2088;
+}
+/* 表格内容字体 */
+.rzl_fc_darkgray{
+  color: #555555;
+}
+.rzl_fc_white{
+  color: #ffffff;
+}
+.rzl_bc_white{
+  background-color: #ffffff;
+}
+.rzl_fc_smokyGrey{
+  color: #444444;
+}
+.rzl_bc_smokyGrey{
+  background-color: #444444;
+}
+.rzl_fc_lightBlue{
+  color: #4642FF;
+}
+.rzl_bc_lightBlue{
+  background-color: #4642FF;
+}
+.rzl_fc_shallowGreen{
+  color: #1DD1EF;
+}
+.rzl_bc_shallowGreen{
+  background-color: #1DD1EF;
+}
+.rzl_fc_lightGrey{
+  color: #CDCDCD;
+}
+.rzl_bc_lightGrey{
+  background-color: #CDCDCD;
+}
+.rzl_bd_lightGrey {
+  border-color: #cdcdcd;
+}
+.rzl_fc_darkBlue{
+  color: #2D2B4C;
+}
+.rzl_bc_darkBlue{
+  background-color: #2D2B4C;
+}
+
+/* 清除浮动 */
+.clearfix:after,
+.clearfix:before {
+  clear: both;
+  content: '\0020';
+  display: block;
+  visibility: hidden;
+  width: 0;
+  height: 0;
+}
+/*搜索框搜索按钮样式*/
+.rzl_seach_Input{
+  width: 300px;
+  height: 36px;
+  line-height: 36px;
+  border: 1px solid #CDCDCD;
+  border-radius: 10px;
+  margin-right: 20px;
+  text-indent: 20px;
+  outline:none;
+}
+.rzl_seach_button{
+  height: 38px;
+  line-height: 38px;
+  width: 60px;
+  border: none;
+  border-radius: 10px;
+  outline:none;
+  cursor: pointer;
+}
+/* 按钮的公共样式 */
+.btn{
+  background:white;
+  border: 2px solid #1D2088;
+  border-radius: 8px;
+  color: #1D2088;
+  outline: none;
+}
+.rzl_content_button{
+  border-radius: 10px;
+  border:0 none;
+  height: 38px;
+  width: 120px;
+  color: #ffffff;
+  background-color: #1D2088;
+}
+/****复写tooltip弹窗效果***/
+.el-popover {
+  width: 240px;
+  height: 60px;
+  padding: 10px 11px;
+  background: #ffffff;
+  box-shadow: 0 2px 4px 2px #e5e5e5;
+  border-radius: 10px;
+}
+/* 尺寸3840之间的：版心最小宽度为，两侧宽各为： */
+@media screen and (min-width:3840px) {
+  .top-header{
+
+  }
+  .rzl-contarner{
+
+  }
+  .footer {
+
+  }
+}
+
+/* 尺寸在1440至3840之间的：版心最小宽度为：1280px，两侧宽各为：80px */
+@media screen and (min-width:1440px) and (max-width:3840px){
+  .top-header {
+    min-width: 1440px;
+    height: auto;
+    box-sizing: border-box;
+  }
+  .rzl-contarner {
+    padding: 0 80px;
+    min-width: 1280px;
+    height: auto;
+    box-sizing: border-box;
+  }
+  .footer {
+    min-width: 1440px;
+    height: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* 尺寸在1024至1440之间的：版心最小宽度为：904px，两侧宽各为：60px */
+@media screen and (max-width:1440px){
+  .top-header {
+    min-width: 904px;
+    height: auto;
+    box-sizing: border-box;
+  }
+  .rzl-contarner {
+    padding: 0 60px;
+    min-width: 904px;
+    height: auto;
+    box-sizing: border-box;
+  }
+  .footer{
+    min-width: 904px;
+    height: 100%;
+    box-sizing: border-box;
+  }
+}

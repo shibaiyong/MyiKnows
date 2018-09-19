@@ -1,0 +1,127 @@
+<template>
+    <div class="checkBox" @click="selected($event)">
+      <input id="rl-checkbox" type="checkbox"/><label for="rl-checkbox" v-show="isChecked"></label>
+    </div>
+</template>
+
+<script>
+    import axios from "axios";
+    
+    export default {
+      name:'checkbox',
+      props:{
+        label:{
+          type:[String,Number],
+          default:''
+        },
+        
+        dataArr:{
+          type:Array,
+          default: function () {
+            return [];
+          }
+        },
+
+        all:{
+          type:String,
+          default:''
+        },
+
+        totalSelect:{
+          type:Function
+        },
+
+        allSelect:{
+          type:Boolean,
+          default:false
+        }
+
+      },
+      data(){
+          return {
+              isChecked:false,
+              outValue:'',
+              flagAll:''
+          }
+      },
+      created(){
+          
+      },
+      updated(){
+          
+      },
+      methods:{
+        selected(event){
+          if(event){//组件内部的点击操作才执行
+            event.preventDefault();
+            this.isChecked = !this.isChecked;
+            if(this.totalSelect){//判断是否为全选复选框。如果是则return
+              if(this.isChecked){
+                this.totalSelect((Math.random()+1)+'');
+              }else{
+                this.totalSelect('');
+              }
+              return false;
+            }
+          }
+          var index = this.dataArr.indexOf(this.label);
+
+          if(this.isChecked){//直接调用执行的代码
+            if(index == -1){//防止点击全选的时候，往数组里重复添加。
+              this.dataArr.push(this.label);
+            }            
+          }else{           
+            if(index != -1){//取消选择时，删除对应的值
+              this.dataArr.splice(index,1);
+            }
+          }
+        } 
+      },
+      mounted(){
+        
+      },
+      watch:{
+        all(val) {//全选框控制的属性
+          if(val != ''){
+            this.isChecked = true;
+          }else{
+            this.isChecked = false;
+          }
+          this.selected();
+        },
+        allSelect(val){//各个复选框都处于选中状态时。该值为真。
+          this.isChecked = val ? true : false
+        }
+      }
+    }
+
+</script>
+<style scoped>
+    .checkBox{
+      width:14px;height:14px;
+      position:relative;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid #CDCDCD;
+      background:white;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .checkBox label, .checkBox input{
+      width:100%;
+      height:100%;
+      position:absolute;
+      text-align: center;
+      line-height: 14px;
+      font-size: 12px;
+      left:0;top:0;
+    }
+    
+    .checkBox input{
+      visibility: hidden;
+    }
+    .checkBox label::after{
+      content:'\2714';
+    }
+    
+</style>

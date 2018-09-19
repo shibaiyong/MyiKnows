@@ -1,0 +1,115 @@
+
+表格组件文档
+
+一.组件存放目录
+
+  组件目录:src/components/common/ZCTable.vue
+
+  组件demo目录:src/components/test/ZCTableDemo.vue
+
+
+二.组件使用方法
+
+  参数
+  data:     必传:是    类型:数组     含义:表格数据数组
+
+  category: 必传:是    类型:数组     含义:当前表格类目名称
+
+  total     必传:否    类型:数字     含义:当前列表总条数
+
+  size      必传:否    类型:数字     含义:当前列表每页条数
+
+  showPageControl 必传:否    类型:Boolean    含义:是否展示分页控制器
+
+  isSelect  必传:否    类型:Boolean  含义:表格是否具有选择功能
+
+
+
+
+  参数详解:
+  category : [
+    {
+      /*  含义:数据索引 必传:是  类型:String */
+      prop:'',
+
+      /*  含义:数据显示名称 必传:是  类型:String */
+      label:'',
+
+      /*  含义:单元格统一样式  必传:否  类型:Object */
+      style:{},
+
+      /*  含义:单元格单独样式  必传:否 类型:Array*/
+      itemsStyle:[
+        {
+          index:1,style:{color:'#ff0000'}
+        }
+        ......
+      ]
+
+      /*  含义:单元格表头样式  必传:否 类型:Object*/
+      headerStyle:{},
+
+      /*  含义:高亮样式 必传:否 类型:Boolean*/
+      showHover:true,
+    },
+    ......
+  ]
+
+  实例
+
+      <zcTable :data="tableData" :category="category"></zcTable>
+
+        this.tableData = [
+            {
+              unionId: "4_1809101131_1496837",
+              inx: 1,
+              articleId: "1809101131_1496837",
+              platformId: "4d83be1d1bad4451bf2b0ad9ce4162be",
+              platformName: "网易新闻_APP",
+              platformTypeId: "e57fb6722d9c4734a36c83798146a35c",
+              platformTypeName: "APP",
+              title: "IS武装或对西欧发动袭击?英军增派部队进驻阿富汗",
+              transNum: 0,
+              commentNum: 0,
+              clickNum: 0,
+              thumbsNum: 0,
+              pageRank: 8,
+              publishTime: "2018-09-10 14:27",
+              author: null
+            },
+            ......
+        ];
+
+
+        this.category = [
+          {prop: 'inx', label: '序号', width: 50,},
+          {
+            prop: 'platformName',
+            label: '平台',
+            width: 100,
+            itemsStyle: [
+              {index: 3, style: {color: '#ff0000'}}
+            ]
+          },
+          {
+            prop: 'title',
+            label: '文章标题',
+            style: {textAlign: 'left'},
+            headerStyle: {textAlign: 'left'},
+            showHover:true
+          },
+          ......
+        ];
+
+
+
+
+
+  监听方法
+  click-table-cell(rowIndex,columnIndex)   含义:当前点击表格的方法,rowIndex columnIndex分别表示行号和列号
+
+  refresh-data(val)     含义:当前页码变化,val表示当前页
+
+  select-data(selects)  含义:对行数据进行选择,selects表示被选中的数组
+
+  operate-data(index)   含义:当前点击的操作按钮,index表示当前被点击的index

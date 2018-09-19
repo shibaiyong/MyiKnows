@@ -1,0 +1,38 @@
+<template>
+<div class="userview">
+    <div class="top-header">
+      <ITop></ITop>
+      <IHeader v-bind:items="items"></IHeader>
+    </div>
+    <div class="rzl-contarner rzl_bc_undercoat wrapcontent">
+    <IUserViewContent></IUserViewContent>
+    </div>
+    <IFoot></IFoot>
+</div>
+</template>
+<script>
+import ITop from "../common/Top.vue";
+import IHeader from '../common/Header.vue';
+import IUserViewContent from "../user/UserViewContent.vue";
+import IFoot from "../common/Footer.vue";
+export default {
+    name:"userview",
+    components:{ITop,IHeader,IUserViewContent,IFoot},
+    data(){
+        return {
+            items:['首页','舆情头条','检测中心','简报中心']
+        };
+    }
+}
+</script>
+<style scoped type="css">
+    .userview{
+        height: 100%;
+    }
+    .userview .wrapcontent{
+        height:calc(100% - 200px - 88px - 60px);
+        padding-top: 20px;
+    }
+</style>
+
+

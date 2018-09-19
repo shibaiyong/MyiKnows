@@ -1,0 +1,42 @@
+
+地图组件文档
+
+一.组件存放目录
+
+  组件目录:src/components/common/ZCChartsMap.vue
+
+  组件demo目录:src/components/test/ZCChartsMapDemo.vue
+
+
+二.组件使用方法
+
+  参数
+  data:    必传:是    类型:数组     含义:地图数据数组
+  label:   必传:是    类型:字符串   含义:当前地图类目名称
+  prop:    必传:是    类型:字符串   含义:当前地图类目对应的值
+  id:      必传:是    类型:字符串    含义:地图唯一id
+
+
+  实例
+
+      <zcPie :data="mapData" label="create_time" prop="read_num"></zcPie>
+
+        this.,mapData = [
+          {
+            "comprehensive_num": 0,
+            "read_num": 335,
+            "trans_num": 2,
+            "comment_num": 3,
+            "click_num": 3,
+            "create_time": "河北"
+          },
+          ......
+        ];
+
+
+
+
+
+
+
+
