@@ -39,7 +39,10 @@
         <el-checkbox v-model="isHitKeysWord">命中以下任意关键词</el-checkbox>
       </div>
       <div class="warnKeysWord-right" v-show="isAddWarnMode">
-        <el-input class="warnKeysWord-input" v-model="hitKeysWord" @blur="handleAllInput" placeholder=""></el-input>
+        <el-input class="warnKeysWord-input" 
+          :disabled="!isHitKeysWord"
+          v-model="hitKeysWord" 
+          @blur="handleAllInput" placeholder=""></el-input>
         <div class="configWarn-hint">
           <i class="el-icon-question rzl_fc_lightGrey font20"></i>
         </div>
@@ -65,10 +68,15 @@
           <el-button circle class="circle-radio" :class="{active: warnTimeRadio}"></el-button>
           <span class="font14 rzl_fc_darkgray">预警时间</span>
         </div>
-        <el-input class="warnTime-input" v-model="startTime" @blur="handleAllInput" placeholder=""></el-input>
+        <el-input class="warnTime-input" 
+          :disabled="!warnTimeRadio"
+          v-model="startTime" 
+          @blur="handleAllInput" placeholder=""></el-input>
         <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
         <span class="warnTime-middle font14 rzl_fc_darkgray">至</span>
-        <el-input class="warnTime-input warnTime-input-last" v-model="endTime" @blur="handleAllInput" placeholder=""></el-input>
+        <el-input class="warnTime-input warnTime-input-last" 
+          :disabled="!warnTimeRadio"
+          v-model="endTime" @blur="handleAllInput" placeholder=""></el-input>
         <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
         <div class="warnTime-warn rzl_fc_errRed font16" v-show="warnTimeWarn">请输入预警时间</div>
       </div>
@@ -122,7 +130,7 @@ export default {
       // 预警结束时间点
       endTime: '',
       // 预警时间提示
-      warnTimeWarn: true,
+      warnTimeWarn: false,
       // 是否周末预警
       isWeekDayWarn: false,
     }

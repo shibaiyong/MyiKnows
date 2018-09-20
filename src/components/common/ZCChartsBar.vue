@@ -1,7 +1,7 @@
 <template>
   <div class="zc_charts_content" id="zc_charts_content">
 
-    <div id="zc_charts_bar"
+    <div :id="'zc_charts_bar'+id"
          class="zc_charts_bar"
          ref="zc_charts_bar">
     </div>
@@ -29,7 +29,7 @@
       return {
         colors: ['#1DD1EF', '#46DD31', '#F5DB21', '#FF9241', '#FB5959', '#8B51E6'],
         eChartsObj: null,
-        idName:null,
+        contentWidth:0
       }
 
     },
@@ -98,19 +98,20 @@
           legend: {
             show: this.category.length>1?true:false,
             orient: 'horizontal',
-            top: 20,
-            right: 40,
+            top: 'top',
+            right: 0,
             icon: 'rect',
             itemWidth: 10,
-            itemHeight:10
+            itemHeight:10,
+            padding:0
           },
           /*坐标系*/
           grid: {
             show: false,
-            top: 60,
-            bottom: 50,
-            left: 60,
-            right: 40
+            top: this.category.length>1?30:0,
+            bottom: 30,
+            left: this.category.length>1?40:0,
+            right: 0,
           },
           /*提示框组件*/
           tooltip: {
@@ -130,12 +131,17 @@
             formatter(params) {
 
               let result = '';
-              params.forEach(function (item, index) {
-                result = result + item.marker + '&nbsp' + item.seriesName + '&nbsp:&nbsp' + item.data + '&nbsp篇';
-                if (index !== params.length - 1) {
-                  result += '<br>'
-                }
-              });
+              if(params.length >1){
+                params.forEach(function (item, index) {
+                  result = result + item.marker + '&nbsp' + item.seriesName + '&nbsp:&nbsp' + item.data + '&nbsp篇';
+                  if (index !== params.length - 1) {
+                    result += '<br>'
+                  }
+                });
+              }else{
+                result = result + params[0].name + '&nbsp:&nbsp' + params[0].data + '&nbsp篇'
+              }
+
               return result;
             },
             extraCssText: 'box-shadow: 1px 1px 10px 2px #F5F5F5;line-height:25px;text-align: left;'
@@ -183,13 +189,14 @@
 
         }
       },
+
       initBarChart(){
 
         let content = document.getElementById('zc_charts_content');
 
         let empty = document.getElementById(this.id);
 
-        let bar = document.getElementById('zc_charts_bar');
+        let bar = document.getElementById('zc_charts_bar'+this.id);
 
         if(this.data.length){
 
@@ -223,11 +230,7 @@
       this.initBarChart();
 
     },
-    beforeCreate(){
 
-      this.idName = Number(new Date());
-
-    }
 
   }
 </script>

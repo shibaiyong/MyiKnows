@@ -78,7 +78,6 @@
 
 <style scoped>
   .top {
-    min-width: 1440px;
     width: 100%;
     box-sizing: border-box;
     height: 88px;

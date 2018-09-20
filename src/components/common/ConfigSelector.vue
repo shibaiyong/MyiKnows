@@ -11,7 +11,12 @@
         <el-radio v-model="dateTypeRadio" label="month" @change="changeDateType()">30天</el-radio>
         <el-radio v-model="dateTypeRadio" label="customTime" @change="changeDateType()">自定义</el-radio>
         <div class="customTime-date">
-          <el-date-picker v-model="customTime" type="daterange" range-separator="-" prefix-icon="" value-format="yyyy-MM-dd"
+          <el-date-picker v-model="customTime" type="daterange" 
+            v-bind:disabled="disabled"
+            range-separator="-" 
+            prefix-icon="" 
+            format="yyyy-MM-dd"
+            value-format="timestamp"
             :picker-options="dateScope" start-placeholder="开始日期" end-placeholder="结束日期">
           </el-date-picker>
         </div>
@@ -66,8 +71,8 @@ export default {
     return {
       // 时间范围类型
       dateTypeRadio: 'year',
-      // 时间控件是否激活
-      customTimeActive: true,
+      // 时间控件是否
+      disabled: true,
       // 自定义时间范围值
       customTime: [],
       // 限定时间范围
@@ -104,11 +109,10 @@ export default {
   methods: {
     // 修改时间范围
     changeDateType () {
-      console.log(this.dateTypeRadio);
       if(this.dateTypeRadio == 'customTime'){
-        this.customTimeActive = true;
+        this.disabled = false;
       }else{
-        this.customTimeActive = false;
+        this.disabled = true;
       }
     },
     // 选择全选
@@ -308,7 +312,11 @@ export default {
   height: 38px;
 }
 .customTime-date >>> .el-input__inner{
-  width: 100%;
+  width: 100% !important;
+}
+.dateDisabled{
+  cursor: none;
+  background: #1D2088;
 }
 .monitorType-content{
   margin-top: 20px;
@@ -325,7 +333,9 @@ export default {
   line-height: 38px;
   cursor: pointer;
 }
-
+.configCondition .periodReport-right .periodReport-checkboxGroup{
+  margin-left: 15px;
+}
 .configCondition .monitorType-all span,
 .configCondition .periodReport-all span{
   display: inline-block;
@@ -333,6 +343,11 @@ export default {
 }
 
 
+/****点击input的边框样式****/
+.configCondition >>> .el-range-editor.is-active, .el-range-editor.is-active:hover{
+  border-color: #1D2088;
+  outline: none;
+}
 /****模拟radio样式****/
 .configCondition .monitorType-content >>>.el-button.is-circle,
 .configCondition .periodReport-content >>>.el-button.is-circle{
@@ -364,5 +379,9 @@ export default {
 .configCondition .periodReport-all .circle-radio{
   position: relative;
   top: -5px;
+}
+
+*:focus{
+  outline-color: #1D2088;
 }
 </style>

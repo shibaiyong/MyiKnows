@@ -4,7 +4,7 @@
       <iTop/>
       <iHeader/>
     </div>
-    <articleDetailsContent class="content rzl_bc_undercoat" />
+    <articleDetailsContent class=" rzl_bc_undercoat rzl-contarner"/>
     <IFooter/>
   </div>
 
@@ -22,29 +22,9 @@
   export default {
     name: "article-details",
     components: {iTop, iHeader, titleLabel, dataUtil, articleDetailsContent, IFooter},
-    data: function () {
-      return {
-        items: [],
-        labelData: [],
-        correlationNewsData: [],
-      }
-    },
-    methods: {
-      a: function (index) {
-      }
-    },
-    mounted() {
-      this.labelData = dataUtil.getLabelData()
-      this.items = dataUtil.getTabItems()
-      this.correlationNewsData = dataUtil.getCorrelationNewsData()
-    }
   }
 </script>
 
 <style scoped>
-  .content {
-    padding: 20px 80px 40px;
-    min-width: 1440px;
-    box-sizing: border-box;
-  }
+
 </style>

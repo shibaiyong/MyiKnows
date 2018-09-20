@@ -2,7 +2,7 @@
 
   <div class="zc_charts_content" id="zc_charts_content">
 
-    <div id="zc_charts_line"
+    <div :id="'zc_charts_line'+id"
          class="zc_charts_line"
          ref="zc_charts_line">
     </div>
@@ -106,18 +106,19 @@
           legend: {
             show: this.category.length>1?true:false,
             orient: 'horizontal',
-            top: 20,
-            right: 40,
+            top: 0,
+            right: 20,
             icon: 'circle',
-            itemWidth: 10
+            itemWidth: 10,
+            padding:0
           },
           /*坐标系*/
           grid: {
             show: false,
-            top: 60,
-            bottom: 50,
-            left: 60,
-            right: 40
+            top: this.category.length>1?40:5,
+            bottom: 30,
+            left: this.category.length>1?60:20,
+            right: 20
           },
           /*提示框组件*/
           tooltip: {
@@ -198,7 +199,7 @@
 
         let empty = document.getElementById(this.id);
 
-        let line = document.getElementById('zc_charts_line');
+        let line = document.getElementById('zc_charts_line'+this.id);
 
         if(this.data.length){
 

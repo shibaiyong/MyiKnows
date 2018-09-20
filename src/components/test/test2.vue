@@ -30,9 +30,9 @@
       }
     },
     mounted: function () {
-      console.log(1);
       var thiz = this;
       this.a = function (index) {
+        console.log(index)
         if (index == 0) {
           thiz.$router.push("/test/A");
         }

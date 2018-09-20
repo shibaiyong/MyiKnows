@@ -16,25 +16,26 @@
               <span class="rzl_fc_navy" id="originalLink" @click="jumpSource">原文链接</span>
             </div>
             <!--<div class="describe">-->
-              <!--<span class="rzl_fc_lightGrey">新闻ID：</span>-->
-              <!--<span class="describe-black">201812141325</span>-->
+            <!--<span class="rzl_fc_lightGrey">新闻ID：</span>-->
+            <!--<span class="describe-black">201812141325</span>-->
             <!--</div>-->
           </div>
           <!--<div>-->
-            <!--<div class="describe">-->
+          <!--<div class="describe">-->
 
-            <!--</div>-->
-            <!--<div class="describe">-->
-              <!--<span class="rzl_fc_lightGrey">本站浏览量：</span>-->
-              <!--<span class="describe-black">1234</span>-->
+          <!--</div>-->
+          <!--<div class="describe">-->
+          <!--<span class="rzl_fc_lightGrey">本站浏览量：</span>-->
+          <!--<span class="describe-black">1234</span>-->
 
-            <!--</div>-->
+          <!--</div>-->
           <!--</div>-->
         </div>
         <div class="key-word-box font14">
           <div class="describe-keyword font14">
             <span class="rzl_fc_lightGrey">关键词：</span>
-            <span class="blue-label rzl_bc_shallowGreen rzl_fc_undercoat" v-for="item in articleDate.keyword">{{item}}</span>
+            <span class="blue-label rzl_bc_shallowGreen rzl_fc_undercoat"
+                  v-for="item in articleDate.keyword">{{item}}</span>
           </div>
           <div class="font-choose" @mouseover="fontSizeMouseover" @mouseout="fontSizeMouseout">
             <div class="font14 rzl_fc_darkgray">字体 ：<span>{{getFontSizeText}}&nbsp;
@@ -94,6 +95,9 @@
           </div>
         </div>
       </div>
+      <div class="go-top" v-if="showGoTop" @click="goTop">
+        <img src="../../assets/up.png"/>
+      </div>
     </div>
   </div>
 
@@ -129,6 +133,7 @@
         articleDate: {},
         contentFontSize: "font14",
         showChooseFontSize: false,
+        showGoTop: false,
       }
     },
     methods: {
@@ -137,24 +142,44 @@
       fontSizeMouseover(event) {
         this.showChooseFontSize = true
       },
+      goTop() {
+        var app = document.getElementById("app");
+        var code = setInterval(function () {
+          if (app.scrollTop > 0) {
+            app.scrollBy(0, -20)
+          } else {
+            clearInterval(code)
+          }
+        }, 3)
+      },
       fontSizeMouseout(event) {
         this.showChooseFontSize = false
       },
       changeFontSize(fontSize) {
         this.contentFontSize = fontSize
       },
-      jumpSource(){
+      jumpSource() {
         window.open(this.articleDate.newsLink)
-      }
+      },
     },
     mounted() {
       this.articleDate = dataUtil.getArticleDetailsData()
+      var app = document.getElementById("app");
+      var thiz = this;
+      app.addEventListener("scroll", function (e) {
+        if (window.innerHeight - app.scrollTop < 0) {
+          thiz.showGoTop = true
+        } else {
+          thiz.showGoTop = false
+        }
+      })
     }
   }
 </script>
 
 <style scoped>
   .iDetails {
+    position: relative;
     text-align: left;
     display: -webkit-flex; /* Safari */
     /*display: flex;*/
@@ -181,7 +206,7 @@
     display: inline-block;
     width: 42%;
     padding-left: 150px;
-    padding-right: 120px;
+    padding-right:30px;
     box-sizing: border-box;
     margin-bottom: 100px;
   }
@@ -429,5 +454,24 @@
   .iDetails .list-item span {
     margin-right: 5px;
     font-weight: bold;
+  }
+
+  .iDetails .go-top {
+    height: 40px;
+    text-align: center;
+    width: 40px;
+    padding: 10px;
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 180px;
+    right: 60px;
+    border-radius: 50%;
+    background: rgba(91, 91, 91, 0.5);
+  }
+
+  .iDetails .go-top img {
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
   }
 </style>

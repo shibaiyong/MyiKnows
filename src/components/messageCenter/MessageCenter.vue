@@ -1,200 +1,34 @@
 <template>
-  <div class="rzl_fc_darkgray">
-    <div class="top-header ">
-      <ITop/>
-      <IHeader :items="items"/>
+  <div>
+    <div class="top-header">
+      <iTop/>
+      <iHeader/>
     </div>
-    <div class="message-center">
-      <div class="empty-button-box font14 rzl_fc_navy">
-        <span>全部标记已读</span>
-        <span>批量删除</span>
-      </div>
-      <div class="message-list-box rzl_fc_darkgray">
-        <div class="list-title font14 rzl_fc_darkgray">
-          <span class="title-checkAll">
-             <checkBox
-               :allSelect="allSelect"
-               :totalSelect="totalSelect"/>全选</span>
-          <span class="title-date">日期</span>
-          <span class="title-type">类型</span>
-          <span class="title-content">消息内容</span>
-          <span class="title-status">状态</span>
-          <span class="title-delete"> &nbsp;</span>
-        </div>
-        <div class="list-item font14 rzl_fc_darkgray" v-for="item in listData">
-          <div class="item-checkAll">
-            <checkBox
-              :label="2"
-              :dataArr="dataArr"
-              :all="checkAll"
-            />
-          </div>
-          <span class="item-date">{{item.date}}</span>
-          <span class="item-type">{{item.type == 1?"系统消息":"未知消息"}}</span>
-          <span class="item-content">{{item.content}}</span>
-          <span class="item-status">{{item.status == 1?"已读":"未读  "}}</span>
-          <div class="item-delete empty-button-box font14 rzl_fc_navy">
-            <span>删除</span>
-          </div>
-        </div>
-
-      </div>
-      <div class="pagination">
-        <Pagination :totalNum="total"
-                    @currentChange="currentChange"
-                    ref="pagination"/>
-      </div>
-    </div>
+    <messageCenterContent class="content rzl_bc_undercoat" />
     <IFooter/>
   </div>
+
 </template>
 
 <script>
-  import ITop from '@/components/common/Top';
-  import IHeader from '@/components/common/Header';
-  import IFooter from '@/components/common/Footer';
-  import checkBox from '@/components/common/CheckBox';
+  import iTop from '@/components/common/Top'
+  import iHeader from '@/components/common/Header'
+  import titleLabel from '@/components/common/TitleLabel'
+  import messageCenterContent from '@/components/messageCenter/MessageCenterContent'
   import dataUtil from '../../assets/js/dataUtlis'
-  import Pagination from "@/components/common/Pagination"
+  import IFooter from '@/components/common/Footer';
 
   export default {
     name: "message-center",
-    components: {ITop, IHeader, IFooter, dataUtil, checkBox, Pagination},
-    data() {
-      return {
-        items: ["首页", "舆情头条", "监测中心", "简报中心"],
-        searchTitle: "",
-        dataArr: [],
-        checkAll: "",
-        total: 0,
-        page: 0,
-        listData: []
-      }
-    },
-    computed: {
-      allSelect() {
-        return this.dataArr.length == 7
-      }
-    },
-    methods: {
-      totalSelect(params) {
-        console.log(params);
-        this.checkAll = params
-      }
-    },
-    mounted() {
-      this.listData = dataUtil.getMessageCenterListData();
-    }
+    components: {iTop, iHeader, titleLabel, dataUtil, messageCenterContent, IFooter},
+
   }
 </script>
 
 <style scoped>
-  .message-center {
-    width: 100%;
+  .content {
+    padding: 20px 80px 40px;
+    min-width: 1440px;
     box-sizing: border-box;
-    min-width: 1344px;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-top: 34px;
-  }
-
-  .message-center .empty-button-box {
-
-  }
-
-  .message-center .empty-button-box span {
-    cursor: pointer;
-    padding: 7px 13px;
-    border: #1D2088 2px solid;
-    margin-right: 15px;
-    border-radius: 10px;
-  }
-
-  .message-center .message-list-box {
-    width: 100%;
-    margin-top: 30px;
-    margin-bottom: 30px;
-  }
-
-  .message-center .list-title {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    background: #F5F5F5;
-    height: 40px;
-    line-height: 40px;
-  }
-
-  .message-center .list-item {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    height: 57px;
-    line-height: 57px;
-    text-align: center;
-    border-bottom: #cdcdcd 1px solid;
-  }
-
-  .message-center .list-title .title-checkAll {
-    flex: 2;
-  }
-
-  .message-center .list-title .title-date {
-    flex: 3;
-  }
-
-  .message-center .list-title .title-type {
-    flex: 3;
-  }
-
-  .message-center .list-title .title-content {
-    text-align: left;
-    flex: 5;
-  }
-
-  .message-center .list-title .title-status {
-    flex: 2;
-  }
-
-  .message-center .list-title .title-delete {
-    flex: 2;
-  }
-
-  .message-center .list-item .item-checkAll {
-    flex: 2;
-  }
-
-  .message-center .list-item .item-date {
-    flex: 3;
-  }
-
-  .message-center .list-item .item-type {
-    flex: 3;
-  }
-
-  .message-center .list-item .item-content {
-    text-align: left;
-    flex: 5;
-  }
-
-  .message-center .list-item .item-status {
-    flex: 2;
-  }
-
-  .message-center .list-item .item-delete {
-    flex: 2;
-  }
-
-  .message-center .list-title span {
-    text-align: center;
-    font-weight: bold;
-  }
-
-  .message-center .pagination {
-    display: flex;
-    align-items: center;
-    flex-direction: row;
-    justify-content: flex-end;
-    margin-bottom: 40px;
   }
 </style>

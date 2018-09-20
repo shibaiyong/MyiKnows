@@ -92,42 +92,42 @@ var dataUtil = {
   },
   getMessageCenterListData() {
     return [{
-      id: "12314",
+      id: "123141",
       date: "2018/08/21 12:23",
       type: "1",
       content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
       status: "1"
     }, {
-      id: "12314",
+      id: "123142",
       date: "2018/08/21 12:23",
       type: "1",
       content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
       status: "1"
     }, {
-      id: "12314",
+      id: "123143",
       date: "2018/08/21 12:23",
       type: "1",
       content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
       status: "1"
     }, {
-      id: "12314",
+      id: "123144",
       date: "2018/08/21 12:23",
       type: "1",
       content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
       status: "1"
     }, {
-      id: "12314",
+      id: "123145",
       date: "2018/08/21 12:23",
       type: "1",
       content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
       status: "1"
     }, {
-      id: "12314",
+      id: "123146",
       date: "2018/08/21 12:23",
       type: "1",
       content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
       status: "1"
-    }, {id: "12314", date: "2018/08/21 12:23", type: "1", content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难", status: "1"}]
+    }, {id: "123147", date: "2018/08/21 12:23", type: "1", content: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难", status: "1"}]
   },
   getArticleDetailsData() {
     return {
@@ -135,7 +135,7 @@ var dataUtil = {
       publishTime: "2018-12-14 13:25",
       source: "新华社",
       gatherSource: "腾讯新闻",
-      id:"1231312313",
+      id: "1231312313",
       newsLink: "http://www.baidu.com",
       keyword: ["海外", "俄罗斯", "俄罗斯"],
       abstract: "本次峰会主题为“合作共赢，携手构建更加紧密的中非命运共同体”。中非合作论坛非方成员领导人将应邀与会，有关非洲地区组织和国际组织代表将出席峰会有关活动。",
@@ -188,6 +188,36 @@ var dataUtil = {
           "closeAble": false
         }
         ,
+        {
+          "titleLabel": "机构标签",
+          "itemLabel": [
+            "海外",
+            "俄罗斯",
+            "海外",
+            "俄罗斯",
+          ],
+          "closeAble": false
+        },
+        {
+          "titleLabel": "机构标签",
+          "itemLabel": [
+            "海外",
+            "俄罗斯",
+            "海外",
+            "俄罗斯",
+          ],
+          "closeAble": false
+        },
+        {
+          "titleLabel": "机构标签",
+          "itemLabel": [
+            "海外",
+            "俄罗斯",
+            "海外",
+            "俄罗斯",
+          ],
+          "closeAble": false
+        },
         {
           "titleLabel": "机构标签",
           "itemLabel": [

@@ -1,12 +1,8 @@
 <template>
   <div>
-    <div class="rzl_bc_white monitor-title">
-      <p class="rzl-contarner font14">{{monitorName}}</p>
-    </div>
     <!-- 内容区最外层容器均采用rzl-contarner样式 -->
     <div class="rzl-contarner rzl_bc_undercoat">
       <div class="warningList-content">
-        <ITabConfig ></ITabConfig>
         <div class="index-content rzl_bc_white">
           <!--近期预警趋势图表-->
           <div class="index-warning-trend" >
@@ -50,13 +46,12 @@
 </template>
 
 <script>
-    import ITabConfig from '@/components/common/TabConfig';
     import lineChart from '@/components/common/ZCChartsLine';
     import pieCharts from'@/components/common/ZCChartsPie';
     import warningTable from '@/components/common/ZCTable'
     export default {
         name: "WarningListContent",
-        components: {ITabConfig,lineChart,pieCharts,warningTable},
+        components: {lineChart,pieCharts,warningTable},
         data() {
           return {
             warningChangeDatas:[],
@@ -117,20 +112,20 @@
           //预警分类占比数据
           loadDatas_WarningType(){
             let data = [{
-              "type_num": 40,
-              "type": "重大-已处理"
-            },{
-              "type_num": 23,
-              "type": "重大-未处理"
-            },{
-              "type_num": 30,
-              "type": "轻微"
+              "type_num": 20,
+              "type": "正常"
             },{
               "type_num": 35,
               "type": "一般"
             },{
-              "type_num": 20,
-              "type": "正常"
+              "type_num": 30,
+              "type": "轻微"
+            },{
+              "type_num": 23,
+              "type": "较大"
+            },{
+              "type_num": 40,
+              "type": "重大"
             }]
             this.handleData_WarningType(data);
           },
@@ -257,8 +252,8 @@
             })
           },
           // 查看按钮
-          operateData(index){
-            alert(index)
+          operateData(rowIndex){
+            alert(rowIndex)
           },
 
         },
@@ -279,7 +274,6 @@
     margin-bottom: 4px;
   }
   .warningList-content{
-    padding-top: 16px;
     width: 100%;
     height: 100%;
   }

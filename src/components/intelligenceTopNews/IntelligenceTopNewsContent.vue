@@ -9,7 +9,7 @@
     <div class="topNews rzl_bc_white" >
       <!--<input type="text" v-model="queryTopNews"  placeholder="" class="rzl_seach_Input font16" >-->
       <!--<button  type="button" class="rzl_seach_button rzl_bc_navy font16 rzl_fc_white">搜索</button>-->
-      <p class="latestNews rzl_bc_undercoat">最新舆情</p>
+      <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14">最新舆情</p>
       <ul  class="topNewsList">
         <li class="topNewsItems clearfix" v-for="(item,index) of topNewsList" :key="index" @click="toDetail(item.id)">
             <div class="topNewsLeft">
@@ -23,10 +23,11 @@
                 {{item.content}}
               </div>
             </div>
-            <div class="topNewsRight">
-              <span class="isread font18" v-if="item.read == 1">已读</span>
-              <span class="unread font18" v-else>未读</span>
-            </div>
+            <!--已读未读-->
+            <!--<div class="topNewsRight">-->
+              <!--<span class="isread font18" v-if="item.read == 1">已读</span>-->
+              <!--<span class="unread font18" v-else>未读</span>-->
+            <!--</div>-->
         </li>
       </ul>
       <div class="rzl_fc_navy t-center loadMore" @click="loadMore()">加载更多</div>
@@ -167,7 +168,7 @@
   }
   .topNewsLeft{
     float: left;
-    width: 90%;
+    width: 100%;
   }
   .topNewsTitle{
     font-weight: 600;

@@ -59,11 +59,11 @@
       </div>
     </div>
     <!-- 地域范围 -->
-    <IConfigArea @area-params="configAreaParams" v-show="!modeIsActive"></IConfigArea>
+    <IConfigArea @area-params="configAreaParams"></IConfigArea>
     <!-- 条件选择模块 -->
-    <IConfigSelector @selector-params="configSelectorParams" v-show="!modeIsActive"></IConfigSelector>
+    <IConfigSelector @selector-params="configSelectorParams"></IConfigSelector>
     <!--预警模块  -->
-    <IConfigWarn @warn-params="configWarnParams" v-show="!modeIsActive"></IConfigWarn>
+    <IConfigWarn @warn-params="configWarnParams"></IConfigWarn>
     <!-- 添加人物 -->
     <IAddPerson :isAddPerson="isAddPerson" 
       @save-person="handleSavePerson" 

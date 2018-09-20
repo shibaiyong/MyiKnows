@@ -134,7 +134,6 @@
   .header {
     box-sizing: border-box;
     width: 100%;
-    min-width: 1440px;
     position: relative;
   }
 

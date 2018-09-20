@@ -30,7 +30,8 @@ export default{
       configArea: '',
       // 查找返回的地域列表
       mappingAreaList: [],
-      // 当前选中的地区()
+      fuzzyArea: '',
+      // 当前选中的地区
       chooseAreaList: [],
       // 地域提示信息
       configAreaWarn: true,

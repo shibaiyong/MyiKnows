@@ -72,15 +72,15 @@
           </el-popover>
         </div>
       </div>
+      <!-- 关键词组合 -->
+      <IConfigPrecise @precise-params="configPreciseParams"></IConfigPrecise>
+      <!-- 地域范围 -->
+      <IConfigArea @area-params="configAreaParams"></IConfigArea>
+      <!-- 条件选择模块 -->
+      <IConfigSelector @selector-params="configSelectorParams"></IConfigSelector>
+      <!--预警模块  -->
+      <IConfigWarn @warn-params="configWarnParams"></IConfigWarn>
     </div>
-    <!-- 关键词组合 -->
-    <IConfigPrecise v-show="!modeIsActive" @precise-params="configPreciseParams"></IConfigPrecise>
-    <!-- 地域范围 -->
-    <IConfigArea @area-params="configAreaParams" v-show="!modeIsActive"></IConfigArea>
-    <!-- 条件选择模块 -->
-    <IConfigSelector @selector-params="configSelectorParams" v-show="!modeIsActive"></IConfigSelector>
-    <!--预警模块  -->
-    <IConfigWarn @warn-params="configWarnParams" v-show="!modeIsActive"></IConfigWarn>
   </div>
 </template>
 <script>  
@@ -342,9 +342,7 @@ export default {
   height: 100%;
   line-height: 38px;
 }
-.mode-fuzzy .periodReport-right .periodReport-checkboxGroup{
-  margin-left: 15px;
-}
+
 
 /*********************精准匹配**********************/
 .mode-precise{
@@ -357,6 +355,7 @@ export default {
   width: 400px;
   height: 38px;
   line-height: 38px;
+  border-radius: 10px;
 }
 
 </style>

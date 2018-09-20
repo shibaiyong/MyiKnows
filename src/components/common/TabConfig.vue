@@ -8,6 +8,9 @@
 <script>
 export default {
   name: 'i-tabconfig',
+  props: {
+    tabType: {type: String/Number, require: true}
+  },
   data () {
     return {
       tabList: []
@@ -20,23 +23,18 @@ export default {
     }
   },
   created() {
-    this.tabList = [{
-      value: '监测结果',
-      isSelected: false,
-      type: '',      
-    },{
-      value: '舆情分析',
-      isSelected: false,
-      type: '',
-    },{
-      value: '预警列表',
-      isSelected: false,
-      type: '',
-    },{
-      value: '方案配置',
-      isSelected: true,
-      type: 'addConfig'
-    }]
+    let tabList = [
+      {value: '监测结果', isSelected: false, type: '1'},
+      {value: '舆情分析', isSelected: false, type: '2'},
+      {value: '预警列表', isSelected: false, type: '3'},
+      {value: '方案配置', isSelected: false, type: '4' }
+    ];
+    tabList.forEach(item =>{
+      if( item.type == this.tabType){
+        item.isSelected = true;
+      }
+    });
+    this.tabList = tabList;
   },
 }
 </script>

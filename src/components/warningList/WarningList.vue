@@ -1,11 +1,6 @@
 <template>
   <div class="topNews" >
-    <div class="top-header">
-      <ITop></ITop>
-      <IHeader  @onClickListener="" :items="items"></IHeader>
-    </div>
     <WarningListContent ></WarningListContent>
-    <IFooter></IFooter>
   </div>
 </template>
 

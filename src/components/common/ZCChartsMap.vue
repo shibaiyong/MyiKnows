@@ -1,7 +1,7 @@
 <template>
   <div class="zc_charts_content" id="zc_charts_content">
 
-    <div id="zc_charts_map"
+    <div :id="'zc_charts_map'+id"
          class="zc_charts_map"
          ref="zc_charts_map">
     </div>
@@ -96,8 +96,8 @@
             }
           },
           geo: {
-            left:'5%',
-            right:'5%',
+            // left:'5%',
+            // right:'5%',
             show: true,
             map: 'china',
             roam: false,
@@ -155,7 +155,7 @@
 
         let empty = document.getElementById(this.id);
 
-        let map = document.getElementById('zc_charts_map');
+        let map = document.getElementById('zc_charts_map'+this.id);
 
         if (this.data.length) {
 

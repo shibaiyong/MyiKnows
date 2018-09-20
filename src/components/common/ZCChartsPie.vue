@@ -1,7 +1,7 @@
 <template>
   <div class="zc_charts_content" id="zc_charts_content">
 
-    <div id="zc_charts_pie"
+    <div :id="'zc_charts_pie'+id"
          class="zc_charts_pie"
          ref="zc_charts_pie">
     </div>
@@ -97,7 +97,7 @@
 
         let empty = document.getElementById(this.id);
 
-        let pie = document.getElementById('zc_charts_pie');
+        let pie = document.getElementById('zc_charts_pie'+this.id);
 
         if (this.data.length) {
 
