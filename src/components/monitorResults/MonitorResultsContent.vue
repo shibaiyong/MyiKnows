@@ -124,47 +124,11 @@
           // 媒体类型
           mediaType:[],
           // 时间范围
-          timeRange:[{
-            type:0,
-            name:'今日'
-          },{
-            type:1,
-            name:'近7天'
-          },{
-            type:2,
-            name:'近30天'
-          },{
-            type:3,
-            name:'自定义'
-          }],
+          timeRange:[],
           // 警报等级
-          alertLevel:[{
-            name:'全部',
-            alertLevel:0
-          },{
-            name:'重大',
-            alertLevel:1
-          },{
-            name:'较大',
-            alertLevel:2
-          },{
-            name:'轻微',
-            alertLevel:3
-          },{
-            name:'一般',
-            alertLevel:4
-          },{
-            name:'正常',
-            alertLevel:5
-          }],
+          alertLevel:[],
           //时间热度排行
-          timeOrhot:[{
-            name:'时间↑',
-            type:0
-          },{
-            name:'热度',
-            type:1
-          }],
+          timeOrhot:[],
           // 初始化默认选中数据
           isActive_MediaType:0,
           isActive_AlertLevel:0,
@@ -340,6 +304,48 @@
         // 日期选择显示当前月和上一月
         this.timeDefaultShow = new Date();
         this.timeDefaultShow.setMonth(new Date().getMonth() - 1);
+        // 时间范围
+        this.timeRange=[{
+          type:0,
+          name:'今日'
+        },{
+          type:1,
+          name:'近7天'
+        },{
+          type:2,
+          name:'近30天'
+        },{
+          type:3,
+          name:'自定义'
+        }];
+        // 警报等级
+        this.alertLevel=[{
+          name:'全部',
+          alertLevel:0
+        },{
+          name:'重大',
+          alertLevel:1
+        },{
+          name:'较大',
+          alertLevel:2
+        },{
+          name:'轻微',
+          alertLevel:3
+        },{
+          name:'一般',
+          alertLevel:4
+        },{
+          name:'正常',
+          alertLevel:5
+        }];
+        //时间热度排行
+        this.timeOrhot=[{
+          name:'时间↑',
+          type:0
+        },{
+          name:'热度',
+          type:1
+        }]
       },
       mounted(){
         this.loadMediaType();

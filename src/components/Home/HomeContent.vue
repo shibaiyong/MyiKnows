@@ -62,7 +62,7 @@
       loadDatas_IntelliGence() {
         let linedata=[{
           "create_time": "09/13",
-          "weixin_num":20,
+          "weixin_num":12,
           "weibo_num":20,
           "web_num":50,
           "app_num":10,
@@ -70,9 +70,23 @@
         },{
           "create_time": "09/14",
           "weixin_num":20,
+          "weibo_num":55,
+          "web_num":10,
+          "app_num":30,
+          "paper_num": 15
+        },{
+          "create_time": "09/15",
+          "weixin_num":40,
           "weibo_num":20,
-          "web_num":50,
-          "app_num":10,
+          "web_num":33,
+          "app_num":24,
+          "paper_num": 23
+        },{
+          "create_time": "09/14",
+          "weixin_num":20,
+          "weibo_num":55,
+          "web_num":10,
+          "app_num":30,
           "paper_num": 15
         },{
           "create_time": "09/15",
@@ -257,8 +271,8 @@
           thiz.hotIntelligenceCategory=[
             {prop: 'title', label: '文章标题',showHover:true},
             {prop: 'source', label: '来源', width: 130},
-            {prop: 'type', label: '媒体类型', width: 70},
-            {prop: 'time', label: '发布时间', width: 120}]
+            {prop: 'type', label: '媒体类型', width: 80},
+            {prop: 'time', label: '发布时间', width: 140}]
         },1000)
       },
       //跳转到文章详情
@@ -311,8 +325,10 @@
     background: #ffffff;
   }
   .index-charts{
-    width: 100%;
+    width: 99%;
     height:380px;
+    padding: 0 30px;
+    box-sizing: border-box;
   }
   .hot-charts{
     width: 99.5%;
@@ -330,8 +346,8 @@
   .loadMore{
     text-align: right;
     font-weight: 600;
-    height: 40px;
-    line-height: 40px;
+    height: 30px;
+    line-height: 30px;
     padding-right: 30px;
     cursor: pointer;
   }

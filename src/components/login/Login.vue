@@ -27,7 +27,7 @@
         <li>Copyright�.UEC Group Co.,Ltd.京ICP备14049550号</li>
       </ul>
     </div>
-    <messageBox :nextprocess="callbackFun" :visible="isVisible" :textOptions="textOptions">
+    <messageBox :visible="isVisible" :textOptions="textOptions">
       <input slot="content" type="text" v-model="email"/>
     </messageBox>
   </div>
@@ -73,19 +73,6 @@
         Object.assign(this.userInfo, iknowsUtil.getCookie('rlUserInfo'));
       },
 
-      callbackFun(btnType,exitCancelBtn){//用户操作完弹窗之后的回调函数。
-        if(btnType == 'cancel' || (btnType == 'confirm' && exitCancelBtn == '') ){
-          this.isVisible = -1;
-        }else if( btnType == 'confirm' ){
-          this.showMessageBox({
-            title:'',
-            cancel:'',
-            confirme:'确定',
-            content:'邮件已成功发到你的邮箱'
-          });
-        }
-      },
-
       rememberMe(){//记住密码
         let userInfo = this.userInfo;
         if( userInfo.userName == '' || userInfo.passWord == ''){
@@ -93,7 +80,10 @@
             title:'',
             cancel:'',
             confirme:'确定',
-            content:'用户名和密码不能为空'
+            content:'用户名和密码不能为空',
+            confirmCallback:()=>{
+              this.isVisible = -1;
+            }
           });
           return false;
         }
@@ -105,14 +95,29 @@
           title:'请输入注册邮箱',
           cancel:'取消',
           confirme:'确定',
-          content:''
+          content:'',
+          confirmCallback:()=>{
+            this.showMessageBox({
+            title:'',
+            cancel:'',
+            confirme:'确定',
+            content:'邮件已成功发到你的邮箱',
+            confirmCallback:()=>{
+              this.isVisible = -1;
+            }
+          });
+          },
+          cancelCallback:()=>{
+            this.isVisible = -1;
+          }
         });
       },
-      showMessageBox(textOptions){//调用弹窗组件的方法,形参的数据类型为对象格式。
 
+      showMessageBox(textOptions){//调用弹窗组件的方法,形参的数据类型为对象格式。
         this.isVisible = 1;
         this.textOptions = textOptions;
       },
+
       changeNumber(keepTime, cycleTime){//数字滚动叠加
 
         let span = this.numberEnd - this.numberStart;

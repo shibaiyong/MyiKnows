@@ -4,7 +4,7 @@
       <iTop/>
       <iHeader/>
     </div>
-    <messageCenterContent class="content rzl_bc_undercoat" />
+    <messageCenterContent class=" rzl_bc_undercoat rzl-contarner" />
     <IFooter/>
   </div>
 
@@ -26,9 +26,5 @@
 </script>
 
 <style scoped>
-  .content {
-    padding: 20px 80px 40px;
-    min-width: 1440px;
-    box-sizing: border-box;
-  }
+
 </style>

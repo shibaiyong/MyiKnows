@@ -6,7 +6,7 @@
             <div class="mes-content" v-if="textOptions.content!=''"><span class="font24">{{textOptions.content}}</span></div>
             <div class="mes-content" v-else><slot name="content"></slot></div>
             
-            <div class="mes-footer"><button @click="handleUser('confirm')">{{textOptions.confirme}}</button><button @click="handleUser('cancel')"  v-show="textOptions.cancel!=''">{{textOptions.cancel}}</button></div>
+            <div class="mes-footer"><button @click="confirmCallback">{{textOptions.confirme}}</button><button @click="cancelCallback"  v-show="textOptions.cancel!=''">{{textOptions.cancel}}</button></div>
         </div>
     </div>    
 </template>
@@ -15,7 +15,7 @@
 
 export default{
     name:'messageBox',
-    props:['textOptions','visible','nextprocess'],
+    props:['textOptions','visible'],
     data(){
         return {
             isOpen:1
@@ -28,10 +28,18 @@ export default{
 
     },
     methods:{
-        //处理用户的点击操作。
-        handleUser(btnType){
-            this.nextprocess(btnType,this.textOptions.cancel);
-        }    
+        
+        confirmCallback(){
+            if(this.textOptions.confirmCallback){
+                this.textOptions.confirmCallback();
+            }
+        },
+
+        cancelCallback(){
+            if(this.textOptions.cancelCallback){
+                this.textOptions.cancelCallback();
+            }
+        }
     },
     mounted(){
 

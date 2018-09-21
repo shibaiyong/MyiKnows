@@ -4,12 +4,14 @@
       <div class="configArea-left rzl_fc_darkgray font16">地域范围</div>
       <div class="configArea-right">
         <div class="configArea-region">
-          <el-autocomplete class="configArea-input" v-model="fuzzyArea" :fetch-suggestions="queryAreaSearch"
+          <el-autocomplete class="configArea-input" v-model="configArea" :fetch-suggestions="queryAreaSearch"
             :trigger-on-focus="false" placeholder="" @select="areaSelect"></el-autocomplete>
-          <div class="configArea-hint">
-            <i class="el-icon-question rzl_fc_lightGrey font20"></i>
-          </div>
-          <div class="configArea-warn rzl_fc_errRed font16" v-show="configAreaWarn">最多可选择几个地域？</div>
+          <el-popover placement="right-start" trigger="hover" content="地域范围最多支持5个！">
+            <el-button slot="reference" class="configArea-hint">
+              <i class="el-icon-question rzl_fc_lightGrey font20"></i>
+            </el-button>
+          </el-popover>
+          <div class="configArea-warn rzl_fc_errRed font16" v-show="configAreaWarn">{{configAreaWarnText}}</div>
         </div>
         <div class="configArea-chooseArea">
           <el-tag size="medium" v-for="(chooseArea, index) in chooseAreaList" :key="index" closable class="rzl_bc_undercoat font14 rzl_fc_darkgray rzl_bd_darkgray tag-chooseArea"
@@ -22,6 +24,7 @@
   </div>  
 </template>
 <script>
+const chooseAreaEnoughText = "地域范围最多支持5个！";
 export default{
   name: 'i-configArea',
   data () {
@@ -34,7 +37,9 @@ export default{
       // 当前选中的地区
       chooseAreaList: [],
       // 地域提示信息
-      configAreaWarn: true,
+      configAreaWarn: false,
+      // 地域提示信息
+      configAreaWarnText: '',
     }
   },
   methods: {
@@ -57,7 +62,15 @@ export default{
       chooseAreaList = chooseAreaList.filter(element => {
         return chooseAreaInnerId != element.innerId;
       });
-      chooseAreaList.push({innerId: chooseAreaInnerId, value: item.value});
+      // 限定最多5个
+      if(chooseAreaList.length < 5){
+        chooseAreaList.push({innerId: chooseAreaInnerId, value: item.value});
+        this.configAreaWarnText = '';
+        this.configAreaWarn = false;
+      }else{
+          this.configAreaWarnText = chooseAreaEnoughText;
+          this.configAreaWarn = true;
+      }
       this.chooseAreaList = chooseAreaList;
       this.configArea = '';
       this._configAreaParams();
@@ -79,7 +92,6 @@ export default{
     _configAreaParams () {
       var params = {};
       params.chooseAreaList = this.chooseAreaList;
-      console.log(params.chooseAreaList);
       this.$emit('area-params', {
         params: params
       });
@@ -124,8 +136,14 @@ export default{
   padding: 9px;
   width: 38px;
   height: 38px;
+  background: none;
+  border: none;
+  border-radius: 9px;
   cursor: pointer;
   box-sizing: border-box;
+}
+.configArea .configArea-hint i:hover{
+  color: #1D2088;
 }
 .configArea .configArea-left{
   width: 138px;
@@ -157,7 +175,7 @@ export default{
   height: 100%;
   line-height: 38px;
 }
-.configArea  .configArea-chooseArea,{
+.configArea  .configArea-chooseArea{
   margin-top: 20px;
   width: 100%;
 }

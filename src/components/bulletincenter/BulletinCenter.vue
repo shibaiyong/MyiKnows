@@ -4,10 +4,12 @@
     <iTop/>
     <iHeader/>
   </div>
-  <div id="pageCenter">
-    <div><button class="btn btn8030">批量删除</button></div>
-    <iDataTable :data="tableData" :transformData="getData"></iDataTable>
-    <div class="paginationContainer"><Pagination :totalNum="total"></Pagination></div>
+  <div id="pageCenter" class="rzl-contarner">
+    <div class="pagecontainer">
+      <div><button class="btn btn8030">批量删除</button></div>
+      <iDataTable :data="tableData" :transformData="getData"></iDataTable>
+      <div class="paginationContainer"><Pagination :totalNum="total"></Pagination></div>
+    </div>
   </div>
   <iFooter/>
 </div>
@@ -34,8 +36,8 @@
           {id:6,time:'2018/08/21 12:23',type:'常规',taskName:'苏州某群体事件监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134'},
           {id:7,time:'2018/08/21 12:23',type:'常规',taskName:'苏州民生监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134?这个国家左-20180913092134'},
           {id:8,time:'2018/08/21 12:23',type:'常规',taskName:'苏州某群体事件监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134'},
-          {id:7,time:'2018/08/21 12:23',type:'常规',taskName:'苏州民生监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134?这个国家左-20180913092134'},
-          {id:8,time:'2018/08/21 12:23',type:'常规',taskName:'苏州某群体事件监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134'}
+          {id:9,time:'2018/08/21 12:23',type:'常规',taskName:'苏州民生监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134?这个国家左-20180913092134'},
+          {id:10,time:'2018/08/21 12:23',type:'常规',taskName:'苏州某群体事件监测',reportName:'美国制裁上瘾新兴市场扛得住吗?这个国家左-20180913092134'}
         ],
         total:7,
       } 
@@ -66,11 +68,15 @@
 </script>
 
 <style scoped>
-  #pageCenter{
+  .pagecontainer{
     background:white;
-    width:92%;
     padding:30px 30px 40px;
+  }
+  
+  .rzl-contarner{
     margin:0 auto;
+    background:#F5F5F6;
+    box-sizing: border-box;
   }
   .btn8030{
     width:80px;

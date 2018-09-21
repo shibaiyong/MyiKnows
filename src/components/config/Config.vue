@@ -7,13 +7,9 @@
         <li v-for="(monitorType, index) in monitorTypeList" class="font18 rzl_fc_darkgray" @click="changeMonitorType(monitorType.type)"
           :class="{rzl_bc_navy: monitorType.isSelect, active: monitorType.isSelect, rzl_fc_white: monitorType.isSelect}">{{monitorType.value}}</li>
       </ul>
-      <IGeneralConfig @config-allParams="gettAllParams" v-show="configType == 'general'"></IGeneralConfig>
-      <IPersonConfig @config-allParams="gettAllParams" v-show="configType == 'person'"></IPersonConfig>
-      <IArticleConfig @config-allParams="gettAllParams" v-show="configType == 'article'"></IArticleConfig>
-    </div>
-    <div class="monitorConfig-btn rzl_bc_white">
-      <button type="button" class="config-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy" @click="saveConfig">保存</button>
-      <button type="button" class="config-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="resetConfig">重置</button>
+      <IGeneralConfig v-show="configType == 'general'"></IGeneralConfig>
+      <IPersonConfig v-show="configType == 'person'"></IPersonConfig>
+      <IArticleConfig v-show="configType == 'article'"></IArticleConfig>
     </div>
   </div>
 </div>
@@ -31,7 +27,6 @@ export default {
       monitorTypeList: [],
       // 常规：general, 人物：person, 文章：article
       configType: 'general',
-      allParams: {}
     }
   },
   methods: {
@@ -46,18 +41,7 @@ export default {
         }
       });
     },
-    gettAllParams (obj) {
-      this.allParams = obj.params;
-    },
-    // 保存配置
-    saveConfig () {
-      console.log('save');
-      console.log(this.allParams);
-    },
-    // 重置配置
-    resetConfig () {
-      console.log('reset');
-    },
+
   },
   created() {
     const monitorTypeList = [
@@ -100,27 +84,4 @@ export default {
   border-radius: 10px;
   overflow: hidden;
 }
-/******提交按钮*****/
-.monitorConfig-btn{
-  width: 100%;
-  display: flex;
-  display: -webkit-box;
-  justify-content: flex-start;
-  padding: 110px 0 100px 240px;
-  box-sizing: border-box;
-}
-.monitorConfig-btn .config-btn{
-  width: 120px;
-  height: 38px;
-  line-height: 34px;
-  text-align: center;
-  border-radius: 10px;
-  cursor: pointer;
-  border-width: 2px;
-  border-style: solid;
-}
-.monitorConfig-btn .config-btn:last-child{
-  margin-left: 120px;
-}
-
 </style>

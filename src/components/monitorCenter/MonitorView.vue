@@ -2,7 +2,7 @@
   <div class="rzl_fc_darkgray">
     <div class="top-header">
       <ITop></ITop>
-      <IHeader :items="items"></IHeader>
+      <IHeader></IHeader>
     </div>
     <div class="rzl-contarner top-label " v-show="topLabel.length > 0">
       <span class="font14 rzl_fc_darkgray">{{topLabel}}</span>

@@ -11,7 +11,8 @@
         <el-radio v-model="dateTypeRadio" label="month" @change="changeDateType()">30天</el-radio>
         <el-radio v-model="dateTypeRadio" label="customTime" @change="changeDateType()">自定义</el-radio>
         <div class="customTime-date">
-          <el-date-picker v-model="customTime" type="daterange" 
+          <el-date-picker v-model="customTime" type="daterange"
+            :editable="false"
             v-bind:disabled="disabled"
             range-separator="-" 
             prefix-icon="" 
@@ -113,6 +114,7 @@ export default {
         this.disabled = false;
       }else{
         this.disabled = true;
+        this.customTime = [];
       }
     },
     // 选择全选

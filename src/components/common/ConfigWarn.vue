@@ -39,14 +39,17 @@
         <el-checkbox v-model="isHitKeysWord">命中以下任意关键词</el-checkbox>
       </div>
       <div class="warnKeysWord-right" v-show="isAddWarnMode">
-        <el-input class="warnKeysWord-input" 
+        <el-autocomplete class="warnKeysWord-input" v-model="hitKeysWord"
           :disabled="!isHitKeysWord"
-          v-model="hitKeysWord" 
-          @blur="handleAllInput" placeholder=""></el-input>
-        <div class="configWarn-hint">
-          <i class="el-icon-question rzl_fc_lightGrey font20"></i>
-        </div>
-        <div class="warnKeysWord-warn rzl_fc_errRed font16" v-show="warnKeysWordWarn">最多3个关键词，空格隔开，or关系</div>
+          :fetch-suggestions="queryKeysWordSearch"
+          :trigger-on-focus="false"
+          placeholder=""></el-autocomplete>
+        <el-popover placement="right-start" trigger="hover" content="最多3个关键词，空格隔开，or关系!">
+          <el-button slot="reference" class="configWarn-hint">
+            <i class="el-icon-question rzl_fc_lightGrey font20"></i>
+          </el-button>
+        </el-popover>
+        <div class="warnKeysWord-warn rzl_fc_errRed font16" v-show="warnKeysWordWarn">{{warnKeysWordWarnText}}</div>
       </div>
     </div>
 
@@ -57,7 +60,7 @@
         <el-checkbox-group v-model="checkedWarns" @change="handleCheckedWarnChange">
           <el-checkbox v-for="(warnOption, index) in warnTypeOptions" :label="warnOption.type" :key="index">{{warnOption.value}}</el-checkbox>
         </el-checkbox-group>
-        <div class="warnType-warn rzl_fc_errRed font16" v-show="warnTypeWarn">请选择预警方式</div>
+        <div class="warnType-warn rzl_fc_errRed font16" v-show="warnTypeWarn">{{warnTypeWarnText}}</div>
       </div>
     </div>
     <!-- 预警时间 -->
@@ -68,17 +71,22 @@
           <el-button circle class="circle-radio" :class="{active: warnTimeRadio}"></el-button>
           <span class="font14 rzl_fc_darkgray">预警时间</span>
         </div>
-        <el-input class="warnTime-input" 
+        <el-autocomplete class="warnTime-input" 
+          v-model="startTime"
+          :maxlength="2"
           :disabled="!warnTimeRadio"
-          v-model="startTime" 
-          @blur="handleAllInput" placeholder=""></el-input>
+          :fetch-suggestions="queryStartTimeSearch"
+          :trigger-on-focus="false" placeholder=""></el-autocomplete>
         <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
         <span class="warnTime-middle font14 rzl_fc_darkgray">至</span>
-        <el-input class="warnTime-input warnTime-input-last" 
+        <el-autocomplete class="warnTime-input  warnTime-input-last" 
+          v-model="endTime"
+          :maxlength="2"
           :disabled="!warnTimeRadio"
-          v-model="endTime" @blur="handleAllInput" placeholder=""></el-input>
+          :fetch-suggestions="queryEndTimeSearch"
+          :trigger-on-focus="false" placeholder=""></el-autocomplete>
         <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
-        <div class="warnTime-warn rzl_fc_errRed font16" v-show="warnTimeWarn">请输入预警时间</div>
+        <div class="warnTime-warn rzl_fc_errRed font16" v-show="warnTimeWarn">{{warnTimeWarnText}}</div>
       </div>
     </div>
     <!-- 周末预警 -->
@@ -97,6 +105,10 @@
   </div>  
 </template>
 <script>
+const hitKeysWordEmptyText = '请输入命中关键词！';
+const hitKeysWordEnoughText = '命中关键词最多支持3个！';
+const warnTimeWarnText = '预警时间不合法，请重新输入！';
+const warnTypeWarnText = '请选择预警方式！';
 import IAddModel from '@/components/common/AddModel';
 export default {
   name: 'i-configWarn',
@@ -113,8 +125,12 @@ export default {
       isHitKeysWord: false,
       // 命中关键词
       hitKeysWord: '',
+      // 借用查询功能
+      hitKeysWordList: [],
       // 命中关键词提示
-      warnKeysWordWarn: true,
+      warnKeysWordWarn: false,
+      // 命中关键词提示信息
+      warnKeysWordWarnText: '',
       // 是否添加模型
       isAddModel: false,
       // 预警方式列表
@@ -122,13 +138,19 @@ export default {
       // 已选预警方式
       checkedWarns: [],
       // 预警方式提示
-      warnTypeWarn: true,
+      warnTypeWarn: false,
+      // 预警方式提示信息
+      warnTypeWarnText: '',
       // 预警时间开启
       warnTimeRadio: false,
+      // 预警时间提示信息
+      warnTimeWarnText: '',
       //预警开始时间点
       startTime: '',
       // 预警结束时间点
       endTime: '',
+      startTimeList: [],
+      endTimeList: [],
       // 预警时间提示
       warnTimeWarn: false,
       // 是否周末预警
@@ -169,6 +191,21 @@ export default {
       this.chooseWarnList.splice(deleteWarnIndex, 1);
       this._warnParams();
     },
+    // 命中关键词
+    queryKeysWordSearch(queryString, callBack) {
+      this.hitKeysWord = queryString;      
+      let mappingKeyWordsList = this.hitKeysWordList;
+      let results = queryString ? mappingKeyWordsList.filter(this._areaFilter(queryString)) : mappingKeyWordsList;
+      // 调用 callback 返回建议列表的数据
+      callBack(results);
+      // 生成参数
+      this._warnParams();
+    },
+    _areaFilter(queryString) {
+      return (mappingItem) => {
+        return (mappingItem.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+      };
+    },
     // 勾选预警方式
     handleCheckedWarnChange (value) {
       let checkedWarns = [];
@@ -187,12 +224,27 @@ export default {
       this.warnTimeRadio = !this.warnTimeRadio;
       this._warnParams();
     },
-    // 是否开启周末预警
-    changeWeekDay () {
+    // 预警时间开始
+    queryStartTimeSearch (queryString, callBack){
+      this.startTime = queryString;
+      let mappingStartTimeList = this.startTimeList;
+      let results = queryString ? mappingStartTimeList.filter(this._areaFilter(queryString)) : mappingStartTimeList;
+      // 调用 callback 返回建议列表的数据
+      callBack(results);
+      // 生成参数
       this._warnParams();
     },
-    // 监听所有input框输入
-    handleAllInput( ){
+    queryEndTimeSearch (queryString, callBack){
+      this.endTime = queryString;
+      let mappingEndTimeList = this.endTimeList;
+      let results = queryString ? mappingEndTimeList.filter(this._areaFilter(queryString)) : mappingEndTimeList;
+      // 调用 callback 返回建议列表的数据
+      callBack(results);
+      // 生成参数
+      this._warnParams();
+    },
+    // 是否开启周末预警
+    changeWeekDay () {
       this._warnParams();
     },
     // 预警配置参数
@@ -204,31 +256,73 @@ export default {
       // 已选择专题类型
       params.chooseWarnList = [];
       params.hitKeysWord = '';
+      // 预警方式
+      params.checkedWarns = [];
+      //周期性简报
+      params.startTime = '';
+      params.endTime = '';
+      // 周末预警
+      params.isWeekDayWarn = false;
 
       // 开启预警的情况
-      if(this.isWarn){       
+      if(this.isWarn){
+        // 预警模型列表  
         if(this.isAddWarnMode){
           this.chooseWarnList.forEach(item => {
             params.chooseWarnList.push(item.type);
           });
         }
         // 命中关键词 '恐怖组织、世界银行、爆炸'
-        if(this.isHitKeysWord){
-          params.hitKeysWord = this.hitKeysWord;
+        if(this.isHitKeysWord){        
+          // 处理命中的关键词
+          let keysWordsList = this.hitKeysWord.split(" ");
+          if(keysWordsList.length > 3 && this.isHitKeysWord){
+            this.warnKeysWordWarn = true;
+            this.warnKeysWordWarnText = hitKeysWordEnoughText;
+            return;
+          }else{
+            params.hitKeysWord = this.hitKeysWord;
+            this.warnKeysWordWarn = false;
+            this.warnKeysWordWarnText = '';
+          }
         }
+        // 预警方式 ['1','2','3']
+        if(this.checkedWarns.length <=0){
+          this.warnTypeWarn = true;
+          this.warnTypeWarnText = warnTypeWarnText;
+          return;
+        }
+        params.checkedWarns = this.checkedWarns;
+        this.warnTypeWarn = false;
+        this.warnTypeWarnText = '';
+
+        //周期性简报
+        if(this.warnTimeRadio){
+          
+          if(this.startTime >= 24 || this.startTime <0){
+            this.warnTimeWarn = true;
+            this.warnTimeWarnText = warnTimeWarnText;
+            return;
+          }
+          if(this.endTime >= 24 || this.endTime <0) { 
+            this.warnTimeWarn=true; 
+            this.warnTimeWarnText=warnTimeWarnText; 
+            return;
+          }
+          if(this.endTime <= this.endTime) { 
+            this.warnTimeWarn=true; 
+            this.warnTimeWarnText=warnTimeWarnText; 
+            return; 
+          }
+          params.startTime = this.startTime;
+          params.endTime = this.endTime;
+          this.warnTimeWarn=false;
+          this.warnTimeWarnText='';
+        }
+        // 同末预警
+        params.isWeekDayWarn = this.isWeekDayWarn;
       }
-      // 预警方式 ['1','2','3']
-      params.checkedWarns = this.checkedWarns;
-      //周期性简报
-      params.startTime = '';
-      params.endTime = '';
-      if(this.warnTimeRadio){
-        params.startTime = this.startTime;
-        params.endTime = this.endTime; 
-      }
-      // 同末预警
-      params.isWeekDayWarn = this.isWeekDayWarn;
-      
+          
       console.log('预警条件:configWarn');
       console.log(params);
       this.$emit('warn-params', {
@@ -306,8 +400,14 @@ export default {
   padding: 9px;
   width: 38px;
   height: 38px;
+  background: none;
+  border: none;
+  border-radius: 9px;
   cursor: pointer;
   box-sizing: border-box;
+}
+.configWarn-hint i:hover{
+  color: #1D2088;
 }
 /*****预警部分的样式****/
 .configWarn .warn-right{
@@ -386,6 +486,7 @@ export default {
   height: 28px;
   line-height: 28px;
   padding: 0 10px;
+  border-radius: 4px;
 }
 .configWarn .warnTime-input-last{
   margin-left: 10px;

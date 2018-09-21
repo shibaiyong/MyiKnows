@@ -68,6 +68,11 @@
     <IAddPerson :isAddPerson="isAddPerson" 
       @save-person="handleSavePerson" 
       @cancel-person="handleCancelPerson"></IAddPerson>
+    <!-- 保存和取消 -->
+    <div class="monitorConfig-btn rzl_bc_white">
+      <button type="button" class="config-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy" @click="saveConfig">保存</button>
+      <button type="button" class="config-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="resetConfig">重置</button>
+    </div>
   </div>  
 </template>
 <script>
@@ -138,6 +143,15 @@ export default {
     configWarnParams (obj) {
       this.warnParams = obj.params;
       this._configAllParams();
+    },
+    // 保存数据
+    saveConfig(){
+
+    },
+    resetConfig () {
+      this.programName = '';
+      this.programNameWarn = false;
+      this.programNameWarnText = '';
     },
     // 获取本页面配置的所有参数
     _configAllParams(){
@@ -352,6 +366,30 @@ export default {
 .personConfig >>> .is-focus .el-checkbox__inner{
   border-color: #1D2088;
 }
+
+/******提交按钮*****/
+.personConfig .monitorConfig-btn{
+  width: 100%;
+  display: flex;
+  display: -webkit-box;
+  justify-content: flex-start;
+  padding: 110px 0 100px 240px;
+  box-sizing: border-box;
+}
+.personConfig .monitorConfig-btn .config-btn{
+  width: 120px;
+  height: 38px;
+  line-height: 34px;
+  text-align: center;
+  border-radius: 10px;
+  cursor: pointer;
+  border-width: 2px;
+  border-style: solid;
+}
+.personConfig .monitorConfig-btn .config-btn:last-child{
+  margin-left: 120px;
+}
+
 
 /* 覆写element-ui的input框样式*/
 .personConfig >>>.el-input__inner{

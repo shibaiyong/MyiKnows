@@ -32,6 +32,7 @@
       </ul>
       <div class="rzl_fc_navy t-center loadMore" @click="loadMore()">加载更多</div>
     </div>
+    <div class="blank_1 rzl_bc_undercoat"></div>
   </div>
 </template>
 
@@ -136,7 +137,7 @@
   }
   .topNews{
     padding: 30px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   .topNewsTab{
     display: flex;

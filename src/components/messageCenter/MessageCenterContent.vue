@@ -5,7 +5,6 @@
         <span @click="signAllRead">全部标记已读</span>
         <span @click="deleteList">批量删除</span>
       </div>
-
       <div class="message-list-box rzl_fc_darkgray">
         <div class="list-title font14 rzl_fc_darkgray">
           <span class="title-checkAll">
@@ -58,13 +57,13 @@
     components: {ITop, IHeader, IFooter, dataUtil, checkBox, Pagination},
     data() {
       return {
-        items: ["首页", "舆情头条", "监测中心", "简报中心"],
         searchTitle: "",
         dataArr: [],
         checkAll: "",
         total: 0,
         page: 0,
-        listData: []
+        listData: [],
+        showGoTop: false,
       }
     },
     computed: {
@@ -73,30 +72,38 @@
       }
     },
     methods: {
-      deleteItem(item){
-        this.$confirm('此操作将永久删除该已经该条消息, 是否继续?', '提示', {
+      goTop() {
+        var app = document.getElementById("app");
+        var code = setInterval(function () {
+          if (app.scrollTop > 0) {
+            app.scrollBy(0, -20)
+          } else {
+            clearInterval(code)
+          }
+        }, 3)
+      },
+      deleteItem(item) {
+        this.$mConfirm('此操作将永久删除该已经该条消息, 是否继续?', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
-          // type: 'warning'
         }).then(() => {
           alert(item.id);
-          // TODO 删除消息
         })
       },
       signAllRead() {
-
+        //TODO 标记已读
       },
       deleteList() {
         if (this.dataArr.length < 1) {
-          this.$alert('请至少勾选一条消息后再进行批量删除.', '提示')
+          this.$mAlert('请至少勾选一条消息后再进行批量删除.')
           return
         }
-        this.$confirm('此操作将永久删除该已经勾选的消息, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+
+        this.$mConfirm('此操作将永久删除该已经勾选的消息, 是否继续?', {
+          confirmButtonText: '删除',
           cancelButtonText: '取消',
-          // type: 'warning'
         }).then(() => {
-          // TODO 批量删除
+          alert(1)
         })
       },
       totalSelect(params) {
@@ -106,6 +113,7 @@
     },
     mounted() {
       this.listData = dataUtil.getMessageCenterListData();
+
     }
   }
 </script>

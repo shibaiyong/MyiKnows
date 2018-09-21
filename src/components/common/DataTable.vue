@@ -72,10 +72,13 @@
 
 </script>
 <style scoped>
+    .dataTables{
+        width:100%;
+    }
     /* 表格固定布局 */
     .inews-table{
         width:100%;
-        table-layout:fixed; word-break: break-all; word-wrap: break-word;
+        word-break: break-all; word-wrap: break-word;
         font-size: 14px;
         color: #555555;
     }
