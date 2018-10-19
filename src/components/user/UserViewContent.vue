@@ -4,7 +4,7 @@
         <table class="userinfo rzl_fc_darkgray font16">
             <tr>
                 <td class="fieldcolumn"><label>用户名：</label></td>
-                <td class="valuecolumn"><label>{{username}}</label></td>
+                <td class="valuecolumn"><label>{{userInfo.userName}}</label></td>
                 <td class="btncolumn" colspan="4">
                     <!-- <router-link :to="{name:'useredit',params:{userid:123}}">信息修改</router-link> -->
                     <button class="rzl_content_button" @click="goEdit()" >信息修改</button>
@@ -12,40 +12,63 @@
             </tr>
              <tr>
                 <td class="fieldcolumn"><label >姓名：</label></td>
-                <td class="valuecolumn"><label>{{realname}}</label></td>
+                <td class="valuecolumn"><label>{{userInfo.realName}}</label></td>
             </tr>
              <tr>
                 <td class="fieldcolumn"><label>联系电话：</label></td>
-                <td class="valuecolumn"><label>{{telephone}}</label></td>
+                <td class="valuecolumn"><label>{{userInfo.mobile}}</label></td>
             </tr>
              <tr>
                 <td class="fieldcolumn"><label>电子邮箱：</label></td>
-                <td class="valuecolumn"><label>{{email}}</label></td>
+                <td class="valuecolumn"><label>{{userInfo.email}}</label></td>
             </tr>
         </table>
     </div>
 </template>
 <script>
+
+import { getUserInfo } from "@/assets/js/api.js"
+ 
 export default {
     name:"UserView_content",
     data(){ 
      return {
-            userid:'123',
-            username:'海绵有风',
-            realname:'王紫涵',
-            telephone:'10086',
-            email:'aa@rongliam.com'
+         userInfo:{
+            userid:'',
+            userName:'',
+            realName:'',
+            mobile:'',
+            email:''
+         }   
      };
     },
     mounted(){
-           //获取用户信息UserInfo对象
+        //获取用户信息UserInfo对象
+        this.getUserInfo();
+
 
     },methods:{
+        //获取用户信息
+        getUserInfo(){
+            getUserInfo().then(res => {
+
+                if(res.code == '200'){
+                    Object.assign(this.userInfo,res.data);
+                }else{
+                    //获取用户信息失败时,使用默认值
+                    Object.assign(this.userInfo,{
+                        userName:'海绵有风',
+                        realName:'王紫涵',
+                        mobile:'10086',
+                        email:'aa@rongliam.com'
+                    });
+                }
+            })
+        },
         // 跳转编辑页面方法
         goEdit(){
-            var userid=this.userid;
+            let userid=this.userid;
             this.$router.push({name:'useredit',params:{userid}});
-        
         }
     }
 }
@@ -68,12 +91,12 @@ export default {
 .viewcontent .userinfo .fieldcolumn{
     padding-left: 10px;
     text-align: right;
-    width: 6%;
+    width: 9%;
 }
 .viewcontent .userinfo .valuecolumn{
     padding-left: 10px;
     text-align: left;
-    width:13%;
+    width:24%;
 }
 .viewcontent .userinfo .btncolumn{
     padding-left: 30px;

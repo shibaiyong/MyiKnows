@@ -1,5 +1,5 @@
 <template>
-  <div class="rzl_fc_darkgray">
+  <div class="rzl_fc_darkgray rzl_wrapper">
     <div class="top-header">
       <ITop></ITop>
       <IHeader></IHeader>
@@ -14,15 +14,21 @@
           @click="tabChange(tabItem.type)">{{tabItem.value}}</li>
       </ul>
     </div>
-    <router-view></router-view>
+    <router-view class="rzl-contarner rzl_bc_undercoat"></router-view>
+    <div v-show="show" @click="returnToTopFn" class="f-db backTop">
+      <img src="../../assets/up.png"/>
+    </div>
     <IFooter></IFooter>
+    <div id="configMask" class="config-mask"></div>
   </div>
 </template>
 <script>
+  import {planType} from '../../assets/js/api.js';
   import ITop from '@/components/common/Top';
   import IHeader from '@/components/common/Header';
   import ITabConfig from '@/components/common/TabConfig';
   import IFooter from '@/components/common/Footer';
+  import iKnowsUtil from '@/assets/js/iknowsUtil';
 
   export default {
     name: 'i-monitorView',
@@ -36,7 +42,9 @@
       return {
         tabList: [],
         // top-label
-        topLabel: '苏州民生网全网监测',
+        topLabel: '',
+        show: false,
+        clean: () => {}
       }
     },
     methods: {
@@ -50,16 +58,69 @@
           }
         });
         this.tabList = tabList;
-        if(type == 'monitorresults'){
-          this.$router.push('/center/monitorresults');
-        }else if(type == 'monitoranalysis'){
-          this.$router.push('/center/monitoranalysis');
-        }else if(type =='warninglist'){
-          this.$router.push('/center/warninglist');
-        }else if(type == 'config'){
-          this.$router.push('/center/config');
+        let id = this.$route.params.id || '';
+        if(id == '' || id == 'undefined'){
+          if(type == 'monitorresults'){
+            this.$router.push('/center/monitorresults');
+          }else if(type == 'monitoranalysis'){
+            this.$router.push('/center/monitoranalysis');
+          }else if(type =='warninglist'){
+            this.$router.push('/center/warninglist');
+          }else if(type == 'config'){
+            this.$router.push('/center/config');
+          }
+        }else{
+          if(type == 'monitorresults'){
+            this.$router.push('/center/monitorresults/'+id);
+          }else if(type == 'monitoranalysis'){
+            this.$router.push('/center/monitoranalysis/'+id);
+          }else if(type =='warninglist'){
+            this.$router.push('/center/warninglist/'+id);
+          }else if(type == 'config'){
+            this.$router.push('/center/config/'+id);
+          }
+        }
+
+      },
+      //返回顶部
+      returnToTopFn() {
+        let el = this.$el.parentNode
+        let st = el.scrollTop >> 0
+        iKnowsUtil.backTop({y: st}, {y: 0}, 500, function({y}, hand){
+          el.scrollTop = y
+          if (0 === y) cancelAnimationFrame(hand)
+        })
+      },
+      //监听scrollTop
+      listen() {
+        let el = this.$el.parentNode
+        el.scrollTop = 0;
+        if (!(el instanceof HTMLElement)) return
+        let scrollFn = () => {
+          let top = el.scrollTop >> 0
+          if (top > 500){
+            this.show = true
+          }else {
+            this.show = false
+          }
+        }
+        el.addEventListener('scroll', scrollFn)
+        return () => {
+          el.removeEventListener('scroll', scrollFn)
         }
       }
+    },
+    mounted() {
+      let id = this.$route.params.id || '';
+      if(id != '' && id != 'undefined'){
+        planType(id).then(response => {
+          let data = response.data;
+          this.topLabel = data.kpName;
+        }).catch(err => {
+          console.log(err);
+        });
+      }
+      this.clean = this.listen()
     },
     created () {
       let tabList = [
@@ -68,20 +129,31 @@
         {value: '预警列表', isSelected: false, type: 'warninglist'},
         {value: '方案配置', isSelected: false, type: 'config' }
       ];
-
-      console.log(this.$route);
       var pathName = this.$route.name;
       let topLabel = this.$route.query.topLabel;
       tabList.forEach(item => {
         if(item.type == pathName){
           item.isSelected = true;
         }
-      })
-      this.tabList = tabList;
+      });
+
+      let id = this.$route.params.id || '';
+      if(id == '' || id == 'undefined'){
+        this.tabList = [];
+      }else{
+        this.tabList = tabList;
+      }
+      
     },
+    beforeDestroy() {
+      this.clean()
+    }
   }
 </script>
 <style scoped>
+.rzl_wrapper{
+  position: relative;
+}
 .top-label{
   width: 100%;
   height: 30px;
@@ -112,5 +184,22 @@
 }
 .tab-config li.active{
   border-radius: 10px 10px 0 0;
+}
+.backTop{
+  height: 40px;
+  text-align: center;
+  width: 40px;
+  padding: 10px;
+  box-sizing: border-box;
+  position: fixed;
+  bottom: 180px;
+  right: 60px;
+  border-radius: 50%;
+  background: rgba(91, 91, 91, 0.5);
+}
+.backTop img{
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 }
 </style>

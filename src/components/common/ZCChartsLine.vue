@@ -1,6 +1,6 @@
 <template>
 
-  <div class="zc_charts_content" id="zc_charts_content">
+  <div class="zc_charts_content" :id="'zc_charts_content_'+id">
 
     <div :id="'zc_charts_line'+id"
          class="zc_charts_line"
@@ -16,7 +16,7 @@
 <script>
 
   import echarts from 'echarts'
-
+  import iKnowsUtil from '@/assets/js/iknowsUtil';
   export default {
     name: "z-c-charts-line",
     props: {
@@ -81,6 +81,7 @@
             symbolSize: 8,
             animation: false,
             data: data,
+            cursor: 'default',
             /*平滑曲线*/
             smooth: true,
             hoverAnimation:true,
@@ -104,7 +105,7 @@
         return {
           /*图例*/
           legend: {
-            show: this.category.length>1?true:false,
+            show: this.category.length>0?true:false,
             orient: 'horizontal',
             top: 0,
             right: 20,
@@ -115,9 +116,9 @@
           /*坐标系*/
           grid: {
             show: false,
-            top: this.category.length>1?40:5,
+            top: this.category.length>0?40:5,
             bottom: 30,
-            left: this.category.length>1?60:20,
+            left: this.category.length>0?60:20,
             right: 20
           },
           /*提示框组件*/
@@ -139,7 +140,12 @@
 
               let result = '';
               params.forEach(function (item, index) {
-                result = result + item.marker + '&nbsp' + item.seriesName + '&nbsp:&nbsp' + item.data + '&nbsp篇';
+                if (item.data < 1){
+                  result = result + item.marker + '&nbsp' + item.seriesName + '&nbsp:&nbsp' + item.data;
+                } else{
+                  result = result + item.marker + '&nbsp' + item.seriesName + '&nbsp:&nbsp' + iKnowsUtil.handleNum(item.data) + '&nbsp篇';
+                }
+
                 if (index !== params.length - 1) {
                   result += '<br>'
                 }
@@ -172,10 +178,10 @@
             axisLine: {show: false},
             axisTick: {show: false},
             axisLabel: {
-              show:this.category.length>1?true:false,
+              show:this.category.length>0?true:false,
               color: '#979797',
               fontSize: 12,
-              margin: 15
+              margin: 0
             },
             splitLine: {
               lineStyle: {
@@ -194,7 +200,7 @@
 
       initLineChart(){
 
-        let content = document.getElementById('zc_charts_content');
+        let content = document.getElementById('zc_charts_content_'+this.id);
 
 
         let empty = document.getElementById(this.id);
@@ -242,7 +248,9 @@
 </script>
 
 <style scoped>
-
+  canvas:hover{
+    background: #000;
+  }
   .zc_charts_content {
     position: relative;
     width: 100%;
@@ -260,5 +268,7 @@
   .zc_charts_empty {
     display: none;
     text-align: center;
+    font-size: 14px;
+    color:#606266 ;
   }
 </style>

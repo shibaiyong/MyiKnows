@@ -3,7 +3,7 @@
   <div class="charts_line_test">
 
     <div class="test_content">
-      <zcBar :data="barData" axis="create_time" :category="category"></zcBar>
+      <zcBar id="aaa" :data="barData" axis="create_time" :category="category"></zcBar>
     </div>
 
 
@@ -150,10 +150,10 @@
 
         thiz.category = [
           {prop: 'trans_num', label: '正常'},
-          {prop: 'comment_num', label: '一般'},
-          {prop: 'read_num', label: '轻微'},
-          {prop: 'comprehensive_num', label: '较大'},
-          {prop: 'click_num', label: '重大'},
+          // {prop: 'comment_num', label: '一般'},
+          // {prop: 'read_num', label: '轻微'},
+          // {prop: 'comprehensive_num', label: '较大'},
+          // {prop: 'click_num', label: '重大'},
         ]
 
       }, 1000);

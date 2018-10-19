@@ -1,11 +1,11 @@
 <template>
     <div class="dataTables">
-        
+
         <table class="inews-table">
             <thead>
                 <tr>
                     <th :style="{'width':'174px'}"><CheckBox :totalSelect="isTotal" :allSelect="hasTotal"/><span class="allcheck">全选</span></th>
-                    
+
                     <th :style="{'width':'233px'}">报告生成时间</th>
                     <th :style="{'width':'172px'}">方案类型</th>
                     <th class="textleft" :style="{'width':'212px','padding-left':'50px'}">监控任务名称</th>
@@ -14,14 +14,18 @@
                 </tr>
             </thead>
             <tbody>
-                <tr v-for='item in data'>
-                    
-                    <td><CheckBox :label="item.id" :dataArr="dataArr" :all="checkAll"/></td>
-                    <td>{{ item.time }}</td>
-                    <td>{{ item.type }}</td>
-                    <td class="textleft" :style="{'padding-left':'50px'}">{{ item.taskName }}</td>
+                <tr v-for='item in data' :key="item.reportId">
+
+                    <td><CheckBox :label="item.reportId" :dataArr="dataArr" :all="checkAll"/></td>
+                    <td>{{ item.reportTime }}</td>
+                    <td>{{ item.planType | formatType }}</td>
+                    <td class="textleft" :style="{'padding-left':'50px'}">{{ item.planName }}</td>
                     <td class="textleft">{{ item.reportName }}</td>
-                    <td><button @click="transformData(item.id)" class="btn btn6030">查看</button><button class="btn btn6030">删除</button></td>
+                    <td>
+                        <!--<button @click="transformData('view', item)" class="btn btn6030">查看</button>-->
+                        <button @click="toReportView(item)" class="btn btn6030">查看</button>
+                        <button @click="transformData('delete', item)" class="btn btn6030">删除</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -31,7 +35,7 @@
 <script>
     import axios from "axios";
     import CheckBox from "@/components/common/CheckBox"
-    
+    import { deleteAllBulletinList, eventBus } from "@/assets/js/api.js"
     export default {
         name:'dataTables',
         props:['data','transformData'],
@@ -45,15 +49,51 @@
             }
         },
         created(){
-            
+            eventBus.$on('deleteAllBulletinList', params => {
+                this.deleteAllBulletinList();
+            })
         },
         updated(){
-            // console.log(this.dataArr);
+
         },
         methods:{
-            
+            toReportView (item) {
+              let pid = item.pid;
+              let timeType = item.reportType;
+              if(timeType >= 5){
+                timeType = timeType - 5;
+              }
+              let warnLevel = 4;
+              let token = localStorage.iKnowsToken || '';
+              if(!!token){
+                window.open(`http://iknows.inewsengine.com:8081/generateWord?timeType=${timeType}&pid=${pid}&token=${token}&warnLevel=4`);
+              }
+
+            },
             isTotal(total){//全选框对外触发的方法。复选框全部被选中。
                 this.checkAll = total;
+            },
+            //批量删除简报中心的数据
+            deleteAllBulletinList(){
+                if(this.dataArr.length == 0){
+                    this.$mAlert('你未选择需要删除的监测方案.')
+                    return false
+                }
+                this.$mConfirm('是否确认删除已选择的方案监测, 是否继续?', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(() => {
+                    var _this = this
+                    deleteAllBulletinList( { reportIds:this.dataArr } ).then( res => {
+                    if(res.code == '200'){
+                        //删除成功后重新更新列表
+                        eventBus.$emit('getBulletinList');
+                    }
+                    }, () => {})
+                })
+
+
+
             }
 
         },
@@ -63,6 +103,18 @@
         computed:{
             hasTotal(){//当各个复选框被选中时,全选框也被选中
                 return this.dataArr.length == this.data.length
+            }
+        },
+        filters:{
+            formatType( value ){
+
+                if ( value == '1' || value == '2' ){
+                    return '常规监测'
+                }else if( value == '3' ){
+                    return '人物监测'
+                }else{
+                    return '文稿监测'
+                }
             }
         },
         components:{

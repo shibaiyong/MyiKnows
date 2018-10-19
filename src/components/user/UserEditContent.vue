@@ -2,47 +2,67 @@
      <div class="rzl_bc_white viewcontent">
         <div class="usertop"><p class="font18">用户中心</p></div>
         <table class="userinfo rzl_fc_darkgray font16">
+            <tr class="errorTip"><td></td><td v-show="errorUserNameShow" class="paddingleft10">{{ errorUserNameMessage }}</td></tr>
             <tr>
                 <td class="fieldcolumn"><label>用户名：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="username"></td>
+                <td class="valuecolumn">
+                    <input :class="{'valuecolumn_txt' : true, 'verify': errorUserNameShow }" type="text" v-model="userInfo.userName">
+                </td>
             </tr>
             <tr>
                 <td class="fieldcolumn"><label >姓名：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="realname"></td>
+                <td class="valuecolumn">
+                    <input class="valuecolumn_txt" type="text" v-model="userInfo.realName">
+                </td>
             </tr>
+            <tr class="errorTip"><td></td><td v-show="errorMobileShow" class="paddingleft10">{{ errorMobileMessage }}</td></tr>
              <tr>
                 <td class="fieldcolumn"><label>联系电话：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="telephone" ></td>
+                <td class="valuecolumn">
+                    <input :class="{'valuecolumn_txt' : true, 'verify': errorMobileShow }" type="text" v-model="userInfo.mobile" >
+                </td>
             </tr>
+            <tr class="errorTip"><td></td><td v-show="errorEmailShow" class="paddingleft10">{{ errorEmailMessage }}</td></tr>
              <tr>
                 <td class="fieldcolumn"><label>电子邮箱：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="email"></td>
+                <td class="valuecolumn">
+                    <input :class="{'valuecolumn_txt' : true, 'verify': errorEmailShow }" type="text" v-model="userInfo.email">
+                </td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td class="fieldcolumn"><label >微信：</label></td>
-                <td class="btncolumn" v-if="webchat===''">
+                <td class="btncolumn" v-if="userInfo.webchat===''">
                     <input type="button" @click="goBindWebChat()" value="绑定" >
                 </td>
                 <td class="valuecolumn" v-else>
-                    <label class="font16" />{{webchat}}</label>
+                    <label class="font16" />{{userInfo.webchat}}</label>
                 </td>
-            </tr>
+            </tr> -->
+            <tr class="errorTip"><td></td><td v-show="errorOldPassShow" class="paddingleft10">{{ errorOldPassMessage }}</td></tr>
             <tr>
                 <td class="fieldcolumn"><label >旧密码：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="oldpwd"></td>
+                <td class="valuecolumn">
+                    <input :class="{'valuecolumn_txt' : true, 'verify': errorOldPassShow }" type="password" v-model="userInfo.oldPassword">
+                </td>
             </tr>
+            <tr class="errorTip"><td></td><td v-show="errorNewPassShow" class="paddingleft10">{{ errorNewPassMessage }}</td></tr>
             <tr>
                 <td class="fieldcolumn"><label >新密码：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="newpwd"></td>
+                <td class="valuecolumn">
+                    <input :class="{'valuecolumn_txt' : true, 'verify': errorNewPassShow }" type="password" v-model="userInfo.newPassword">
+                </td>
             </tr>
+            <tr class="errorTip"><td></td><td v-show="errorComfirmNewPassShow" class="paddingleft10">{{ errorComfirmNewPassMessage }}</td></tr>
             <tr>
                 <td class="fieldcolumn"><label >确认新密码：</label></td>
-                <td class="valuecolumn"><input class="valuecolumn_txt" type="text" v-model="repeatnewpwd"></td>
+                <td class="valuecolumn">
+                    <input :class="{'valuecolumn_txt' : true, 'verify': errorComfirmNewPassShow }" type="password" v-model="confirmNewPassWord">
+                </td>
             </tr>
             <tr>
                 <td></td>
                 <td class="btncolumn" colspan="2">
-                    <button class="btncolletion rzl_content_button" @click="goSave()" >保存</button>
+                    <button class="btncolletion rzl_content_button" @click="saveUserInfo()" >保存</button>
                     <button class="rzl_content_button" @click="goBack()" >返回</button>
                 </td>
             </tr>
@@ -50,55 +70,189 @@
     </div>
 </template>
 <script>
+
+import { modifyUserInfo } from "@/assets/js/api.js"
+import { getUserInfo } from "@/assets/js/api.js"
+import sha256 from "js-sha256"
+var i = 0;
 export default {
   name:"UserEdit_content",
-    data(){ 
-     return {
- 
-            username:'蓝猫淘气',
-            realname:'蓝淘',
-            telephone:'10086',
-            email:'aa@rongliam.com',
-            webchat:'11',
-            oldpwd:'',
-            newpwd:'',
-            repeatnewpwd:''
+    data(){
 
-     };
+        return {
+            userInfo:{
+                userName:'',
+                realName:'',
+                mobile:'',
+                email:'',
+                oldPassword:'',
+                newPassword:'',
+            },
+            confirmNewPassWord:'',
+            errorUserNameShow:false,
+            errorUserNameMessage:'',
+            errorMobileShow:false,
+            errorMobileMessage:'',
+            errorEmailShow:false,
+            errorEmailMessage:'',
+            errorOldPassShow:false,
+            errorOldPassMessage:'',
+            errorNewPassShow:false,
+            errorNewPassMessage:'',
+            errorComfirmNewPassShow:false,
+            errorComfirmNewPassMessage:'',
+            saveDisabled:true
+        };
     },
     created(){
-           //获取用户信息UserInfo对象
-           
+        //this.$watch('userInfo',this.getUserInfo)
     },
     mounted(){
-
-        //alert(this.$route.params.userid);
-        var _this = this;
-        //根据userid获取用户完整数据加载编辑页面
-        // setTimeout(function(){
-        //     _this.username = 'www',
-        //     _this.realname='www',
-        //     _this.telephone='www',
-        //     _this.email='33333',
-        //     _this.webchat='22',
-        //     _this.oldpwd='11',
-        //     _this.newpwd='',
-        //     _this.repeatnewpwd=''
-            
-        // },1000)
+        this.getUserInfo()
     },
     methods:{
         // 调用方法
         goBindWebChat(userid){
            alert('chat')
         },
-         goSave(userid){
-           alert(`user=${this.username},realname=${this.realname}`)
+        saveUserInfo(){
+            let userInfo = this.userInfo
+            let verityResult = this.formValidation() //执行表单验证，获取验证结果
+            this.checkRepeat()                       //检测用户是否修改了信息
+            let params = new URLSearchParams()
+
+            params.append('userName', userInfo.userName)
+            params.append('realName', userInfo.realName)
+            params.append('mobile', userInfo.mobile)
+            params.append('email', userInfo.email)
+            if(userInfo.oldPassword && userInfo.newPassword){
+                params.append('oldPassword', sha256( userInfo.oldPassword ))
+                params.append('newPassword', sha256( userInfo.newPassword ))
+            }
+            
+            if( !verityResult || this.saveDisabled ){//判断验证结果
+                return false
+            }
+
+            modifyUserInfo( params ).then( res => {
+
+                if(res.code == '200'){
+                    this.getUserInfo()
+                    this.$message({
+                        message: '用户信息修改成功',
+                        type: 'success'
+                    })
+                }
+                
+           })
         },
         goBack(){
             //this.$router.push({name:'userview',});
             this.$router.go(-1);
+        },
+        getUserInfo(){
+            getUserInfo().then(res => {
+
+                if(res.code == '200'){
+                    
+                    this.userInfo = Object.assign({},this.userInfo, res.data);
+                    this.confirmNewPassWord = '';
+                    localStorage.iKnowsUserInfo = JSON.stringify( this.userInfo ) 
+                }else{
+                    //获取用户信息失败时,使用默认值
+                    Object.assign(this.userInfo,{
+                        userName:'无',
+                        realName:'无',
+                        mobile:'无',
+                        email:'无'
+                    });
+                }
+            })
+        },
+        formValidation(){//用户名支持数字，字母，区分大小写；密码支持数字，字母，区分大小写。
+
+        let userName = this.userInfo.userName
+        let mobile = this.userInfo.mobile
+        let email = this.userInfo.email
+        let oldPassword = this.userInfo.oldPassword
+        let newPassWord = this.userInfo.newPassword
+        let confirmNewPassWord = this.confirmNewPassWord
+
+        let userReg = /^[a-zA-Z\d_]{3,20}$/
+        let passwordReg = /^[a-zA-Z\d]{6,20}$/
+        let mobileReg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
+        //验证邮箱合法性(匹配邮箱中名称可以包含汉字、字母、数字，域名只允许为英文和数字)
+        let emailReg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+        
+        let verifyUserName = userReg.test( userName )
+        let verifyMobile = mobileReg.test( mobile )
+        let verifyEmail = emailReg.test( email )
+        let verifyPassWord = passwordReg.test( newPassWord )
+
+        if( !verifyUserName ){
+          this.errorUserNameMessage = '用户名长度3-20个字符，支持英文大小写、数字、下划线'
+          this.errorUserNameShow = true
+          return false
+        }else{
+          this.errorUserNameShow = false
         }
+
+        if( !verifyMobile ){
+          this.errorMobileMessage = '手机号不合法'
+          this.errorMobileShow = true
+          return false
+        }else{
+          this.errorMobileShow = false
+        }
+
+        if( !verifyEmail ){
+          this.errorEmailMessage = '邮箱不合法'
+          this.errorEmailShow = true
+          return false
+        }else{
+          this.errorEmailShow = false
+        }
+        
+        if( oldPassword == '' && newPassWord != '' ){
+            this.errorOldPassMessage = '密码长度6-20个字符，支持英文大小写、数字、符号'
+            this.errorOldPassShow = true
+            return false
+        }else{
+            this.errorOldPassShow = false
+        }
+
+        if( !verifyPassWord && newPassWord != '' ){
+            this.errorNewPassMessage = '密码长度6-20个字符，支持英文大小写、数字、符号'
+            this.errorNewPassShow = true
+            return false
+        }else{
+            this.errorNewPassShow = false
+        }
+
+        if( (newPassWord != confirmNewPassWord) && (newPassWord || confirmNewPassWord) ){
+            this.errorComfirmNewPassMessage = '两次密码输入不一致'
+            this.errorComfirmNewPassShow = true
+            return false
+        }else{
+            this.errorComfirmNewPassShow = false
+        }
+        
+        return true
+      },
+    
+      checkRepeat(){//检测用户是否修改了信息
+          let userInfo = JSON.parse( localStorage.iKnowsUserInfo );
+          for(let key in userInfo){
+
+              if(!this.userInfo[key] || typeof this.userInfo[key]=='object') continue;
+              if( userInfo[key] != this.userInfo[key] ){
+                this.saveDisabled = false
+                return
+              }else{
+                this.saveDisabled = true
+              }
+          }
+      }
     }
 }
 </script>
@@ -109,7 +263,6 @@ export default {
 }
 .viewcontent .usertop{
     width: 100%;
-    padding-top: 20px;
     padding-left:20px;
 }
 .viewcontent .userinfo{
@@ -133,6 +286,18 @@ export default {
     line-height: 38px;
     border-radius: 10px;
     padding: 0 10px;
+    outline: none;
+}
+.viewcontent .userinfo .valuecolumn .valuecolumn_txt.verify{
+    border: 1px solid red;
+}
+
+.errorTip td{
+    line-height:18px;
+}
+.errorTip td.paddingleft10{
+    padding-left:10px;
+    color:red;
 }
 .viewcontent .userinfo .btncolumn{
     padding-left: 30px;

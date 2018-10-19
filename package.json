@@ -1,5 +1,5 @@
 {
-  "name": "iknowswebdfsdf",
+  "name": "iknowsweb",
   "version": "1.0.0",
   "description": "A Vue.js project",
   "author": "Latitude 5280 <fkji@ronglian.com>",
@@ -13,6 +13,9 @@
     "axios": "^0.18.0",
     "echarts": "^4.1.0",
     "element-ui": "^2.4.6",
+    "html2canvas": "^1.0.0-alpha.12",
+    "js-sha256": "^0.9.0",
+    "jspdf": "^1.4.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },

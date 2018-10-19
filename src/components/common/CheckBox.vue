@@ -1,6 +1,6 @@
 <template>
     <div class="checkBox" @click="selected($event)">
-      <input id="rl-checkbox" type="checkbox"/><label for="rl-checkbox" v-show="isChecked"></label>
+      <label v-show="isChecked"></label>
     </div>
 </template>
 
@@ -18,7 +18,7 @@
         dataArr:{
           type:Array,
           default: function () {
-            return [];
+            return []
           }
         },
 
@@ -59,7 +59,7 @@
               if(this.isChecked){
                 this.totalSelect((Math.random()+1)+'');
               }else{
-                this.totalSelect('');
+                this.totalSelect('allEmpty');
               }
               return false;
             }
@@ -82,7 +82,9 @@
       },
       watch:{
         all(val) {//全选框控制的属性
-          if(val != ''){
+          if( val == 'allEmpty' ){
+            this.isChecked = false;
+          }else if( val != '' ){
             this.isChecked = true;
           }else{
             this.isChecked = false;
@@ -106,6 +108,7 @@
       background:white;
       display: inline-block;
       vertical-align: middle;
+      cursor: pointer;
     }
     .checkBox label, .checkBox input{
       width:100%;
@@ -115,6 +118,7 @@
       line-height: 14px;
       font-size: 12px;
       left:0;top:0;
+      cursor: pointer;
     }
     
     .checkBox input{

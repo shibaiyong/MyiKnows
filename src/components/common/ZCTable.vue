@@ -2,9 +2,10 @@
 
   <div class="zc_tables_content">
 
-    <div :id="id" class="zc_tables" ref="zc_tables">
+    <div :id="id" class="zc_tables">
 
       <el-table :data="data"
+                ref="zc_tables"
                 style="width: 100%"
                 empty-text="暂无相关数据"
                 :header-cell-style="ZCHeaderCellStyle"
@@ -37,7 +38,7 @@
             <span class="operations"
                   v-for="(item,index) in operations"
                   v-text="item"
-                  @click="operationsClick(index)">
+                  @click="operationsClick(scope,index)">
             </span>
 
           </template>
@@ -117,12 +118,15 @@
       /*编辑单元格表头样式*/
       ZCHeaderCellStyle({row, column, rowIndex, columnIndex}) {
 
+        row.rowIndex = rowIndex;
+        column.columnIndex = this.isSelect ? columnIndex - 1 : columnIndex;
+
         // 默认单元格表头样式
         let style = Object.assign({}, this.baseHeaderCellStyle);
 
         this.category.forEach(function (category, categoryIndex) {
 
-          if (columnIndex === categoryIndex && category.headerStyle) {
+          if (column.columnIndex === categoryIndex && category.headerStyle) {
 
             // 链接默认样式和自定义样式
             style = Object.assign(style, category.headerStyle);
@@ -141,8 +145,8 @@
         row.rowIndex = rowIndex;
         column.columnIndex = this.isSelect ? columnIndex - 1 : columnIndex;
 
-
         let style = Object.assign({}, this.baseCellStyle);
+
 
         this.category.forEach(function (category, categoryIndex) {
 
@@ -222,6 +226,7 @@
       /*单元格点击事件*/
       ZCCellClick(row, column, cell, event) {
 
+
         let thiz = this;
         this.category.forEach(function (category, categoryIndex) {
 
@@ -258,13 +263,19 @@
       },
 
       /***************************操作按钮监听方法************************/
-      operationsClick(index){
-        this.$emit('operate-data',index);
+      operationsClick(scope,index){
+        this.$emit('operate-data',scope.row.rowIndex,index);
       }
     },
 
     mounted() {
-
+      // /*监听屏幕拖拽*/
+      // let tableEl = this.$refs.zc_tables;
+      // window.addEventListener("resize", function () {
+      //
+      //   tableEl.clearSort();
+      //
+      // });
     },
     created() {
 

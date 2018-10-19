@@ -2,7 +2,7 @@
   <!-- 添加新文章 -->
   <div class="addArticle" v-show="isAddArticle">
     <div class="addArticle-content">
-      <div class="addArticle-content-bg"></div>
+      <!-- <div class="addArticle-content-bg"></div> -->
       <div class="addArticle-content-layout rzl_bc_white">
         <div class="addArticle-title rzl_fc_darkgray font24">添加文章</div>
         <div class="addArticle-articleURLWarn rzl_fc_errRed font14">{{articleURLWarnText}}</div>
@@ -16,17 +16,17 @@
         </div>
         <!-- 文章标题 -->
         <div class="addArticle-articleTitle">
-          <div class="addArticle-left rzl_fc_darkgray font16">文章标题</div>
+          <div class="addArticle-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>文章标题</div>
           <div class="addArticle-right">
             <el-input class="addArticle-input" v-model="articleTitle" placeholder=""></el-input>
             <div class="addArticle-hint">
               <i class="el-icon-question rzl_fc_lightGrey font20"></i>
-            </div>         
+            </div>
           </div>
         </div>
         <!-- 文章正文 -->
         <div class="addArticle-articleContent">
-          <div class="articleContent-left rzl_fc_darkgray font16">文章正文</div>
+          <div class="articleContent-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>文章正文</div>
           <div class="articleContent-right">
             <div class="addArticle-input-contnet">
               <el-input type="textarea" v-model="articleContent"
@@ -52,16 +52,19 @@
         </div>
 
       </div>
-    </div> 
+    </div>
   </div>
 </template>
 <script>
+import {articleGather, articleSimilar} from '../../assets/js/api.js';
 const crawlErrorText = "抓取失败，请您手动输入";
-const urlEmptyText = "文章url不能为空！";
+const urlEmptyText = "文稿url不能为空！";
 const titleEmptyText = "文章标题不能为空!";
 const titleEnoughText = "标题最多支持100个字符!";
 const contentEmptyText = "文章正文不能为空！";
 const contentEngoughText = "正文不得超过2000字符!";
+const articleFullText = "最多支持添加5篇文章!";
+const articleSimilarText = "不符合文章添加规则，添加失败！";
 export default {
   name: 'i-addArticle',
   props: {
@@ -69,9 +72,18 @@ export default {
       type: Boolean,
       require: true,
     },
+    articles: {
+      type: Array,
+      require: true,
+      default () {
+        return [];
+      }
+    }
   },
   data () {
     return {
+      // 目前添加的文章列表
+      articlesAdded: [],
       // 文章url
       articleURL: '',
       // 抓取失败提示
@@ -99,73 +111,143 @@ export default {
   methods: {
     // 名称匹配查找
     queryArticleByURL() {
-      let url = this.articleURL;
-      let articleDemo = {
-        articleURL: url,
-        articleTitle: '国际爱牙日 | 平均每个中国孩子有2.8颗蛀牙，宝宝牙齿不好会有怎样的影响?',
-        articleContent: '家长们都知道幼儿时期是生长发育的旺盛期，而口腔是消化系统的第一道门户，牙齿是重要的咀嚼器官，健康的乳牙有助于消化作用，'
-                        +'有利于生长发育。如果发生了蛀牙，孩子会减少进食，即使进食也也减少咀嚼的时间和次数，那么没有充分咀嚼的食物到达胃部，增加了胃部的负担，孩子'
-                        +'容易消化不良。2、影响面部发育同时，良好的咀嚼功能又能有助于颌面部的正常发育，为将来恒牙的萌出和整齐排列创造良好条件。蛀牙疼痛，导致儿童养'
-                        +'成偏侧咀嚼习惯，久而久之容易造成面部发育不对称。小贴士:这里也要提醒家长一点，不要过于精细地养育孩子，也不要在孩子长出小牙后还是一直喂养'
-                        +'流质食物，嚼功能的刺激，才能促进颌骨的正常发育哦!婴幼儿期是儿童学习语言的时期，完整的乳牙有助于孩子掌握正确的发音，乳牙龋坏和早失则会使'
-                        +'孩子发音不清。乳前牙区严重的龋蚀，影响美观，使有些孩子羞于开口说话，对孩子的心理发育也很不利。'
-      };
-      this.articleTitle = articleDemo.articleTitle;
-      this.articleContent = articleDemo.articleContent; 
-      if(!url || url.length == 0){
-        this.articleURLWarnText = urlEmptyText;
-      }else{
-        this.articleURLWarnText = '';
+      if(this.articleURL == '' || this.articleURL.length == 0){
+        this.$message.error(urlEmptyText);
       }
-      // 失败的警告信息
-      this.articleURLWarnText = crawlErrorText;
+
+      var params = {
+        url: this.articleURL
+      }
+      articleGather(params).then(response => {
+        console.log(response);
+        if(response.code == 200){
+          this.articleTitle = response.data.title;
+          this.articleContent = response.data.content;
+        }
+      }).catch(error => {
+        this.$message.error(crawlErrorText);
+      });
     },
     // 保存文章
     saveArticle () {
-      // url验证
-      if(!this.articleURL || this.articleURL == ''){
-        this.articleURLWarnText = urlEmptyText;
-        return ;
-      }
+      // // url验证
+      // if(!this.articleURL || this.articleURL == ''){
+      //   this.$message.error(urlEmptyText);
+      //   return ;
+      // }
       // 标题验证
       if(!this.articleTitle || this.articleTitle == ''){
-        this.articleURLWarnText = titleEmptyText;
+        this.$message.error(titleEmptyText);
         return ;
       }
       if(this.articleTitle.length > 100){
-        this.articleURLWarnText = titleEnoughText;
+        this.$message.error(titleEnoughText);
         return ;
       }
-      this.articleURLWarnText = '';
+
       // 正文验证
       if(!this.articleContent || this.articleContent == ''){
-        this.articleContentWarnText = contentEmptyText;
+        this.$message.error(contentEmptyText);
         return ;
       }
       if(this.countNum > 2000){
-        this.articleContentWarnText = contentEngoughText;
+        this.$message.error(contentEngoughText);
         return;
       }
 
-      this.articleContentWarnText = '';
-      
-      this.$emit('save-article',{
-        articleURL: this.articleURL,
-        articleTitle: this.articleTitle,
-        articleContent: this.articleContent,
+      // 不超过5个
+      if(this.articlesAdded.length >=5){
+        this.$message.error(articleFullText);
+        return
+      }
+
+      let title = this.articleTitle;
+      let content = this.articleContent;
+      // 去掉转义字符
+      title = title.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+      // 去掉特殊字符
+      title = title.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
+        // 去除标签
+      title = title.replace(/<[^>]+>/g,"");
+      // 去掉转义字符
+      content = content.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+      // 去掉特殊字符
+      content = content.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
+      // 去除标签
+      content = content.replace(/<[^>]+>/g,"");
+
+
+      // 相似相关验证
+      var params = {
+        "oriArticle":{
+          "oriwebpageCode":"",
+          "oriTitle":title,
+          "oriContent":content
+        },
+        "oriToList":[]
+      };
+      this.articlesAdded.forEach(element => {
+        params.oriToList.push({
+          "webpageCode":"",
+          "title":element.title,
+          "content":element.content
+        });
       });
+      if(this.articlesAdded.length > 0){
+        articleSimilar(params).then(response => {
+          if(response.code == 200){
+            if(response.data){
+              this.$emit('save-article',{
+                articleURL: this.articleURL,
+                articleTitle: title,
+                articleContent: content,
+              });
+              document.getElementById('configMask').style.display= 'none';
+              this.articleURL = '';
+              this.articleTitle = '';
+              this.articleContent = '';
+            }else{
+              this.$message.error('文章相似度不匹配，请重新输入！');
+            }
+          }else{
+            this.$message.error('保存失败，请重新偿试！');
+          }
+        }).catch(err => {
+          this.$message.error('系统异常，请重新偿试！');
+          document.getElementById('configMask').style.display= 'none';
+          this.articleURL = '';
+          this.articleTitle = '';
+          this.articleContent = '';
+        });
+      }else{
+        this.$emit('save-article',{
+          articleURL: this.articleURL,
+          articleTitle: title,
+          articleContent: content,
+        });
+        document.getElementById('configMask').style.display= 'none';
+        this.articleURL = '';
+        this.articleTitle = '';
+        this.articleContent = '';
+      }
+
     },
     // 取消文章
     cancelArticle () {
       this.$emit('cancel-article',{});
+      document.getElementById('configMask').style.display= 'none';
+      this.articleURL = '';
+      this.articleTitle = '';
+      this.articleContent = '';
     },
   },
   mounted() {
     this.articleURL = '';
     this.articleTitle = '';
     this.articleContent = '';
+    this.articlesAdded = this.articles;
   },
-}  
+}
 </script>
 <style scoped>
 .addArticle{
@@ -230,7 +312,7 @@ export default {
   justify-content: flex-start;
 }
 .addArticle .addArticle-left{
-  width: 72px;
+  width: 80px;
   height: 100%;
   line-height: 38px;
   text-align: right;
@@ -277,7 +359,7 @@ export default {
   justify-content: flex-start;
 }
 .addArticle .articleContent-left{
-  width: 72px;
+  width: 80px;
   height: 100%;
   text-align: right;
   font-weight: 600;
@@ -302,9 +384,13 @@ export default {
   border-radius: 10px;
   border-color: #CDCDCD;
   outline: none;
+  /* overflow-y: auto; */
+}
+.addArticle .articleContent-input >>> textarea{
+  width: 100%;
+  height: 227px !important;
   overflow-y: auto;
 }
-
 .addArticle .articleContent-count{
   margin-top: 10px;
   width: 100%;

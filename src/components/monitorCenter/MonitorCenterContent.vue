@@ -1,8 +1,8 @@
 <template>
   <div class="rzl_fc_darkgray">
-    <div class="monitor-center">
+    <div class="monitor-center" id="monitor-center-content">
       <div class="search-input-box">
-        <input type="text" v-model="searchTitle"/>
+        <input type="text" v-model="querystr"/>
         <span class="text-button-navy rzl_bc_navy rzl_fc_white font14" @click="search">搜索</span>
         <i class="rzl_bc_shallowGreen rzl_fc_white" v-if="showInputWarring">!</i>
         <span class="font14 rzl_fc_errRed" v-if="showInputWarring">请减少到20字以内。</span>
@@ -20,15 +20,16 @@
         <span @click="stopList">批量停止</span>
         <span @click="createCase">新建监测方案</span>
       </div>
-      <div class="items-box ">
-        <div class="item " :class="{itemLeft:index%2==1,itemRight:index%2==0}" v-for="(item,index) in listData">
+      <div class="items-box " v-if="listData.length">
+        <div class="item " :class="{itemLeft:index%2==1,itemRight:index%2==0}" v-for="(item,index) in listData"
+             :key="item.id">
           <div class="item-title">
             <div class="left-title font16 rzl_fc_darkgray">
-              <checkBox :label="item.id" :dataArr="dataArr" :all="checkAll"/>
-              {{item.name}}
+              <checkBox :label="item.id" :dataArr="dataArr" :all="checkAll" v-show="hadStop"/>
+              {{item.kpName}}
             </div>
             <div class="right-title font14">
-              <span>运行中 常规监控</span>
+              <span>{{ kpType( item.kpType ) }}</span>
             </div>
           </div>
           <div class="table-box rzl_fc_navy font16">
@@ -45,28 +46,68 @@
             <span @click="updateConfig(item)"
                   :class="{rzl_bc_navy:item.buttonStyle[2],rzl_fc_white:item.buttonStyle[2]}"
                   @mouseover='mouseover(item,2)'
-                  @mouseout="mouseout(item,2)">
+                  @mouseout="mouseout(item,2)"
+                  v-show="hadStop">
                   修改配置
               </span>
             <span @click="stopItem(item)"
                   :class="{rzl_bc_navy:item.buttonStyle[3],rzl_fc_white:item.buttonStyle[3]}"
                   @mouseover='mouseover(item,3)'
-                  @mouseout="mouseout(item,3)">
+                  @mouseout="mouseout(item,3)"
+                  v-show="hadStop">
                   停止
               </span>
           </div>
         </div>
       </div>
-      <div class="pagination">
+      <div class="no-data" v-if="!listData.length">暂无相关数据</div>
+      <div class="pagination" v-if="listData.length">
         <Pagination :totalNum="total"
+                    :pageSize="pageSize"
                     @currentChange="currentChange"
+                    v-if="hackReset"
                     ref="pagination"/>
       </div>
       <div class="go-top" v-if="showGoTop" @click="goTop">
         <img src="../../assets/up.png"/>
       </div>
-      <div class="dialog">
-        
+      <div class="dialog-box" v-if="showCreateDialog||showCreateSuccessDialog">
+        <div v-if="showCreateDialog" class="dialog-content-box ">
+          <div class="dialog-title rzl_fc_darkgray font24">生成简报</div>
+          <div class="date-rang">
+            <span class=" rzl_fc_darkgray font16">数据时间范围</span>
+            <!-- <el-radio v-model="dateTypeRadio" label="year" @change="changeDateType()">持续(1年)</el-radio> -->
+            <el-radio v-model="dateTypeRadio" label="0" @change="changeDateType()">1天</el-radio>
+            <el-radio v-model="dateTypeRadio" label="1" @change="changeDateType()">7天</el-radio>
+            <el-radio v-model="dateTypeRadio" label="3" @change="changeDateType()">30天</el-radio>
+            <el-radio v-model="dateTypeRadio" label="customTime" @change="changeDateType()">自定义</el-radio>
+            <!-- <div class="customTime-date">
+              <el-date-picker v-model="customTime" type="daterange"
+                              :disabled="disabled"
+                              range-separator="-"
+                              :default-time="['00:00:00', '23:59:59']"
+                               start-placeholder="开始日期" end-placeholder="结束日期">
+              </el-date-picker>
+            </div> -->
+          </div>
+          <div class="date-rang">
+            <span class=" rzl_fc_darkgray font16">生成格式 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <el-radio v-model="reportFormat" label="pdf" @change="changeDateType()">PDF</el-radio>
+            <el-radio v-model="reportFormat" label="word" @change="changeDateType()">Word</el-radio>
+          </div>
+          <div class="dialog-button-box font16 rzl_fc_navy">
+            <span class="rzl_bc_navy rzl_fc_white" @click="createReport()">生成</span>
+            <span class="rzl_bc_white rzl_fc_navy" @click="cancelCreateReport()">取消</span>
+          </div>
+        </div>
+        <div v-if="showCreateSuccessDialog" class="dialog-success-box">
+          <div class="dialog-title rzl_fc_darkgray font24">生成简报</div>
+          <div class="dialog-button-box dialog-success-button-box font16 rzl_fc_navy">
+            <span class="rzl_bc_navy rzl_fc_white" @click="downloadBulletin()">查看结果</span>
+            <span class="rzl_bc_white rzl_fc_navy" @click="bulletinCenter()">简报中心</span>
+            <span class="rzl_bc_white rzl_fc_navy" @click="backHome()">返回</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -79,11 +120,14 @@
   import IFooter from '@/components/common/Footer';
   import checkBox from '@/components/common/CheckBox';
   import dataUtil from '../../assets/js/dataUtlis'
-  import Pagination from "@/components/common/Pagination"
+  import Pagination from '@/components/common/Pagination'
+  import {getPlanList} from '../../assets/js/api.js';
+  import {stopPlan} from '../../assets/js/api.js';
 
   export default {
     name: "monitor-center",
     components: {ITop, IHeader, IFooter, dataUtil, checkBox, Pagination},
+    props: ["parentHeight"],
     watch: {
       searchTitle() {
         if (this.searchTitle && this.searchTitle.length > 20) {
@@ -91,27 +135,124 @@
         } else {
           this.showInputWarring = false
         }
+      },
+      parentHeight() {
+        var dom = document.getElementById("monitor-center-content")
+        if (dom && this.parentHeight != 0 && this.parentHeight > dom.offsetHeight) {
+          var a = this.parentHeight > 600 ? this.parentHeight : 600
+          dom.style.minHeight = a + "px"
+          console.log(a)
+        }
       }
     },
     data() {
       return {
-        items: ["首页", "舆情头条", "监测中心", "简报中心"],
-        searchTitle: "",
+        pageStart: 0,
+        showCreateDialog: false,
+        showCreateSuccessDialog: false,
+        dateTypeRadio: "",
+        customTime: '',
+        hackReset: true,
+        querystr: "",
         showInputWarring: false,
-        missType: "A",
-        missStatus: "A",
+        planType: [1],
+        status: 1,
+        disabled: true,
         statusData: [],
         listData: [],
         dataArr: [],
         checkAll: "",
         total: 0,
-        page: 0,
-        showGoTop: false
+        pageSize: 10,
+        showGoTop: false,
+        reportFormat: "",
+        dateScope: {
+          disabledDate(time) {
+            return time.getTime() < Date.now() - 8.64e7;
+          }
+        },
+        flag: true,
+        hadStop:true,
+        pid:''
       }
     },
     methods: {
       loadList() {
-        //TODO  加载列表
+        var _this = this
+        // var params = new URLSearchParams();
+        // params.append('pageStart', this.pageStart);
+        // params.append('pageSize', 10);
+        // params.append('planType', this.planType);
+        // params.append('status', this.status);
+        // params.append('querystr', this.querystr);
+        var params = {
+          pageStart: this.pageStart,
+          pageSize: 10,
+          planType: this.planType,
+          status: this.status,
+          querystr: this.querystr
+        }
+        params = JSON.stringify(params)
+        getPlanList(params).then(response => {
+          if (response.code == 200) {
+            _this.listData = response.data.simplePlans
+            for (var i = 0; i < _this.listData.length; i++) {
+              _this.listData[i].buttonStyle = [true, false, false, false]
+            }
+            if (_this.pageStart == 0) {
+              _this.hackReset = false
+              _this.$nextTick(() => {
+                _this.total = response.data.total
+                _this.hackReset = true
+              })
+            }
+          }
+        }).catch(error => {
+          console.log(error);
+        })
+      },
+      changeDateType() {
+        
+        if (this.dateTypeRadio == "customTime") {
+          this.disabled = false
+        } else {
+          this.disabled = true
+        }
+      },
+      createReport() {
+        
+        if(this.dateTypeRadio=='' && this.customTime=='' || this.reportFormat==''){
+          this.$mAlert('时间和报告格式必选')
+          return
+        }
+
+        this.showCreateDialog = false
+        this.showCreateSuccessDialog = true
+        
+      },
+      cancelCreateReport() {
+        this.showCreateDialog = false;
+      },
+
+      downloadBulletin( ) {
+        this.showCreateSuccessDialog = false
+        let timeType = this.dateTypeRadio
+        let token = localStorage.iKnowsToken
+        let pid = this.pid
+        window.open(`http://iknows.inewsengine.com:8081/generateWord?timeType=${timeType}&pid=${pid}&token=${token}&warnLevel=4`)
+      },
+      bulletinCenter() {
+        this.$router.push({
+          name: 'bulletincenter',
+          params: {
+            id: "11111111111111111"
+          }
+        })
+        // this.$router.push("/bulletincenter")
+        this.showCreateSuccessDialog = false
+      },
+      backHome() {
+        this.showCreateSuccessDialog = false
       },
       goTop() {
         var app = document.getElementById("app");
@@ -124,46 +265,67 @@
         }, 3)
       },
       getResult(item) {
-        //TODO 查看结果
-        this.$router.push("/publicsentiment")
+        this.$router.push("/center/monitorresults/" + item.id)
       },
       stopItem(item) {
-        this.$confirm('此操作将永久删除该已经该条消息, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+
+        if(!this.hadStop){//监测方案 已经停止，点击停止按钮失效 Fixed by shibaiyong
+          this.$mAlert('该监测方案已经停止，不能重复操作')
+          return
+        }
+
+        this.$mConfirm('是否确认停止该方案监测', {
+          confirmButtonText: '停止',
           cancelButtonText: '取消',
           // type: 'warning'
         }).then(() => {
-          alert(item.id);
-          //TODO 停止
+          var _this = this
+          var str = item.id
+          var params = {id: str}
+          stopPlan({params: params}).then(response => {
+            _this.loadList()
+          }).catch(error => {
+            console.log(error);
+          })
         })
       },
       updateConfig(item) {
-        //TODO 更改配置
-        this.$router.push("/center/config")
+        this.$router.push("/center/config/" + item.id)
       },
       builderDoc(item) {
-        //TODO 生成文档
+        this.showCreateDialog = true;
+        this.pid = item.id
       },
       search() {
         if (this.showInputWarring) {
           return
         }
-        //TODO  搜索
+        this.loadList()
       },
       createCase() {
-        //TODO 创建新的方案
+        this.$router.push("/center/config")
       },
       stopList() {
+        var _this = this
         if (this.dataArr.length < 1) {
-          this.$alert('请至少勾选一条消息后再进行批量删除.', '提示')
+          this.$mAlert('你未选择需要停止的监测方案')
           return
         }
-        this.$confirm('此操作将永久删除该已经勾选的消息, 是否继续?', '提示', {
-          confirmButtonText: '确定',
+        this.$mConfirm('是否确认停止已选择的方案监测', {
+          confirmButtonText: '停止',
           cancelButtonText: '取消',
-          // type: 'warning'
         }).then(() => {
-          // TODO 批量停止
+          var str = ""
+          for (var i = 0; i < _this.dataArr.length; i++) {
+            str = str + _this.dataArr[i] + ","
+          }
+          str = str.substr(0, str.length - 1);
+          var params = {id: str}
+          stopPlan({params: params}).then(response => {
+            _this.loadList()
+          }).catch(error => {
+            console.log(error);
+          })
         })
       },
       mouseover(item, index) {
@@ -176,7 +338,8 @@
         this.$delete(this.listData, "test")
       },
       currentChange(index) {
-        // alert(index);
+        this.pageStart = index - 1
+        this.loadList()
       },
       mouseout(item, index) {
         var list = item.buttonStyle;
@@ -188,6 +351,12 @@
         this.$delete(this.listData, "test")
       },
       chooseStatue(parentItem, item) {
+        if( item.name == '已停止') {//任务状态已停止时，不显示查询结果按钮 Fixed by shibaiyong 
+          this.hadStop = false
+        }else if(item.name == '运行中'){
+          this.hadStop = true
+        }
+
         if (item.isSelected) {
           return
         } else {
@@ -197,14 +366,26 @@
           }
           item.isSelected = !item.isSelected
           this[parentItem.id] = item.id
+          this.pageStart = 0;
+          this.loadList()
+        }
+      },
+      kpType(value) {// 判断监测方案的类型 Bug fixed by shibaiyong
+        let flag = this.hadStop ? '运行中 ' : '已停止 '
+        if ( value == '1' || value == '2' ){
+          return  flag + '常规监测'
+        }else if( value == '3' ){
+          return flag + '人物监测'
+        }else{
+          return flag + '文稿监测'
         }
       }
     },
+    
     mounted() {
       this.statusData = dataUtil.getStatusData()
-      this.listData = dataUtil.getMonitorListData()
-      this.total = 100;
-      this.$refs.pagination.changeCurrentPage(1)
+      this.loadList()
+      // this.$refs.pagination.changeCurrentPage(1)
       var app = document.getElementById("app");
       var thiz = this;
       app.addEventListener("scroll", function (e) {
@@ -328,17 +509,19 @@
     flex-direction: row;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    margin-left: 12.5%;
+    margin-right: 12.5%;
   }
 
   .monitor-center .items-box .item-title .left-title {
-    flex: 1;
+    
     text-align: center;
     font-weight: bold;
   }
 
   .monitor-center .items-box .item-title .right-title {
-    flex: 1;
-    padding-right: 12.5%;
+    /* padding-right: 12.5%; */
     text-align: end;
   }
 
@@ -406,7 +589,105 @@
     width: 20px;
   }
 
-  .monitor-center .dialog {
+  .monitor-center .dialog-box {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+  }
 
+  .monitor-center .dialog-content-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -150px;
+    margin-left: -450px;
+    width: 900px;
+    height: 300px;
+    background: white;
+    border-radius: 20px;
+  }
+
+  .monitor-center .dialog-success-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -115px;
+    margin-left: -300px;
+    width: 600px;
+    height: 210px;
+    background: white;
+    border-radius: 20px;
+  }
+
+  .monitor-center .dialog-title {
+    font-weight: bold;
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .monitor-center .date-rang {
+    margin-top: 40px;
+    font-weight: bold;
+    display: flex;
+    flex-flow: row;
+    align-items: center;
+    padding-left: 60px;
+    display: -webkit-box;
+    justify-content: flex-start;
+  }
+
+  .monitor-center .date-rang span {
+    font-weight: bold;
+    margin-right: 20px;
+  }
+
+  .monitor-center .customTime-date {
+    margin-left: 18px;
+    width: 250px;
+    height: 38px;
+  }
+
+  .monitor-center .customTime-date >>> .el-input__inner {
+    width: 100% !important;
+  }
+
+  .monitor-center .dialog-button-box {
+    padding-left: 280px;
+    padding-right: 280px;
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .monitor-center .dialog-success-button-box {
+    padding-left: 60px;
+    padding-right: 60px;
+    margin-top: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .monitor-center .no-data {
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    color: #606266;
+  }
+
+  .monitor-center .dialog-button-box span {
+    cursor: pointer;
+    border: #1D2088 2px solid;
+    display: inline-block;
+    width: 120px;
+    height: 38px;
+    border-radius: 10px;
+    font-weight: bold;
+    line-height: 38px;
+    text-align: center;
   }
 </style>

@@ -263,7 +263,7 @@
           {
             prop: 'platformName',
             label: '平台',
-            width: 100,
+            // width: 100,
             itemsStyle: [
               {index: 3, style: {color: '#ff0000'}}
             ]
@@ -275,13 +275,13 @@
             headerStyle: {textAlign: 'left'},
             showHover: true
           },
-          {prop: 'transNum', label: '转载数', width: 100},
-          {prop: 'commentNum', label: '评论数', width: 100},
-          {prop: 'clickNum', label: '阅读数', width: 100},
-          {prop: 'thumbsNum', label: '点赞数', width: 100},
-          {prop: 'publishTime', label: '发布时间', width: 150},
-          {prop: 'author', label: '作者', width: 100},
-          {prop: 'pageRank', label: '传播力', width: 100},
+          {prop: 'transNum', label: '转载数'},
+          {prop: 'commentNum', label: '评论数'},
+          {prop: 'clickNum', label: '阅读数'},
+          {prop: 'thumbsNum', label: '点赞数'},
+          {prop: 'publishTime', label: '发布时间'},
+          {prop: 'author', label: '作者'},
+          {prop: 'pageRank', label: '传播力'},
         ];
 
 
@@ -295,7 +295,7 @@
 
   .test_content {
     /*border: 1px solid #e2e3e4;*/
-    width: 100%;
+    width: 80%;
     background-color: #fff;
     /*height: 300px;*/
 

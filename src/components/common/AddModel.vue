@@ -2,32 +2,37 @@
   <!-- 配置页面-添加模型 -->
   <div class="addModel" v-show="isAddModel">
     <div class="addModel-content">
-      <div class="addModel-content-bg"></div>
+      <!-- <div class="addModel-content-bg"></div> -->
       <div class="addModel-content-layout rzl_bc_white">
         <div class="addModel-title rzl_fc_darkgray font24">添加模型</div>
         <!-- 已选中模型 -->
         <div class="addModel-tag">
           <div class="addModel-selectedTag-tag rzl_fc_darkgray font16 ">已选中模型</div>
           <div class="addModel-selectedTag-item">
-            <el-tag size="medium" v-for="(chooseWarn, index) in selectedModeList" :key="index" closable
+            <!-- <el-tag size="medium" v-for="(chooseWarn, index) in selectedModeList" :key="index" closable
               class="rzl_bc_undercoat font14 rzl_fc_darkgray rzl_bd_darkgray tag-chooseWarn"
               @close="deleteModel(chooseWarn)" :type="chooseWarn.type">
               {{chooseWarn.value}}
-            </el-tag>
+            </el-tag> -->
+            <span class="el-tag rzl_bc_undercoat font14 rzl_fc_darkgray rzl_bd_darkgray tag-chooseWarn el-tag--1 el-tag--medium"
+              v-for="(chooseWarn, index) in selectedModeList" :key="index">
+            {{chooseWarn.name}}</span>
           </div>
         </div>
         <!-- 模型查询 -->
         <div class="addModel-query">
-          <div class="addModel-query-tag rzl_fc_darkgray font16 ">已选中模型</div>
+          <div class="addModel-query-tag rzl_fc_darkgray font16 ">模型列表</div>
           <div class="addModel-query-item">
             <el-input class="addModel-input" v-model="queryModel" placeholder=""></el-input>
-            <button class="queryModel-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy">搜索</button>
+            <button class="queryModel-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy" @click="queryModelList">搜索</button>
           </div>
         </div>
         <div class="addModel-modelList">
           <el-checkbox-group v-model="checkedModels" @change="handleCheckedModelChange">
-            <el-checkbox v-for="(modelOption, index) in modelOptions" 
-            :label="modelOption.type" :key="index">{{modelOption.value}}</el-checkbox>
+            <el-checkbox v-for="(modelOption, index) in modelOptions"
+            :label="modelOption.id"
+            v-bind:checked="modelOption.id == modelOption.checkId"
+            :key="index">{{modelOption.name}}</el-checkbox>
           </el-checkbox-group>
         </div>
       <div class="addModel-button rzl_bc_white">
@@ -39,35 +44,30 @@
   </div>
 </template>
 <script>
+import {modelShow} from '../../assets/js/api.js';
+const addModelEnoughText = "最多支持勾选5个模型！";
 export default {
   name: 'i-addModel',
   props: {
     isAddModel: {
-      type: Boolean, 
+      type: Boolean,
       require: true
     },
-    chooseModelList: {
-      type: Array, 
-      require: true, 
+    checkedWarnList: {
+      type: Array,
+      require: true,
       default() {
         return []
       }
     },
   },
-  // computed: {
-  //   modelOptionsList () {
-  //     // 复显选中项
-  //     this.modelOptions.forEach(element => {
-  //       element.selectType = '';
-  //       this.selectedModeList.forEach(item => {
-  //         if( element.type == item.type){
-  //           element.selectType = element.type;
-  //         }
-  //       });
-  //     });
-  //     return this.modelOptions;
-  //   }
-  // },
+  watch: {
+    checkedWarnList (newVal, oldVal){
+      // 将父元素传入的值 重新保存起来
+      this.selectedModeList = this.checkedWarnList || [];
+      return this.checkedWarnList;
+    }
+  },
   data () {
     return {
       // 已选中的列表(此处数据由父组件传入，在这里需中转一下)
@@ -78,102 +78,126 @@ export default {
       queryModel: '',
       // 通过查询后勾选的模型列表
       checkedModels: [],
+      // 存放全部的模型数据
+      allModelOptions: [],
     }
   },
+  //  watch: {
+  //    modelOptions (newVal, oldVal){
+  //      this.modelOptions = [];
+  //      this.modelOptions = newVal;
+  //      console.log('变化了');
+  //    }
+  //  },
   methods: {
     // 删除已选择模型
     deleteModel (item) {
-      let warnType = item.type;
+      let warnId = item.id;
       let deleteWarnIndex = 0;
       let chooseModelList = this.selectedModeList;
       chooseModelList.forEach( (element, index)=> {
-        if( warnType == element.type){
+        if( warnId == element.id){
           deleteWarnIndex = index;
           return;
         }
       });
       this.selectedModeList.splice(deleteWarnIndex, 1);
+      let modelOptions = this.modelOptions;
+      // 同时更新下方的选中状态
+      modelOptions.forEach( element => {
+        if( element.id == warnId){
+          element.checkId = '';
+        }
+      });
+      this.modelOptions = modelOptions;
+      console.log(this.modelOptions);
     },
     // 勾选下方查询到的模型(同时将勾选的模型更新到已选中chooseModelList模型列表中)
     handleCheckedModelChange (value) {
-      console.log(value);
+      // console.log("checkbox勾选："+value);
+      if(value.length > 5){
+        // 获取最后一个选中项，将其选中状态取消
+        let lastId = value.pop();
+        this.modelOptions.forEach( item => {
+          if(item.id == lastId){
+            item.checkId = '';
+          }
+        });
+        this.$message.error(addModelEnoughText);
+        return;
+      }
       let newCheckedModels = [];
-      this.modelOptions.forEach(element => {
+      this.allModelOptions.forEach(element => {
         value.forEach(item => {
-          if(item == element.type){
+          if(item == element.id){
+            element.checkId = element.id;
             newCheckedModels.push(element);
+          }else{
+            element.checkId = '';
           }
         });
       });
       // 更新已选中模型chooseModelList列表
-      newCheckedModels.forEach((item, index) => {
-        if( this._getItemIndexOfArray(this.selectedModeList, item) == -1 && this.selectedModeList.length <5){
-          this.selectedModeList.push(item)
-        }
-      });
+      this.selectedModeList = newCheckedModels;
     },
-    // 获取元素在数组中的位置
-    _getItemIndexOfArray(array, item){
-      let selectedIndex = -1;
-      if(array.length >0){
-        array.forEach((element, index) => {
-          if( element.type == item.type){
-            selectedIndex = index;
+    queryModelList () {
+      let params = {};
+      params.name = this.queryModel || '';
+      modelShow(params).then(response => {
+        if(response.code == 200){
+          this.modelOptions = response.data || [];
+          if(this.modelOptions.length > 0){
+            this.modelOptions.forEach( item => {
+              this.selectedModeList.forEach(element => {
+                if(item.id == element.id){
+                  item.checkId = item.id;
+                }
+              });
+            });
           }
-        })
-      }
-      return selectedIndex;
+        }
+      }).catch(error => {
+//        this.$message.error('系统异常，请重新偿试！');
+      });
     },
     // 保存模型
     saveModel () {
+      document.getElementById('configMask').style.display= 'none';
       this.$emit('save-model',{
-        chooseModelList: this.chooseModelList || [],
+        chooseModelList: this.selectedModeList || [],
       });
     },
     // 取消模型
     cancelModel () {
       this.$emit('cancel-model',{});
+      document.getElementById('configMask').style.display= 'none';
     },
   },
-  created() {
+  mounted() {
     // 将父元素传入的值 重新保存起来
-    this.selectedModeList = this.chooseModelList;
-    // 所有模型
-    const modelOptions = [
-      {type:'1' ,value:'证券票犯罪'},
-      {type:'2',value:'抢劫问题'},
-      {type:'3',value:'危险品问题'},
-      {type:'4',value:'反恐防恐问题'},
-      {type:'5' ,value:'反腐舆情类'},
-      {type:'6',value:'政策导向类'},
-      {type:'7',value:'涉黄舆情类'},
-      {type:'8',value:'涉恐舆情类'},
-      {type:'9',value:'反动舆情类9'},
-      {type:'10',value:'反动舆情类10'},
-      {type:'11',value:'反动舆情类11'},
-      {type:'12',value:'反动舆情类12'},
-      {type:'13',value:'反动舆情类13'},
-      {type:'14',value:'反动舆情类14'},
-      {type:'15',value:'反动舆情类15'},
-      {type:'16',value:'反动舆情类16'},
-      {type:'17',value:'反动舆情类17'},
-      {type:'18',value:'反动舆情类18'},
-      {type:'19',value:'反动舆情类19'},
-      {type:'20',value:'反动舆情类20'},
-      {type:'21',value:'反动舆情类21'},
-      {type:'22',value:'反动舆情类22'},
-      {type:'23',value:'反动舆情类23'},
-      {type:'24',value:'反动舆情类24'},
-      {type:'25',value:'反动舆情类25'},
-      {type:'26',value:'反动舆情类26'},
-      {type:'27',value:'反动舆情类27'},
-      {type:'28',value:'反动舆情类28'},
-      {type:'29',value:'反动舆情类29'},
-      {type:'30',value:'反动舆情类30'},
-    ];
-    this.modelOptions = modelOptions;
-  },
+    this.selectedModeList = this.checkedWarnList || [];
+    this.queryModelList();
 
+    // modelOptions.forEach( item => {
+    //   this.selectedModeList.forEach(element => {
+    //     if(item.id == element.id){
+    //       item.checkId = item.id;
+    //     }
+    //   });
+    // });
+    // this.modelOptions = modelOptions;
+  },
+  created() {
+    let params = {};
+    params.name = '';
+    modelShow(params).then(response => {
+      if(response.code == 200){
+        this.allModelOptions = response.data || [];
+      }
+    }).catch(error => {
+//        this.$message.error('系统异常，请重新偿试！');
+    });
+  }
 }
 </script>
 <style scoped>
@@ -203,7 +227,7 @@ export default {
   left: calc((100% - 900px)/2);
   z-index: 1999;
   width: 900px;
-  height: 500px;
+  min-height: 500px;
   padding: 30px 70px 40px 60px;
   border-radius: 20px;
   box-sizing: border-box;
@@ -221,6 +245,7 @@ export default {
   height: auto;
   display: flex;
   justify-content: flex-start;
+  margin-top: 20px;
 }
 .addModel-selectedTag-tag{
   width: 120px;
@@ -280,17 +305,16 @@ export default {
 /****模型列表*****/
 .addModel-modelList{
   width: 100%;
-  height: 145px;
+  height: 170px;
   padding-top: 15px;
   overflow-y: auto;
 }
-
 /****保存和取消***/
 .addModel-button{
-  width: 100%;
+  margin: 0 auto;
+  width: 340px;
   display: flex;
-  display: -webkit-box;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding-top: 40px;
   box-sizing: border-box;
 }
@@ -304,13 +328,10 @@ export default {
   border-width: 2px;
   border-style: solid;
 }
-.addModel-button-btn .addModel-btn:last-child{
-  margin-left: 120px;
-}
 
 /* 覆写element-ui的样式*/
 .addModel >>>.el-input__inner{
-  width: 300px;
+  width: 300px !important;
   height: 38px;
   line-height: 38px;
 }

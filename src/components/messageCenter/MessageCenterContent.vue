@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="message-center rzl_fc_darkgray">
+    <div class="message-center rzl_fc_darkgray" id="message-center-content">
       <div class="empty-button-box font14 rzl_fc_navy">
         <span @click="signAllRead">全部标记已读</span>
         <span @click="deleteList">批量删除</span>
@@ -17,7 +17,7 @@
           <span class="title-status">状态</span>
           <span class="title-delete"> &nbsp;</span>
         </div>
-        <div class="list-item font14 rzl_fc_darkgray" v-for="item in listData">
+        <div class="list-item font14 rzl_fc_darkgray" v-for="item in listData" v-if="listData.length">
           <div class="item-checkAll">
             <checkBox
               :label="item.id"
@@ -25,53 +25,84 @@
               :all="checkAll"
             />
           </div>
-          <span class="item-date">{{item.date}}</span>
-          <span class="item-type">{{item.type == 1?"系统消息":"未知消息"}}</span>
+          <span class="item-date"> {{getDate(item.publishTime)}}</span>
+          <span class="item-type">{{item.type == 1?"系统消息":"预警消息"}}</span>
           <span class="item-content">{{item.content}}</span>
-          <span class="item-status">{{item.status == 1?"已读":"未读  "}}</span>
+          <span class="item-status">{{item.state == 1?"已读":"未读  "}}</span>
           <div class="item-delete empty-button-box font14 rzl_fc_navy">
             <span @click="deleteItem(item)">删除</span>
           </div>
         </div>
-
+        <div class="no-data" v-if="!listData.length">暂无相关数据</div>
       </div>
-      <div class="pagination">
-        <!--<Pagination :totalNum="total"-->
-        <!--@currentChange="currentChange"-->
-        <!--ref="pagination"/>-->
+      <div class="pagination" v-if="listData.length">
+        <Pagination :totalNum="total"
+                    @currentChange="currentChange"
+                    :pageSize=pageSize
+                    ref="pagination"/>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-  import ITop from '@/components/common/Top';
-  import IHeader from '@/components/common/Header';
-  import IFooter from '@/components/common/Footer';
-  import checkBox from '@/components/common/CheckBox';
+  import ITop from '@/components/common/Top'
+  import IHeader from '@/components/common/Header'
+  import IFooter from '@/components/common/Footer'
+  import checkBox from '@/components/common/CheckBox'
   import dataUtil from '../../assets/js/dataUtlis'
   import Pagination from "@/components/common/Pagination"
+  import { messagePageList, messageRead, messageDelete } from '../../assets/js/api.js'
+  import iKnowsUtil from '@/assets/js/iknowsUtil'
 
   export default {
     name: "message-center-content",
     components: {ITop, IHeader, IFooter, dataUtil, checkBox, Pagination},
+    props: ["parentHeight"],
     data() {
       return {
         searchTitle: "",
         dataArr: [],
         checkAll: "",
         total: 0,
-        page: 0,
+        page: 1,
         listData: [],
         showGoTop: false,
+        pageSize: 10
+      }
+    },
+    watch: {
+      parentHeight() {
+        var dom = document.getElementById("message-center-content")
+        if (dom && this.parentHeight != 0 && this.parentHeight > dom.offsetHeight) {
+          var a = this.parentHeight > 600 ? this.parentHeight : 600
+          dom.style.minHeight = a + "px"
+          console.log(a)
+        }
       }
     },
     computed: {
       allSelect() {
-        return this.dataArr.length == 7
+        return this.dataArr.length == this.listData.length
       }
     },
     methods: {
+      // initHeight() {
+      //   // var dom = document.getElementById("message-center-content")
+      //   // if (dom && this.parentHeight != 0 && this.parentHeight > dom.offsetHeight) {
+      //   //   dom.style.height = this.parentHeight+"px"
+      //   // }
+      // },
+      getDate(time) {
+        if (!time || time == null || time == "" || time == undefined) {
+          return "未知时间"
+        }
+        return iKnowsUtil.dataFormat(new Date(time).getTime())
+      },
+      currentChange(page) {
+        this.page = page;
+        this.loadList()
+      },
       goTop() {
         var app = document.getElementById("app");
         var code = setInterval(function () {
@@ -83,37 +114,90 @@
         }, 3)
       },
       deleteItem(item) {
-        this.$mConfirm('此操作将永久删除该已经该条消息, 是否继续?', {
+        this.$mConfirm('此操作将永久删除该条消息, 是否继续?', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
         }).then(() => {
-          alert(item.id);
+          var _this = this
+          var params = new URLSearchParams();
+          params.append('ids', item.id);
+          messageDelete(params).then(response => {
+            _this.loadList()
+          }).catch(error => {
+            console.log(error);
+          })
         })
       },
       signAllRead() {
-        //TODO 标记已读
+        var str = "";
+        for (var i = 0; i < this.listData.length; i++) {
+          if (this.listData[i].state == 0) {
+            str = str + this.listData[i].id + ","
+          }
+        }
+        if (str) {
+          str = str.substr(0, str.length - 1);
+        } else {
+          this.$mAlert("没有未读消息")
+          return
+        }
+        var params = new URLSearchParams();
+        params.append('ids', str);
+        var _this = this
+        messageRead(params).then(response => {
+          _this.loadList()
+        }).catch(error => {
+          console.log(error);
+        })
       },
       deleteList() {
+        var _this = this
         if (this.dataArr.length < 1) {
           this.$mAlert('请至少勾选一条消息后再进行批量删除.')
           return
         }
-
-        this.$mConfirm('此操作将永久删除该已经勾选的消息, 是否继续?', {
+        this.$mConfirm('此操作将永久删除已经勾选的消息, 是否继续?', {
           confirmButtonText: '删除',
           cancelButtonText: '取消',
         }).then(() => {
-          alert(1)
+          var str = ""
+          for (var i = 0; i < _this.dataArr.length; i++) {
+            str = str + _this.dataArr + ","
+          }
+          str = str.substr(0, str.length - 1);
+          var params = new URLSearchParams();
+          params.append('ids', str);
+          messageDelete(params).then(response => {
+            _this.loadList()
+          }).catch(error => {
+            console.log(error);
+          })
         })
       },
       totalSelect(params) {
         console.log(params);
         this.checkAll = params
+      },
+      loadList() {
+        //重置复选框
+        this.checkAll = "update"
+        var data = {"pageNo": this.page}
+        messagePageList({params: data}).then(response => {
+          if (response && response.code == 200 && response.data.content.length > 0) {
+            this.listData = response.data.content
+            this.total = response.data.totalElements
+          }
+        }).catch(error => {
+          console.log(error);
+        })
       }
+      
     },
-    mounted() {
-      this.listData = dataUtil.getMessageCenterListData();
 
+    mounted() {
+      // this.listData = dataUtil.getMessageCenterListData();
+      this.loadList()
+      //this.getLastMessage()
     }
   }
 </script>
@@ -123,13 +207,7 @@
     background: white;
     width: 100%;
     box-sizing: border-box;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-top: 34px;
-  }
-
-  .message-center .empty-button-box {
-
+    padding: 34px 30px 1px;
   }
 
   .message-center .empty-button-box span {
@@ -170,6 +248,13 @@
     flex: 1;
   }
 
+  .message-center .no-data {
+    text-align: center;
+    height: 60px;
+    line-height: 60px;
+    color: #606266;
+  }
+
   .message-center .list-title .title-date {
     flex: 3;
   }
@@ -207,6 +292,9 @@
   .message-center .list-item .item-content {
     text-align: left;
     flex: 5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .message-center .list-item .item-status {

@@ -1,28 +1,32 @@
 <template>
   <div class="addPerson" v-show="isAddPerson">
     <div class="addPerson-content">
-      <div class="addPerson-content-bg"></div>
+      <!-- <div class="addPerson-content-bg"></div> -->
       <div class="addPerson-content-layout rzl_bc_white">
         <div class="addPerson-title rzl_fc_darkgray font24">添加模型</div>
         <!-- 人物名称关键字 -->
         <div class="addPerson-name">
-          <div class="addPerson-left rzl_fc_darkgray font16">人物名称关键词</div>
+          <div class="addPerson-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>人物名称关键词</div>
           <div class="addPerson-right">
             <el-autocomplete class="addPerson-input" v-model="personName" :fetch-suggestions="queryPersonSearch" :trigger-on-focus="false"
               placeholder=""></el-autocomplete>
-            <div class="addPerson-hint">
-              <i class="el-icon-question rzl_fc_lightGrey font20"></i>
-            </div>
+            <el-popover placement="right-start" trigger="hover" content="人物名称不得超过10个字!">
+              <el-button slot="reference" class="addPerson-hint">
+                <i class="el-icon-question  rzl_fc_lightGrey font20"></i>
+              </el-button>
+            </el-popover>
           </div>
         </div>
         <!-- 人物职位关键词 -->
         <div class="addPerson-job">
-          <div class="addPerson-left rzl_fc_darkgray font16">人物职位关键词</div>
+          <div class="addPerson-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>人物职位关键词</div>
           <div class="addPerson-right">
             <el-input class="addPerson-input" v-model="personJob" placeholder=""></el-input>
-            <div class="addPerson-hint">
-              <i class="el-icon-question rzl_fc_lightGrey font20"></i>
-            </div>
+            <el-popover placement="right-start" trigger="hover" content="人物职位关键词不可超过4个，每个小于10字，用空格隔开!">
+              <el-button slot="reference" class="addPerson-hint">
+                <i class="el-icon-question  rzl_fc_lightGrey font20"></i>
+              </el-button>
+            </el-popover>
           </div>
         </div>
         <!-- 添加历史 -->
@@ -38,9 +42,9 @@
             <li v-for="(person, index) in addPersonHistoryList" :key="index" class="rzl_bd_lightGrey">
               <div class="personList-name rzl_fc_darkgray font14 ">{{person.name}}</div>
               <div class="personList-job rzl_fc_darkgray font14">{{person.job}}</div>
-              <div class="personList-operate font14">
-                <button type="button" class="delHistory-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="delHistory(index)">删除</button>
-              </div>
+              <!--<div class="personList-operate font14">-->
+                <!--<button type="button" class="delHistory-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="delHistory(index)">删除</button>-->
+              <!--</div>-->
             </li>
           </ul>
         </div>
@@ -53,6 +57,12 @@
   </div>
 </template>
 <script>
+import {recommendUsers} from '../../assets/js/api.js';
+const nameEmptyText = '人物名称关键词不能为空!';
+const nameEnoughText = '人物名称关键词最多支持10个字符!';
+const jobEmptyText = "人物职位关键词不能为空";
+const jobEnoughText = "您输入的人物职位关键词不符合要求，请重新输入！";
+const jobFullText = "最多支持添加5个目标人物!";
 export default {
   name: 'i-addPerson',
   props: {
@@ -60,6 +70,13 @@ export default {
       type: Boolean,
       require: true,
     },
+    personWords: {
+      type: Array,
+      require: true,
+      default () {
+        return [];
+      }
+    }
   },
   data () {
     return {
@@ -67,6 +84,8 @@ export default {
       personName: '',
       // 人物职位关键词
       personJob: '',
+      // 目前添加的人物列表
+      personWordsAdded: [],
       // 借用查询功能
       historyList: [],
       // 人物历史
@@ -90,55 +109,78 @@ export default {
         };
     },
     _loadPersonHistoryList (){
-      var demoHistoryList = [
-        {id: '1', name: '李国美', job: '总经理'},
-        {id: '2', name: '赵日天', job: 'BOSS'},
-        {id: '3', name: '叶良辰', job: 'CEO'},
-        {id: '4', name: '赵大宝', job: '事务部大事务官'},
-        {id: '5', name: '张国立', job: '购物部经理'},
-        {id: '6', name: '王家怀', job: '采购员、出纳'},
-        {id: '7', name: '周产波', job: '经理助理'},
-        {id: '8', name: '超爱国', job: '经理助理'},
-        {id: '9', name: '张三样', job: '行政专员'},
-        {id: '10', name: '李家嘴', job: '开发'},
-        {id: '11', name: '方苏芸', job: '开发'},
-      ];
-      this.addPersonHistoryList = demoHistoryList.filter(element => {
-        return element.name.indexOf(this.personName) !== -1;
+      let params = {
+        userName: this.personName
+      };
+      recommendUsers(params).then(response => {
+        console.log(response);
+        if(response.code == 200){
+          this.addPersonHistoryList = response.data || [];
+        }
+      }).catch(error => {
+//        this.$message.error('系统异常，请重新偿试！');
       });
     },
     // 删除历史
-    delHistory(index){
-      this.addPersonHistoryList.splice(index,1);
-    },
+//    delHistory(index){
+//      this.addPersonHistoryList.splice(index,1);
+//    },
     // 保存人物
     savePerson () {
-      this.$emit('save-person',{
-        personName: this.personName,
-        personJob: this.personJob,
+      // 人物名称验证
+      if(this.personName == '' || this.personName.length == 0){
+        this.$message.error(nameEmptyText);
+        return
+      }
+      if( this.personName.length > 10){
+        this.$message.error(nameEnoughText);
+        return
+      }
+      // 人物职位验证
+      if(this.personJob == '' || this.personJob.length == 0){
+        this.$message.error(jobEmptyText);
+        return
+      }
+      let jobs = this.personJob.split(' ');
+      if(jobs.length > 4){
+        this.$message.error(jobEnoughText);
+        return
+      }
+      jobs = jobs.filter(item => {
+        return item.length > 10;
       });
+      if(jobs.length > 0){
+        this.$message.error(jobEnoughText);
+        return
+      }
+
+      // 不超过5个
+      if(this.personWordsAdded.length >=5){
+        this.$message.error(jobFullText);
+        return
+      }
+
+      this.$emit('save-person',{
+        name: this.$iknowsUtil.trim(this.personName),
+        job: this.$iknowsUtil.trim(this.personJob),
+      });
+      this.personName = '';
+      this.personJob = '';
+      document.getElementById('configMask').style.display= 'none';
     },
     // 取消人物
-    cancelPerson () { 
+    cancelPerson () {
       this.$emit('cancel-person',{});
+      this.personName = '';
+      this.personJob = '';
+      document.getElementById('configMask').style.display= 'none';
     },
   },
-  created() {
-    this.addPersonHistoryList = [
-      {id: '1', name: '李国美', job: '总经理'},
-      {id: '2', name: '赵日天', job: 'BOSS'},
-      {id: '3', name: '叶良辰', job: 'CEO'},
-      {id: '4', name: '赵大宝', job: '事务部大事务官'},
-      {id: '5', name: '张国立', job: '购物部经理'},
-      {id: '6', name: '王家怀', job: '采购员、出纳'},
-      {id: '7', name: '周产波', job: '经理助理'},
-      {id: '8', name: '超爱国', job: '经理助理'},
-      {id: '9', name: '张三样', job: '行政专员'},
-      {id: '10', name: '李家嘴', job: '开发'},
-      {id: '11', name: '方苏芸', job: '开发'},
-    ];
+  mounted() {
+    this.personWordsAdded = this.personWords;
+    this.personName = '';
+    this.personJob = '';
   },
-
 }
 </script>
 <style scoped>
@@ -173,6 +215,17 @@ export default {
   border-radius: 20px;
   box-sizing: border-box;
 }
+@media screen and (max-width:1440px){
+  .addPerson .addPerson-content-layout{
+    top: calc((100% - 560px)/2);
+    left: calc((100% - 900px)/2);
+    width: 900px;
+    height: 560px;
+  }
+  .addPerson .addPerson-contentList{
+    height: 200px;
+  }
+}
 .addPerson .addPerson-title{
   width: 100%;
   height: 30px;
@@ -195,7 +248,7 @@ export default {
   justify-content: flex-start;
 }
 .addPerson .addPerson-left{
-  width: 122px;
+  width: 130px;
   height: 100%;
   line-height: 38px;
   text-align: left;
@@ -220,6 +273,9 @@ export default {
   border: none;
   border-radius: 9px;
   box-sizing: border-box;
+}
+.addPerson .addPerson-hint i:hover{
+  color: #1D2088;
 }
 .addPerson .addPerson-history{
   margin-top: 30px;
@@ -256,16 +312,17 @@ export default {
   border: none;
 }
 .addPerson .personList-name{
-  width: 230px;
+  width: 210px;
+  padding-left: 20px;
   text-align: left;
 }
 .addPerson .personList-job{
-  width: 450px;
+  width: 520px;
   text-align: left;
 }
-.addPerson .personList-operate{
-  width: 100px;
-}
+/*.addPerson .personList-operate{*/
+  /*width: 100px;*/
+/*}*/
 .addPerson .name-header,
 .addPerson .job-header{
   font-weight: 600;

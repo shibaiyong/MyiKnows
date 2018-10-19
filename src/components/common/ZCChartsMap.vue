@@ -1,5 +1,5 @@
 <template>
-  <div class="zc_charts_content" id="zc_charts_content">
+  <div class="zc_charts_content" :id="'zc_charts_content_'+id">
 
     <div :id="'zc_charts_map'+id"
          class="zc_charts_map"
@@ -38,8 +38,8 @@
           {name: '西藏'}, {name: '四川'}, {name: '宁夏'}, {name: '海南'}, {name: '台湾'}, {name: '香港'}, {name: '澳门'},
           {name: '南海诸岛'}
         ],
-        max:0,
-        mapData:[]
+        max: 0,
+        mapData: []
       }
 
     },
@@ -60,13 +60,14 @@
 
         thiz.provincesData.forEach(function (item) {
           thiz.data.forEach(function (data) {
-            if(data[thiz.label] === item.name){
+            let provinceName = thiz.cutProvinceName(data[thiz.label])
+            if (provinceName === item.name) {
 
-              thiz.max = Math.max(thiz.max,data[thiz.prop]);
+              thiz.max = Math.max(thiz.max, data[thiz.prop]);
 
-              result.push({name: data[thiz.label], value: data[thiz.prop]})
-            }else{
-              result.push({name:item.name})
+              result.push({name: provinceName, value: data[thiz.prop]})
+            } else {
+              result.push({name: item.name})
             }
           })
 
@@ -88,11 +89,11 @@
             },
             extraCssText: 'box-shadow: 1px 1px 10px 2px #F5F5F5;line-height:25px;text-align: left;',
 
-            formatter(params){
-              if(params.name === '南海诸岛'){
+            formatter(params) {
+              if (params.name === '南海诸岛') {
                 return
               }
-              return params.name+'&nbsp:&nbsp'+(params.value?params.value:'-')
+              return params.name + '&nbsp:&nbsp' + (params.value ? params.value : '-')
             }
           },
           geo: {
@@ -101,22 +102,22 @@
             show: true,
             map: 'china',
             roam: false,
-            layoutCenter: ['50%','50%'],
+            layoutCenter: ['50%', '50%'],
             itemStyle: {
               areaColor: '#dddddd',
               borderColor: '#fff',
               borderWidth: 1,
               shadowBlur: 0
             },
-            regions:[{
-              name:'南海诸岛',
+            regions: [{
+              name: '南海诸岛',
               value: 0,
-              itemStyle:{
-                opacity:0
+              itemStyle: {
+                opacity: 0
               },
-              emphasis:{
-                itemStyle:{
-                  opacity:0
+              emphasis: {
+                itemStyle: {
+                  opacity: 0
                 },
 
               }
@@ -124,18 +125,18 @@
             label: {show: false,},
             emphasis: {label: {show: false}}
           },
-          visualMap:{
-            type:'continuous',
-            orient:'horizontal',
-            inverse:true,
-            min:0,
-            max:this.max,
-            itemHeight:100,
-            left:10,
-            bottom:30,
+          visualMap: {
+            type: 'continuous',
+            orient: 'horizontal',
+            inverse: true,
+            min: 0,
+            max: this.max,
+            itemHeight: 100,
+            left: 10,
+            bottom: 30,
             text: ['高', '低'],
-            inRange:{
-              color:['#E4E9FE', '#3B87F5']
+            inRange: {
+              color: ['#E4E9FE', '#3B87F5']
             }
 
           },
@@ -151,11 +152,11 @@
 
       initMapChart() {
 
-        let content = document.getElementById('zc_charts_content');
+        let content = document.getElementById('zc_charts_content_' + this.id);
 
         let empty = document.getElementById(this.id);
 
-        let map = document.getElementById('zc_charts_map'+this.id);
+        let map = document.getElementById('zc_charts_map' + this.id);
 
         if (this.data.length) {
 
@@ -181,6 +182,17 @@
           empty.style.lineHeight = content.offsetHeight + 'px';
 
         }
+      },
+
+
+      cutProvinceName(name) {
+        let newName = name;
+        if (name.indexOf('省') > 0) {
+          newName = name.substring(0, name.indexOf('省'))
+        } else if (name.indexOf('市') > 0) {
+          newName = name.substring(0, name.indexOf('市'))
+        }
+        return newName
       }
 
     },
@@ -214,5 +226,7 @@
   .zc_charts_empty {
     display: none;
     text-align: center;
+    font-size: 14px;
+    color:#606266 ;
   }
 </style>

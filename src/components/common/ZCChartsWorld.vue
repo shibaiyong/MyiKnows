@@ -1,5 +1,5 @@
 <template>
-  <div class="zc_charts_content" id="zc_charts_content">
+  <div class="zc_charts_content" :id="'zc_charts_content_'+id">
 
     <div id="zc_charts_world"
          class="zc_charts_world"
@@ -73,6 +73,7 @@
           sizeRange: [12, 50],
           rotationRange: [0, 0],
           shape: 'circle',
+          cursor: 'default',
           textStyle:{
             normal:{
               color(){
@@ -114,7 +115,7 @@
 
       initWorldCloudChart() {
 
-        let content = document.getElementById('zc_charts_content');
+        let content = document.getElementById('zc_charts_content_'+this.id);
 
         let empty = document.getElementById(this.id);
 
@@ -173,5 +174,7 @@
   .zc_charts_empty {
     display: none;
     text-align: center;
+    font-size: 14px;
+    color:#606266 ;
   }
 </style>

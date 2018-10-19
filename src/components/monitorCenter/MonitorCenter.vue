@@ -1,10 +1,11 @@
 <template>
-  <div>
+  <div class="body-box">
     <div class="top-header">
       <iTop/>
       <iHeader/>
     </div>
-    <monitorCenterContent class=" rzl_bc_undercoat rzl-contarner" />
+    <monitorCenterContent :parentHeight="height" class=" rzl_bc_undercoat rzl-contarner content"
+                          id="monitorContentBox"/>
     <IFooter/>
   </div>
 </template>
@@ -20,10 +21,26 @@
   export default {
     name: "monitor-center",
     components: {iTop, iHeader, titleLabel, dataUtil, monitorCenterContent, IFooter},
-
+    data() {
+      return {
+        height: 0,
+      }
+    },
+    mounted() {
+      this.height = document.getElementById("monitorContentBox").offsetHeight
+    }
   }
 </script>
 
 <style scoped>
+  .body-box {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    height: 100%;
+  }
 
+  .content {
+    flex: 1;
+  }
 </style>

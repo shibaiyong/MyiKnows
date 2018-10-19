@@ -1,5 +1,5 @@
 <template>
-  <div class="rzl-contarner rzl_bc_undercoat">
+  <div class="rzl-contarner rzl_bc_undercoat" >
     <div class="blank_1 rzl_bc_undercoat"></div>
     <ul class="topNewsTab">
       <li v-for="(item,index) of topNewsTab" :key="index" @click="NewsTab(item.type)" v-bind:class='{active:item.type==isActive}'>
@@ -9,15 +9,16 @@
     <div class="topNews rzl_bc_white" >
       <!--<input type="text" v-model="queryTopNews"  placeholder="" class="rzl_seach_Input font16" >-->
       <!--<button  type="button" class="rzl_seach_button rzl_bc_navy font16 rzl_fc_white">搜索</button>-->
-      <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14">最新舆情</p>
-      <ul  class="topNewsList">
-        <li class="topNewsItems clearfix" v-for="(item,index) of topNewsList" :key="index" @click="toDetail(item.id)">
+      <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14">最 新</p>
+      <div v-if="topNewsList.length >0">
+        <ul  class="topNewsList" >
+          <li class="topNewsItems clearfix" v-for="(item,index) of topNewsList" :key="index" @click="toDetail(item.id,item.publishTime)">
             <div class="topNewsLeft">
               <p class="topNewsTitle font16 rzl_fc_darkgray">{{item.title}}</p>
               <div class="topNewsTag rzl_fc_darkgray font14">
-                <span>发布时间：<i>{{item.time}}</i></span>
-                <span>来源：<i>{{item.source}}</i></span>
-                <span>热度指数：<i>{{item.hotNum}}</i></span>
+                <span>发布时间：<i>{{getDate(item.publishTime)}}</i></span>
+                <span class="source">来源：<i>{{item.source}}</i></span>
+                <!--<span>热度指数：<i>{{item.score}}</i></span>-->
               </div>
               <div class="topNewsContent font14">
                 {{item.content}}
@@ -25,24 +26,42 @@
             </div>
             <!--已读未读-->
             <!--<div class="topNewsRight">-->
-              <!--<span class="isread font18" v-if="item.read == 1">已读</span>-->
-              <!--<span class="unread font18" v-else>未读</span>-->
+            <!--<span class="isread font18" v-if="item.read == 1">已读</span>-->
+            <!--<span class="unread font18" v-else>未读</span>-->
             <!--</div>-->
-        </li>
-      </ul>
-      <div class="rzl_fc_navy t-center loadMore" @click="loadMore()">加载更多</div>
+          </li>
+        </ul>
+        <div class="rzl_fc_navy t-center loadMore" v-show="loadmore" @click="loadMore()">加载更多</div>
+      </div>
+      <div v-else class="noData font16" >暂无相关数据</div>
+
     </div>
     <div class="blank_1 rzl_bc_undercoat"></div>
   </div>
 </template>
 
 <script>
+    import {getIntelligentTopNews}  from '@/assets/js/api';
+    import iKnowsUtil from '@/assets/js/iknowsUtil';
     export default {
         name: "IntelligenceTopNewsContent",
+        props: ["parentHeight"],
+        watch: {
+          parentHeight() {
+            var dom = document.getElementById("doc")
+            dom.style.height = this.parentHeight+"px"
+            // if (dom && this.parentHeight != 0 && this.parentHeight > dom.offsetHeight) {
+            //
+            // }
+          }
+        },
         data(){
           return{
+            // 搜索条件
             queryTopNews: '',
+            // 头条列表
             topNewsList:[],
+            // tab切换
             topNewsTab:[{
               'title':'推荐',
               'type':1
@@ -50,80 +69,113 @@
               'title':'本地热点',
               'type':2
             },{
-              'title':'周边热点',
-              'type':3
-            },{
               'title':'全国热点',
-              'type':4
+              'type':3
             }],
+            // 默认显示推荐数据
             isActive:1,
+            // 初始化默认10条
+            loadMorePage:10,
+            topNewsArray:[],
+            loadmore:true
           }
         },
         methods:{
+          // 时间格式处理
+          getDate(time) {
+            if (!time || time == null || time == "" || time == undefined) {
+              return "未知时间"
+            }
+            return iKnowsUtil.dataFormat(new Date(time).getTime())
+          },
           //tab切换
           NewsTab(id){
             this.isActive = id;
+            this.topNewsArray=[];
+            this.loadMorePage=10;
+            let _this = this;
+            _this.loadTopNewsData()
           },
           //获取舆情头条数据
           loadTopNewsData(){
-            let data =[{
-              id:0,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              read:'1'
-            },{
-              id:1,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              read:'2'
-            },{
-              id:2,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              read:'1'
-            },{
-              id:3,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              read:'2'
-            }]
-            this.handleData_TopNews(data)
+            let params = new URLSearchParams();
+            params = {
+              searchType:this.isActive
+            };
+            let _this = this;
+            getIntelligentTopNews(params).then(response => {
+              if (response.code == 200) {
+                _this.handleData_TopNews(response.data);
+                _this.topNewsArray = response.data;
+              }else {
+                this.$message.error(response.message);
+              }
+            }).catch(error => {
+              console.log(error);
+            })
+
           },
+          // 处理数据首次显示10条
           handleData_TopNews(data){
-            this.topNewsList = data;
+            let Data = data;
+            let topNewsData =[];
+            let loadPage = this.loadMorePage;
+            Data.forEach(function (v,i) {
+              if (i<loadPage){
+                if (v.score == '' || v.score== null){
+                  v.score = '-'
+                }
+                topNewsData.push(v)
+              }
+            })
+            this.topNewsList = topNewsData;
+          },
+          // 加载更多分页数据处理
+          handleData_TopNewsPage(){
+            let Data = this.topNewsArray;
+            let length = Data.length;
+            let topNewsData =[];
+            let loadPage = this.loadMorePage + 5;
+            if (loadPage < length ){
+              Data.forEach(function (v,i) {
+                if(i<loadPage){
+                  if (v.score == '' || v.score== null){
+                    v.score = '-'
+                  }
+                  topNewsData.push(v)
+                }
+              })
+              this.topNewsList = topNewsData;
+              this.loadMorePage = loadPage
+            } else {
+              Data.forEach(function (v,i) {
+                if(i<loadPage){
+                  topNewsData.push(v)
+                }
+              })
+              this.loadmore = false;
+              this.topNewsList = topNewsData;
+            }
+
+
           },
           //跳转到详情页面
-          toDetail(id){
-
+          toDetail(id,time){
+            let releaseDatetime = new Date(time).getTime();
+             window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
+              // this.$router.push({
+              //   path: '/details',
+              //   query: {
+              //     webpageCode: id,
+              //     releaseDatetime:new Date(time).getTime()
+              //   }
+              // })
           },
           //加载更多数据
           loadMore(){
-
+            this.handleData_TopNewsPage()
           },
+
         },
         mounted(){
           this.loadTopNewsData();
@@ -163,6 +215,9 @@
     text-align: center;
     font-weight: 600;
   }
+  .topNewsList{
+    min-height: 260px;
+  }
   .topNewsItems{
     padding: 0 90px;
     border-bottom:1px solid #CDCDCD;
@@ -170,6 +225,7 @@
   .topNewsLeft{
     float: left;
     width: 100%;
+    cursor: pointer;
   }
   .topNewsTitle{
     font-weight: 600;
@@ -181,6 +237,9 @@
     display: inline-block;
     font-weight: 600;
   }
+  .topNewsTag span.source{
+    width: 60%;
+  }
   .topNewsTag span i{
     color: #252525;
     font-style:normal;
@@ -188,6 +247,8 @@
   .topNewsContent{
     margin: 20px 0;
     line-height: 22px;
+    max-height: 45px;
+    overflow: hidden;
   }
   .topNewsRight{
     float: right;
@@ -209,6 +270,12 @@
     text-align: center;
     margin-top: 30px;
     cursor: pointer;
+  }
+  .noData{
+    height: 370px;
+    text-align: center;
+    padding-top: 30px;
+    color: #606266;
   }
 
 </style>

@@ -1,14 +1,17 @@
 <template>
-  <div class="topNews" id="top">
-    <div class="top-header">
+  <div class="topNews" id="top" ref='documentHeight'>
+    <div class="top-header" ref='topHeight'>
       <ITop></ITop>
       <IHeader  @onClickListener="" :items="items"></IHeader>
     </div>
-    <TopNewsContent ></TopNewsContent>
-    <span v-show="show" @click="returnToTopFn" class="f-db backTop">
-      <img src="../../assets/backtop.png"/>
-    </span>
-    <IFooter></IFooter>
+    <TopNewsContent :parentHeight="height"></TopNewsContent>
+    <div v-show="show" @click="returnToTopFn" class="f-db backTop">
+      <img src="../../assets/up.png"/>
+    </div>
+    <div  ref='bottomHeight'>
+      <IFooter ></IFooter>
+    </div>
+
   </div>
 </template>
 
@@ -17,7 +20,7 @@
   import ITop from '@/components/common/Top';
   import IHeader from '@/components/common/Header';
   import IFooter from '@/components/common/Footer';
-  import TopNewsContent from './IntelligenceTopNewsContent';
+  import TopNewsContent from '@/components/IntelligenceTopNews/IntelligenceTopNewsContent';
   import iKnowsUtil from '@/assets/js/iknowsUtil';
   export default {
     name: "IntelligenceTopNews",
@@ -26,7 +29,8 @@
       return {
         items:["首页","舆情头条","监测中心","简报中心"],
         show: false,
-        clean: () => {}
+        clean: () => {},
+        height: 0,
       }
     },
     methods:{
@@ -42,11 +46,11 @@
       //监听scrollTop
       listen() {
         let el = this.$el.parentNode
+        el.scrollTop = 0;
         if (!(el instanceof HTMLElement)) return
         let scrollFn = () => {
           let top = el.scrollTop >> 0
-          console.log(top)
-          if (top > 100){
+          if (top > 500){
             this.show = true
           }else {
             this.show = false
@@ -56,10 +60,20 @@
         return () => {
           el.removeEventListener('scroll', scrollFn)
         }
+      },
+      //获取高度
+      ajustHeight(){
+        // let topHeight = this.$refs.topHeight.offsetHeight
+        // let bottomHeight = this.$refs.bottomHeight.offsetHeight
+        // let documentHeight = this.$refs.documentHeight.offsetHeight
+        //
+        // this.height  = documentHeight - topHeight - bottomHeight;
+        // this.height = this.height < 600 ? 600 : this.height;
       }
     },
     mounted(){
-      this.clean = this.listen()
+      this.clean = this.listen();
+      this.ajustHeight()
     },
     beforeDestroy() {
       this.clean()
@@ -69,11 +83,20 @@
 
 <style scoped>
   .backTop{
-    width: 40px;
     height: 40px;
+    text-align: center;
+    width: 40px;
+    padding: 10px;
+    box-sizing: border-box;
     position: fixed;
-    right: 5%;
-    bottom: 20%;
+    bottom: 180px;
+    right: 60px;
+    border-radius: 50%;
+    background: rgba(91, 91, 91, 0.5);
+  }
+  .backTop img{
+    width: 20px;
+    height: 20px;
     cursor: pointer;
   }
 </style>

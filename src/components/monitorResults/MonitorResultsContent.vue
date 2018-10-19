@@ -1,13 +1,13 @@
 <template>
   <div>
     <!-- 内容区最外层容器均采用rzl-contarner样式 -->
-    <div class="rzl-contarner rzl_bc_undercoat">
+    <div class="">
       <div class="warningList-content">
         <div class="monitor-content rzl_bc_white">
           <!--搜索框-->
           <div>
             <input type="text"  v-model="queryTopNews"  placeholder="请输入文章标题" ref="count" class="rzl_seach_Input font16" >
-            <button type="button" class="rzl_seach_button rzl_bc_navy font16 rzl_fc_white">搜索</button>
+            <button type="button" class="rzl_seach_button rzl_bc_navy font16 rzl_fc_white" @click="seachKey()">搜索</button>
             <span><el-alert
               title="请减少到20字以内"
               type="warning"
@@ -21,7 +21,7 @@
             <span class="font16">媒体类型</span>
             <ul class="clearfix">
               <li v-for="(item,index) of mediaType" :key="index" class="font14" @click="changeMediaType(item.type)" v-bind:class='{active:item.type==isActive_MediaType}'>
-                {{item.name}}({{item.typeNum}})
+                {{item.name}}({{item.count}})
               </li>
             </ul>
           </div>
@@ -66,36 +66,37 @@
             </ul>
           </div>
           <!--舆情列表-->
-          <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14">最新舆情</p>
-          <ul  class="topNewsList">
-            <li class="topNewsItems clearfix" v-for="(item,index) of monitorResultList" :key="index">
+          <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14">最 新</p>
+          <div v-show="dataload"  class="noData font16">数据加载中...</div>
+          <div v-show="noData"   class="noData font16">暂无相关数据</div>
+          <ul  class="topNewsList" v-if="monitorResultList.length >0">
+            <li class="topNewsItems clearfix" v-for="(item,index) of monitorResultList" :key="index" @click="toDetail(item.webpageCode,item.releaseDatetime)">
               <div class="topNewsLeft">
-                <p class="topNewsTitle font16 rzl_fc_darkgray">{{item.title}}</p>
+                <p class="topNewsTitle font16 rzl_fc_darkgray" v-html ="heightLightShow(item.title)"></p>
                 <div class="topNewsTag rzl_fc_darkgray font14">
-                  <span>发布时间：<i>{{item.time}}</i></span>
-                  <span>来源：<i>{{item.source}}</i></span>
+                  <span>发布时间：<i>{{getDate(item.releaseDatetime)}}</i></span>
+                  <span>来源：<i>{{item.sourceCrawl}}</i></span>
                 </div>
-                <div class="topNewsContent font14">
-                  {{item.content}}
+                <div class="topNewsContent font14" v-html ="heightLightShow(item.summary)">
                 </div>
                 <div class="topNewsTag rzl_fc_darkgray font14 mb20">
-                  <span>情感指数：<i>{{item.hotNum}}</i></span>
+                  <span>情感倾向：<i :class="{redLabel:item.tags == '负面'}">{{item.tags}}</i></span>
                 </div>
               </div>
               <div class="topNewsRight t_center">
-                <span class="leavl1 font18 " v-if="item.leavl == 1">重大</span>
-                <span class="leavl2 font18 " v-else-if="item.leavl == 2">较大</span>
-                <span class="leavl3 font18 " v-else-if="item.leavl == 3">轻微</span>
-                <span class="leavl4 font18 " v-else-if="item.leavl == 4">一般</span>
+                <span class="leavl1 font18 " v-if="item.status == 4">重大</span>
+                <span class="leavl2 font18 " v-else-if="item.status == 3">较大</span>
+                <span class="leavl3 font18 " v-else-if="item.status == 2">轻微</span>
+                <span class="leavl4 font18 " v-else-if="item.status == 1">一般</span>
                 <span class="leavl5 font18 " v-else>正常</span>
               </div>
               <div class="topNewsRight mt_10">
-                <span class="infoBtn rzl_bc_navy rzl_fc_white font16" @click="toDetail(item.id)">查看详情</span>
+                <span class="infoBtn rzl_bc_navy rzl_fc_white font16" @click="toDetail(item.webpageCode,item.releaseDatetime)">查看详情</span>
               </div>
             </li>
           </ul>
           <!--分页-->
-          <div class="pagination">
+          <div class="pagination" v-if="monitorResultList.length">
             <Pagination :totalNum="total"
                         @currentChange="currentChange"
                         ref="pagination"/>
@@ -109,11 +110,15 @@
 
 <script>
    // import ITabConfig from '@/components/common/TabConfig';
-   import Pagination from "@/components/common/Pagination"
+   import { getMonitorResults ,getMonitorType}from '@/assets/js/api';
+   import Pagination from "@/components/common/Pagination";
+   import iKnowsUtil from '@/assets/js/iknowsUtil';
+   let vm;
    export default {
       name: "MonitorResultsContent",
       components: {Pagination},
       data(){
+        vm = this
         return{
           // 搜索框
           queryTopNews: '',
@@ -122,7 +127,11 @@
           // 字数超出提示
           wordnumber: false,
           // 媒体类型
-          mediaType:[],
+          mediaType:[{
+            name:'全部',
+            count:0,
+            type:null
+          }],
           // 时间范围
           timeRange:[],
           // 警报等级
@@ -130,9 +139,9 @@
           //时间热度排行
           timeOrhot:[],
           // 初始化默认选中数据
-          isActive_MediaType:0,
+          isActive_MediaType:null,
           isActive_AlertLevel:0,
-          isActive_TimeRange:0,
+          isActive_TimeRange:2,
           isActive_TimeOrHot:0,
           // 时间控件是否禁用
           disabled: true,
@@ -141,149 +150,198 @@
           // 限定时间范围-只可选择当前时间之前
           dateScope: {
             disabledDate(time) {
-              return time.getTime() > Date.now() - 8.64e6
+              // time.getTime() > Date.now() - 8.64e6;
+              return time.getTime() < Date.now() - 8.64e7 * 60;
             }
           },
           timeDefaultShow:'',
           //监测结果列表
           monitorResultList:[],
-          // 分页
+          // 分页总数
           total: 0,
-          page: 0,
+          // 当前页
+          page:1,
+          dataload:false,
+          noData:false
         }
       },
       methods:{
+          //关键字搜索
+          seachKey(){
+              if (this.queryTopNews != ''){
+                this.loadMonitorResultData()
+                  // alert(this.queryTopNews)
+              } else {
+                this.$message.error('请输入关键字搜索');
+              }
+          },
           // 媒体类型数据
           loadMediaType(){
-           this.mediaType=[{
-             type:0,
-             name:'全部',
-             typeNum:'123'
-           },{
-             type:1,
-             name:'新闻',
-             typeNum:'123'
-           },{
-             type:2,
-             name:'数字报',
-             typeNum:'123'
-           },{
-             type:3,
-             name:'微信',
-             typeNum:'123'
-           },{
-             type:4,
-             name:'微博',
-             typeNum:'123'
-           },{
-             type:5,
-             name:'APP',
-             typeNum:'123'
-           }]
+            let params;
+            params = {
+              id:this.$route.params.id,
+            };
+            getMonitorType(params).then(response => {
+              if (response.code == 200) {
+                this.mediaType=response.data
+                this.mediaType = this.mediaType.reverse()
+              }else if(response.code == 103){
+                this.$message.error(response.msg);
+              }else {
+                this.$message.error(response.message);
+              }
+            }).catch(error => {
+              // console.log(error);
+            })
          },
           //选择媒体类型
           changeMediaType(id){
             this.isActive_MediaType = id;
+            this.page=1;
+            this.monitorResultList=[];
+            this.loadMonitorResultData()
           },
           //选择警报等级
           changeAlertLevel(id){
             this.isActive_AlertLevel = id;
-            // console.log(this.isActive_MediaType)
-            // console.log(this.customTime)
-            // console.log(this.isActive_TimeRange)
-            // console.log(this.isActive_AlertLevel)
+            this.page=1;
+            this.monitorResultList=[];
+            this.loadMonitorResultData()
           },
           //选择时间范围
           changeTimeRange(id){
              this.isActive_TimeRange = id;
-             if (id == 3){
+             if (id == 4){
                this.disabled = false;
              }else {
                this.disabled = true;
+               this.page=1;
+               this.monitorResultList=[];
+               this.loadMonitorResultData()
              }
+
           },
           //自定义时间选择
           getCustomTime(){
-            this.customTime;
-            console.log(this.customTime)
-            console.log(this.isActive_TimeRange)
+            this.page=1;
+            this.monitorResultList=[];
+            this.loadMonitorResultData()
           },
           //时间热度排行
           changeTimeOrHot(id){
             this.isActive_TimeOrHot = id;
+            this.page=1;
+            this.monitorResultList=[];
+            this.loadMonitorResultData();
           },
           //获取监测结果列表数据
           loadMonitorResultData(){
-            let data =[{
-              id:0,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              leavl:'1'
-            },{
-              id:1,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              leavl:'2'
-            },{
-              id:2,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              leavl:'3'
-            },{
-              id:3,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              leavl:'4'
-            },{
-              id:3,
-              title:'美国制裁上瘾新兴市场扛得住吗?这个国家左右为难',
-              time:'2018/08/21 12:23',
-              source:'人民网',
-              hotNum:'100',
-              content:' 最近，美国先后宣布对伊朗、俄罗斯和土耳其发动制裁。\n' +
-              '受此影响，俄罗斯卢布周一跌至2016年初以来的最低位，土耳其里拉周一开盘再次崩跌10%，南非兰特等新兴市场货币也出现大跌，印尼盾成为亚洲表现最差的货币。\n' +
-              '最糟糕的可能是伊朗。自特朗普宣布退出伊核协议后不到三个月内，伊朗货币大幅贬值，里亚尔对美元已贬值近半。\n' +
-              '尽管如此，伊朗仍称近期将不会与美国谈判，土耳其和俄罗斯政要也表示将与美国开打“经济战”。',
-              leavl:'5'
-            }]
-            this.handleData_onitorResult(data)
+            this.noData = false;
+            this.dataload = true;
+            let params = new URLSearchParams();
+            let time=[];
+            let start =  new Date(this.customTime[0]).getTime();
+            let end =  new Date(this.customTime[1]).getTime();
+            if (start == end){
+              this.$message.error('结束时间须大于开始时间，请重新选择');
+              this.customTime =[];
+              this.dataload = false;
+              return false;
+            } else{
+              var starttime =  start;
+              var endtime =  end;
+            }
+            time.push(start);
+            time.push(end);
+            let sortFie,sortType;
+            let isHot = this.isActive_TimeOrHot;
+            if (isHot == 0){
+              sortFie='releaseDatetime'
+              sortType = 0
+            } else if(isHot == 1) {
+              sortFie='releaseDatetime'
+              sortType = 1
+            }else {
+              sortFie='weight'
+              sortType = 0
+            }
+            let page = this.page -1;
+            let pagestart = page * 10;
+            params = {
+              id:this.$route.params.id,
+              searchArticleTitle:this.queryTopNews,
+              level:this.isActive_AlertLevel,
+              carrier:this.isActive_MediaType,
+              timeType:this.isActive_TimeRange,
+              startTime:starttime,
+              endTime:endtime,
+              sortField:sortFie,
+              sortType:sortType,
+              pageStart:pagestart,
+              pageSize:10
+            };
+            let _this = this;
+            getMonitorResults(params).then(response => {
+              _this.handleData_onitorResult(response);
+              // if (response.code == 200) {
+              //   _this.handleData_onitorResult(response.data);
+              // }else {
+              //   this.$message.error(response.message);
+              // }
+            }).catch(error => {
+              // console.log(error);
+            })
           },
           handleData_onitorResult(data){
-            this.monitorResultList = data;
+            let Data = data.content;
+            if (Data != '' && Data != null) {
+              Data.forEach(function (v) {
+                var sentiment = v.sentiment;
+                // v.sentiment = sentiment.toFixed(2);
+                if (sentiment <= 0.7 && sentiment >= 0.3) {
+                  v.tags = '中性'
+                } else if (sentiment < 0.3) {
+                  v.tags = '负面'
+                } else {
+                  v.tags = '正面'
+                }
+              })
+              this.dataload = false;
+              this.noData = false;
+              this.monitorResultList = Data;
+              this.total = data.totalElements;
+            }else {
+              this.noData = true;
+              this.dataload = false;
+            }
+
+          },
+          //时间格式处理
+          getDate(time) {
+            if (!time || time == null || time == "" || time == undefined) {
+              return "未知时间"
+            }
+            return iKnowsUtil.dataFormat(new Date(time).getTime())
           },
           //跳转到详情页面
-          toDetail(id){
-              // alert(id)
-          },
-          // 分页
-          currentChange(i){
-              // alert(i)
+          toDetail(id,time){
+          let Time = new Date(time).getTime();
+          window.open('/details?webpageCode='+id+'&releaseDatetime='+ Time );
+        },
+        // 分页
+        currentChange(i){
+          this.page = i;
+          this.loadMonitorResultData()
+        },
+        heightLightShow( val ){
+          let queryStr = vm.queryTopNews
+          var newVal = val
+          let replaceStr = "<span class='red'>"+ queryStr +"</span>"
+          if( queryStr != ''){
+            newVal = val.replace(new RegExp(queryStr,'g'),replaceStr)
           }
-
+          return newVal
+       }
       },
       watch:{
        queryTopNews:{
@@ -300,22 +358,23 @@
          deep:true
        }
      },
+
       created(){
         // 日期选择显示当前月和上一月
         this.timeDefaultShow = new Date();
         this.timeDefaultShow.setMonth(new Date().getMonth() - 1);
         // 时间范围
         this.timeRange=[{
-          type:0,
+          type:1,
           name:'今日'
         },{
-          type:1,
+          type:2,
           name:'近7天'
         },{
-          type:2,
+          type:3,
           name:'近30天'
         },{
-          type:3,
+          type:4,
           name:'自定义'
         }];
         // 警报等级
@@ -324,34 +383,40 @@
           alertLevel:0
         },{
           name:'重大',
-          alertLevel:1
-        },{
-          name:'较大',
-          alertLevel:2
-        },{
-          name:'轻微',
-          alertLevel:3
-        },{
-          name:'一般',
           alertLevel:4
         },{
-          name:'正常',
-          alertLevel:5
-        }];
-        //时间热度排行
-        this.timeOrhot=[{
-          name:'时间↑',
-          type:0
+          name:'较大',
+          alertLevel:3
         },{
-          name:'热度',
-          type:1
-        }]
+          name:'轻微',
+          alertLevel:2
+        },{
+          name:'一般',
+          alertLevel:1
+        },
+//          {
+//          name:'正常',
+//          alertLevel:5
+//        }
+        ];
+        //时间热度排行
+        this.timeOrhot=[
+          {
+            name:'时间降序↓',
+            type:0
+          },{
+            name:'时间升序↑',
+            type:1
+          },
+        //   {
+        //   name:'热度',
+        //   type:2
+        // }
+        ]
       },
       mounted(){
         this.loadMediaType();
         this.loadMonitorResultData();
-        this.total = 100;
-        this.$refs.pagination.changeCurrentPage(1);
       }
     }
 </script>
@@ -422,14 +487,14 @@
   .timeOrHot ul{
     margin-top: 0;
     margin-left: 0;
-    width: 120px;
+    /*width: 120px;*/
     height: 34px;
     border: 2px solid #1D2088;
     border-radius: 10px;
     overflow: hidden;
   }
   .timeOrHot ul li{
-    width: 60px;
+    width: 75px;
     height: 34px;
     line-height: 34px;
     padding:0px;
@@ -437,7 +502,7 @@
     text-align: center;
   }
   .timeOrHot ul li.active{
-    width: 60px;
+    width: 75px;
     padding:0px;
     border-radius: 0;
   }
@@ -454,6 +519,9 @@
     text-align: center;
     font-weight: 600;
   }
+  .topNewsList{
+    min-height: 260px;
+  }
   .topNewsItems{
     padding: 0 80px;
     border-bottom:1px solid #CDCDCD;
@@ -461,6 +529,7 @@
   .topNewsLeft{
     float: left;
     width: 70%;
+    cursor: pointer;
   }
   .topNewsTitle{
     font-weight: 600;
@@ -473,8 +542,11 @@
     font-weight: 600;
   }
   .topNewsTag span i{
-    color: #252525;
-    font-style:normal;
+       color: #252525;
+       font-style:normal;
+  }
+  .topNewsTag i.redLabel{
+    color: #D62828;
   }
   .topNewsContent{
     margin: 20px 0;
@@ -531,5 +603,11 @@
     flex-direction: row;
     justify-content: flex-end;
     margin-top: 10px;
+  }
+  .noData{
+    height: 260px;
+    text-align: center;
+    padding-top: 30px;
+    color: #606266;
   }
 </style>

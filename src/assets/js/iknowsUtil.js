@@ -16,7 +16,7 @@ var iknowsUtil = {
   * 返回格式: yyyy-mm-dd hh:mm:ss 如: 2018-09-10 12:25:40
   */
   dataFormat: function (dateTime) {
-    var date = new Date(time);
+    var date = new Date(dateTime);
     var year = date.getFullYear();
     var month = date.getMonth() + 1;
     var day = date.getDate();
@@ -25,8 +25,16 @@ var iknowsUtil = {
     if (minutes.length == 1) {
       minutes = "0" + minutes
     }
-    return year + "-" + month + "-" + day + " " + hours + ":" + minutes
+    return checkTime(year) + "-" + checkTime(month) + "-" + checkTime(day) + " " + checkTime(hours) + ":" + checkTime(minutes)
+    // 补0
+    function checkTime(time) {
+      if (time < 10) {
+        time = "0" + time;
+      }
+      return time;
+    }
   },
+
   // 对Date的扩展，将 Date 转化为指定格式的String
   // 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
   // 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
@@ -69,7 +77,7 @@ var iknowsUtil = {
     let endTime = new Date(currentTime.getTime() + deadTime * 24 * 3600 * 1000);
     document.cookie = name + "=" + JSON.stringify(value) +";expires=" + endTime.toGMTString();
   },
-  
+
   getCookie:function(key){//获取cookie
 
     if( document.cookie ){//如果cookie存在就获取
@@ -81,26 +89,34 @@ var iknowsUtil = {
           return JSON.parse( item[1] );//将结果转成对象返回
         }
       }
-      return {};// 如果cookie存在，但是不存在key的值  
+      return {};// 如果cookie存在，但是不存在key的值
     }
     return {};//如果cookie不存在  返回一个空对象
   },
+
+  deleteCookie:function( key ){
+    var date = new Date();
+    date.setTime(date.getTime() - 1);
+    var delValue = this.getCookie(key);
+    if (!!delValue) {
+        document.cookie = key+'='+delValue+';expires='+date.toGMTString();
+    }
+  },
   //返回顶部
   backTop: function(initObj, targetObj, time, callback){
-      let _frame = null;
-      function animate(_time) {
-        _frame = requestAnimationFrame(animate);
-        Tween.update(_time)
-      }
+    let _frame = null;
+    function animate(_time) {
       _frame = requestAnimationFrame(animate);
-      let tween = new Tween.Tween(initObj)
-        .to(targetObj, time)
-        .easing(Tween.Easing.Cubic.Out)
-        .onUpdate(function() {
-          callback(initObj, _frame);
-        })
-        .start()
+      Tween.update(_time)
     }
-
+    _frame = requestAnimationFrame(animate);
+    let tween = new Tween.Tween(initObj)
+      .to(targetObj, time)
+      .easing(Tween.Easing.Cubic.Out)
+      .onUpdate(function() {
+        callback(initObj, _frame);
+      })
+      .start()
+  },
 };
 export default iknowsUtil;

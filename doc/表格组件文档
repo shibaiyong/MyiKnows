@@ -112,4 +112,4 @@
 
   select-data(selects)  含义:对行数据进行选择,selects表示被选中的数组
 
-  operate-data(index)   含义:当前点击的操作按钮,index表示当前被点击的index
+  operate-data(rowIndex,index)   含义:当前点击的操作按钮,rowIndex表示当前被点击的行号,index表示当有多个按钮时,当前被点击的按钮的index

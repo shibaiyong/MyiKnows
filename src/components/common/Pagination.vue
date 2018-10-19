@@ -39,7 +39,7 @@ export default {
 
         pageSize:{
             type:Number,
-            default:5
+            default:10
         }
     },
     data(){
@@ -147,8 +147,12 @@ export default {
             var start = Math.ceil( showPaginationBtns/2 );
 
             var end = this.lastTotalNum + 2 - start;
-
-            if(currentPage <= start){
+            if(this.lastTotalNum <= showPaginationBtns){
+                this.turnLeft = false;
+                this.turnRight = false;
+                var rest = start - currentPage;
+                this.showPageNum = this.totalShowPageNum.slice(0, currentPage - 1 + start + rest)
+            }else if(currentPage <= start){
 
                 this.turnLeft = false;
                 this.turnRight = true;

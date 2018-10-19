@@ -1,8 +1,16 @@
 <template>
-  <div class="topNews" >
-    <MonitorResultsContent ></MonitorResultsContent>
+  <div class="topNews rzl_fc_darkgray " >
+    <div class="top-header">
+      <ITop></ITop>
+      <IHeader></IHeader>
+    </div>
+    <div class="rzl-contarner rzl_bc_undercoat">
+      <div class="blank_1"></div>
+      <MonitorResultsContent ></MonitorResultsContent>
+    </div>
+    <IFooter></IFooter>
     <span v-show="show" @click="returnToTopFn" class="f-db backTop">
-      <img src="../../assets/backtop.png"/>
+      <img src="../../assets/up.png"/>
     </span>
   </div>
 </template>
@@ -36,12 +44,12 @@
       },
       //监听scrollTop
       listen() {
-        let el = this.$el.parentNode
+        let el = this.$el.parentNode;
+        el.scrollTop = 0;
         if (!(el instanceof HTMLElement)) return
         let scrollFn = () => {
           let top = el.scrollTop >> 0
-          console.log(top)
-          if (top > 100){
+          if (top > 500){
             this.show = true
           }else {
             this.show = false
@@ -63,12 +71,24 @@
 </script>
 
 <style scoped>
+  .blank_1{
+    height: 20px;
+  }
   .backTop{
-    width: 40px;
     height: 40px;
+    text-align: center;
+    width: 40px;
+    padding: 10px;
+    box-sizing: border-box;
     position: fixed;
-    right: 5%;
-    bottom: 20%;
+    bottom: 180px;
+    right: 60px;
+    border-radius: 50%;
+    background: rgba(91, 91, 91, 0.5);
+  }
+  .backTop img{
+    width: 20px;
+    height: 20px;
     cursor: pointer;
   }
 </style>

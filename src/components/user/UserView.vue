@@ -26,13 +26,14 @@ export default {
 }
 </script>
 <style scoped type="css">
-    .userview{
-        height: 100%;
-    }
-    .userview .wrapcontent{
-        height:calc(100% - 200px - 88px - 60px);
-        padding-top: 20px;
-    }
+.userview{
+    height: 100%;
+}
+.userview .wrapcontent{
+    
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
 </style>
 
 

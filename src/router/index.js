@@ -35,6 +35,12 @@ export default new Router({
       name: 'monitorcenter',
       component: resolve => require(['@/components/monitorCenter/MonitorCenter'], resolve)
     },
+    // 列表页面
+    {
+      path: '/monitorresults',
+      name: 'monitorresultsList',
+      component: resolve => require(['@/components/monitorResults/MonitorResults'], resolve)
+    },
     // 监测中心-二级页面
     {
       path: '/center',
@@ -48,9 +54,21 @@ export default new Router({
           name: 'config',
           component: resolve => require(['@/components/config/Config'], resolve)
         },
+        // 监测中心--方案配置页面
+        {
+          path: '/center/config/:id',
+          name: 'config',
+          component: resolve => require(['@/components/config/Config'], resolve)
+        },
         // 监测中心-舆情分析页面
         {
-          path: '/center/monitoranalysis',
+          path: '/center/monitoranalysis/:id',
+          name: 'monitoranalysis',
+          component: resolve => require(['@/components/monitorAnalysis/MonitorAnalysis'], resolve)
+        },
+        // 监测中心-舆情分析页面
+        {
+          path: '/center/monitoranalysis/:id',
           name: 'monitoranalysis',
           component: resolve => require(['@/components/monitorAnalysis/MonitorAnalysis'], resolve)
         },
@@ -58,7 +76,13 @@ export default new Router({
         {
           path: '/center/monitorresults',
           name: 'monitorresults',
-          component: resolve => require(['@/components/monitorResults/MonitorResults'], resolve)
+          component: resolve => require(['@/components/monitorResults/MonitorResultsContent'], resolve)
+        },
+        // 监测中心-监测结果页面
+        {
+          path: '/center/monitorresults/:id',
+          name: 'monitorresults',
+          component: resolve => require(['@/components/monitorResults/MonitorResultsContent'], resolve)
         },
         // 监测中心-预警列表页面
         {
@@ -66,8 +90,14 @@ export default new Router({
           name: 'warninglist',
           component: resolve => require(['@/components/warningList/WarningList'], resolve)
         },
+        // 监测中心-预警列表页面
+        {
+          path: '/center/warninglist/:id',
+          name: 'warninglist',
+          component: resolve => require(['@/components/warningList/WarningList'], resolve)
+        },
       ]
-    },   
+    },
     //用户中心查看页
     {
       path: '/userview',
@@ -170,5 +200,8 @@ export default new Router({
       component: resolve => require(['@/components/error/404'], resolve)
     }
   ],
-
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 })
+

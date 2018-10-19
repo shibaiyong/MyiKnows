@@ -2,13 +2,17 @@
   <!-- 内容区最外层容器均采用rzl-contarner样式 -->
   <div class="rzl-contarner rzl_bc_undercoat index-wapper">
     <div class="blank_1 rzl_bc_undercoat"></div>
+
     <!--首页舆情折线图-->
-    <div class="index-chartsLine" >
-      <lineChart id="indexChartLine"
-                 :data="intelligenceLineData"
-                 axis="create_time"
-                 :category="intelligenceCategory"
-      ></lineChart>
+    <div class="rzl_bc_white mt20">
+      <div class="rzl_fc_darkgray font18 index-title">监测结果走势</div>
+      <div class="index-chartsLine" >
+        <lineChart id="indexChartLine"
+                   :data="intelligenceLineData"
+                   axis="create_time"
+                   :category="intelligenceCategory"
+        ></lineChart>
+      </div>
     </div>
     <div class="index-content">
       <!--近期预警趋势图表-->
@@ -24,7 +28,7 @@
       </div>
       <!--热点舆情列表-->
       <div class="index-warning-trend">
-        <div class="rzl_fc_darkgray font18 index-title">热点舆情</div>
+        <div class="rzl_fc_darkgray font18 index-title">热 点</div>
         <div class="rzl_fc_navy font14 loadMore" @click="loadMore">更多></div>
         <div class=" hot-charts"  >
             <hotTable :data="hotIntelligenceData"
@@ -39,10 +43,11 @@
 </template>
 
 <script>
-  import { getListPage  } from '@/assets/js/api';
+  import { getHomeCount,getRecentTrends,getHotIntelligence } from '@/assets/js/api';
   import lineChart from '@/components/common/ZCChartsLine';
   import barChart from '@/components/common/ZCChartsBar';
   import hotTable from '@/components/common/ZCTable';
+  import iKnowsUtil from '@/assets/js/iknowsUtil';
   export default {
     name: 'Home-content',
     components: {lineChart,barChart,hotTable},
@@ -53,234 +58,123 @@
         recentTrendsData:[],
         recentTrendsCategory:[],
         hotIntelligenceData: [],
-        hotIntelligenceCategory: [],
+        hotIntelligenceCategory:[
+        {prop: 'articleTitle',
+          label: '文章标题',
+          showHover:true,
+          style: {textAlign: 'left'},
+          headerStyle: {textAlign: 'left'}
+        },
+        {prop: 'articleSource',
+          label: '来源',
+          width: 130,
+          style: {textAlign: 'left'},
+          headerStyle: {textAlign: 'left'}
+        },
+        {prop: 'articleType', label: '媒体类型', width: 80},
+        {prop: 'time', label: '发布时间', width: 140}],
         options: {},
       }
     },
     methods: {
       // 舆情折线图数据
       loadDatas_IntelliGence() {
-        let linedata=[{
-          "create_time": "09/13",
-          "weixin_num":12,
-          "weibo_num":20,
-          "web_num":50,
-          "app_num":10,
-          "paper_num": 35
-        },{
-          "create_time": "09/14",
-          "weixin_num":20,
-          "weibo_num":55,
-          "web_num":10,
-          "app_num":30,
-          "paper_num": 15
-        },{
-          "create_time": "09/15",
-          "weixin_num":40,
-          "weibo_num":20,
-          "web_num":33,
-          "app_num":24,
-          "paper_num": 23
-        },{
-          "create_time": "09/14",
-          "weixin_num":20,
-          "weibo_num":55,
-          "web_num":10,
-          "app_num":30,
-          "paper_num": 15
-        },{
-          "create_time": "09/15",
-          "weixin_num":10,
-          "weibo_num":20,
-          "web_num":5,
-          "app_num":10,
-          "paper_num": 15
-        }];
-        this.handleData_IntelliGence(linedata)
-        // let para = {};
-        // getListPage(para).then((res) => {
-        //   let response = JSON.parse(res.bodyText);
-        //   this.intelliGenceTrendDatas = {categoryArr: [], valueArr: []};
-        //   if (response.code == 200 && response.data) {
-        //     this.handleData_TimeTrend(response.data)
-        //   }
-        // });
+        let params = new URLSearchParams();
+        params = {};
+        let _this = this;
+        getHomeCount(params).then(response => {
+          if (response.code == 200) {
+            _this.handleData_IntelliGence(response.data)
+          }else {
+            this.$message.error(response.message);
+          }
+        }).catch(error => {
+          console.log(error);
+        })
       },
       handleData_IntelliGence(data) {
         let thiz =this;
         setTimeout(function () {
           thiz.intelligenceLineData = data;
           thiz.intelligenceCategory=[
-            {prop: 'weixin_num', label: '微信'},
-            {prop: 'weibo_num', label: '微博'},
-            {prop: 'web_num', label: '网站'},
-            {prop: 'app_num', label: 'APP'},
-            {prop: 'paper_num', label: '数字报'},
+            {prop: 'website', label: '网媒'},
+            {prop: 'weixin', label: '微信'},
+            {prop: 'weibo', label: '微博'},
+            {prop: 'app', label: 'APP'},
           ]
-        },1000)
+        },100)
       },
 
       //近期预警趋势数据
       loadDatas_RecentTrends() {
-        let bardata=[{
-          "create_time": "09/131",
-          "levelZD":20,
-          "levelJD":20,
-          "levelQW":50,
-          "levelYB":10,
-          "levelZC": 35
-        },{
-          "create_time": "09/14",
-          "levelZD":20,
-          "levelJD":20,
-          "levelQW":50,
-          "levelYB":10,
-          "levelZC": 15
-        },{
-          "create_time": "09/15",
-          "levelZD":10,
-          "levelJD":20,
-          "levelQW":5,
-          "levelYB":10,
-          "levelZC": 15
-        },{
-          "create_time": "09/13",
-          "levelZD":20,
-          "levelJD":20,
-          "levelQW":50,
-          "levelYB":10,
-          "levelZC": 35
-        },{
-          "create_time": "09/14",
-          "levelZD":20,
-          "levelJD":20,
-          "levelQW":50,
-          "levelYB":10,
-          "levelZC": 15
-        },{
-          "create_time": "09/18",
-          "levelZD":10,
-          "levelJD":20,
-          "levelQW":5,
-          "levelYB":10,
-          "levelZC": 15
-        },{
-          "create_time": "09/13",
-          "levelZD":20,
-          "levelJD":20,
-          "levelQW":50,
-          "levelYB":10,
-          "levelZC": 35
-        },{
-          "create_time": "09/14",
-          "levelZD":20,
-          "levelJD":20,
-          "levelQW":50,
-          "levelYB":10,
-          "levelZC": 15
-        },{
-          "create_time": "09/15",
-          "levelZD":10,
-          "levelJD":20,
-          "levelQW":5,
-          "levelYB":10,
-          "levelZC": 15
-        }];
-
-        this.handleData_RecentTrends(bardata)
-        // let para = {};
-        // getListPage(para).then((res) => {
-        //   let response = JSON.parse(res.bodyText);
-        //   this.intelliGenceTrendDatas = {categoryArr: [], valueArr: []};
-        //   if (response.code == 200 && response.data) {
-        //     this.handleData_RecentTrends(response.data)
-        //   }
-        // });
+        let params = new URLSearchParams();
+        params = {};
+        let _this = this;
+        getRecentTrends(params).then(response => {
+          if (response.code == 200) {
+            _this.handleData_RecentTrends(response.data)
+          }else {
+            this.$message.error(response.message);
+          }
+        }).catch(error => {
+          console.log(error);
+        })
       },
       handleData_RecentTrends(data) {
         let thiz = this;
         setTimeout(function () {
           thiz.recentTrendsData = data;
           thiz.recentTrendsCategory=[
-            {prop: 'levelZC', label: '正常'},
-            {prop: 'levelYB', label: '一般'},
-            {prop: 'levelQW', label: '轻微'},
-            {prop: 'levelJD', label: '较大'},
-            {prop: 'levelZD', label: '重大'},
+            {prop: 'level1', label: '一般'},
+            {prop: 'level0', label: ''},
+            {prop: 'level2', label: '轻微'},
+            {prop: 'level3', label: '较大'},
+            {prop: 'level4', label: '重大'},
           ]
-        },1000)
-
-
+        },100)
       },
       //表格
       loadDatas_hotIntelligence(){
-        let data = {
-          limit: 5,
-          content: [
-            {
-              id:1,
-              title: "IS武装或对西欧发动袭击?英军增派部队进驻阿富汗",
-              time: "2018-09-10 14:27",
-              source: "临夏市党建网临夏市委…",
-              type:"微博"
-            },
-            {
-              id:2,
-              title: "针对中俄高超音速武器？美研发滑翔破坏者拦截器",
-              time: "2018-09-10 14:27",
-              source: "临夏市党建网临夏市委…",
-              type:"微博"
-            },
-            {
-              id:3,
-              title: "小伙网上买克隆出租车拉活 运营仨月被刑拘",
-              time: "2018-09-10 14:27",
-              source: "临夏市党建网临夏市委…",
-              type:"微博"
-            },
-            {
-              id:4,
-              title: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
-              time: "2018-09-10 14:27",
-              source: "临夏市党建网临夏市委…",
-              type: "微博"
-            },
-            {
-              id:5,
-              title: "美国制裁上瘾新兴市场扛得住吗?这个国家左右为难",
-              time: "2018-09-10 14:27",
-              source: "临夏市党建网临夏市委…",
-              type: "微博"
-            }
-          ]
-        };
-        this.handleData_hotIntelligence(data)
-        // let para = {};
-        // getListPage(para).then((res) => {
-        //   let response = JSON.parse(res.bodyText);
-        //   this.intelliGenceTrendDatas = {categoryArr: [], valueArr: []};
-        //   if (response.code == 200 && response.data) {
-        //     this.handleData_RecentTrends(response.data)
-        //   }
-        // });
+        let params = new URLSearchParams();
+        params = {};
+        let _this = this;
+        getHotIntelligence(params).then(response => {
+          if (response.code == 200) {
+            _this.handleData_hotIntelligence(response.data)
+          }else {
+            this.$message.error(response.message);
+          }
+        }).catch(error => {
+          console.log(error);
+        })
       },
       handleData_hotIntelligence(data){
         let thiz = this;
         setTimeout(function () {
           thiz.hotIntelligenceData = data.content;
-          thiz.hotIntelligenceCategory=[
-            {prop: 'title', label: '文章标题',showHover:true},
-            {prop: 'source', label: '来源', width: 130},
-            {prop: 'type', label: '媒体类型', width: 80},
-            {prop: 'time', label: '发布时间', width: 140}]
-        },1000)
+          if (thiz.hotIntelligenceData) {
+            thiz.hotIntelligenceData.forEach((value, index) => {
+              let publishTime = new Date(value.publishTime).getTime();
+              let time =iKnowsUtil.dataFormat(publishTime);
+              value.time = time;
+              if (value.articleType==''|| value.articleType == null) {
+                value.articleType = '-'
+              }
+            })
+          }
+
+
+        },100)
       },
       //跳转到文章详情
       clickTableCell(rowIndex) {
         let thiz = this;
         thiz.hotIntelligenceData.forEach(function (value,index) {
           if (rowIndex == index) {
-            console.log(value.title);
+            let id =  value.articleId;
+            let time = value.publishTime;
+            let releaseDatetime= new Date(time).getTime();
+             window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
           }
         })
       },
@@ -299,6 +193,9 @@
 </script>
 
 <style scoped type="text/css">
+  .mt20{
+    margin-top: 20px;
+  }
   .blank_1{
     height: 1px;
   }
@@ -307,9 +204,11 @@
   }
   .index-chartsLine{
     width: 100%;
-    height: 535px;
+    height: 495px;
     overflow-x: hidden;
     margin: 20px 0;
+    padding: 20px 0px 20px 20px;
+    box-sizing:border-box;
     background: #ffffff;
   }
   .index-content{
@@ -320,8 +219,9 @@
     display: flex;
   }
   .index-warning-trend{
-    -webkit-flex: 1;
-    flex: 1;
+    /*-webkit-flex: 1;*/
+    /*flex: 1;*/
+    width: 50%;
     background: #ffffff;
   }
   .index-charts{
@@ -350,6 +250,11 @@
     line-height: 30px;
     padding-right: 30px;
     cursor: pointer;
+  }
+  .loadingData{
+    height: 500px;
+    text-align: center;
+    line-height: 500px;
   }
 </style>
 

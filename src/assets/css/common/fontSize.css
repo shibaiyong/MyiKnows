@@ -11,6 +11,9 @@
 
 /* 尺寸在1440至3840之间的：版心最小宽度为：1280px，两侧宽各为：80px */
 @media screen and (min-width:1440px) and (max-width:3840px) {
+  .font64{
+    font-size: 54px;
+  }
   .font24 {
     font-size: 24px;
   }
@@ -33,6 +36,9 @@
 
 /* 尺寸在1024至1440之间的：版心最小宽度为：904px，两侧宽各为：60px */
 @media screen and (max-width:1440px) {
+    .font64{
+      font-size: 40px;
+    }
     .font24 {
       font-size: 22px;
     }

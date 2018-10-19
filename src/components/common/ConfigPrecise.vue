@@ -8,19 +8,23 @@
         </div>
         <!-- 包含 -->
         <div class="configPrecise-contain">
-          <div class="configPrecise-left  rzl_fc_darkgray font14">{{preciseGroup.contain}}</div>
+          <div class="configPrecise-left  rzl_fc_darkgray font14"><i class="rzl_fc_errRed require-color">*</i>{{preciseGroup.contain}}</div>
           <div class="configPrecise-right">
-            <el-input class="configPrecise-input" v-model="preciseGroup.containValue" 
+            <el-input class="configPrecise-input" v-model="preciseGroup.containValue"
               placeholder="" value="preciseGroup.containValue" @blur="handleAllInput"></el-input>
+            <!-- <el-autocomplete class="configPrecise-input"
+              v-model="preciseGroup.containValue"
+              value="preciseGroup.containValue"
+              :fetch-suggestions="querypreciseWordsearch" :trigger-on-focus="false" placeholder=""></el-autocomplete> -->
           </div>
         </div>
         <!-- 排除 -->
         <div class="configPrecise-exclude">
           <div class="configPrecise-left  rzl_fc_darkgray font14">{{preciseGroup.exclude}}</div>
           <div class="configPrecise-right">
-            <el-input class="configPrecise-input" v-model="preciseGroup.excludeValue" 
+            <el-input class="configPrecise-input" v-model="preciseGroup.excludeValue"
               placeholder="" value="preciseGroup.excludeValue" @blur="handleAllInput"></el-input>
-            <div class="general-add" @click="addPreciseGroup" v-show="index == (preciseGroupList.length - 1)">
+            <div class="general-add" @click="addPreciseGroup">
               <i class="el-icon-circle-plus rzl_fc_navy font20"></i>
             </div>
             <div class="general-del" @click="delPreciseGroup(index)">
@@ -35,13 +39,25 @@
 <script>
 export default {
   name: 'i-configPrecise',
+  props: {
+    // 当前选中的地区
+    preciseWords: {
+      type: Array,
+      require: true,
+      default () {
+        return [];
+      }
+    }
+  },
   data () {
     return {
-      preciseGroupList: [
-        {groupName: '组合', contain: '包含', containValue: '', exclude: '排除', excludeValue: ''},
-        {groupName: '组合', contain: '包含', containValue: '', exclude: '排除', excludeValue: ''},
-      ]
+      preciseGroupList: []
     }
+  },
+  watch: {
+    preciseWords(newVal, oldVal) {
+      this.preciseGroupList = this.preciseWords;
+    },
   },
   methods: {
     // 添加组合
@@ -57,11 +73,11 @@ export default {
         exclude: '排除',
         excludeValue: ''
       };
-      this.preciseGroupList.push(preciseGroup); 
+      this.preciseGroupList.push(preciseGroup);
     },
     // 删除组合
     delPreciseGroup (index) {
-      if(this.preciseGroupList.length > 2){
+      if(this.preciseGroupList.length > 1){
         this.preciseGroupList.splice(index, 1);
       }
     },
@@ -70,14 +86,29 @@ export default {
       this._preciseParams();
     },
     _preciseParams () {
-      // console.log(this.preciseGroupList);
+       console.log(this.preciseGroupList);
       var params = {};
       params.preciseGroupList = this.preciseGroupList;
       this.$emit('precise-params', {
         params: params
       });
     }
-  }
+  },
+  mounted() {
+    this.preciseGroupList = this.preciseWords;
+    // 处理数据结构
+    if(this.preciseGroupList && this.preciseGroupList.length > 0){
+      this.preciseGroupList.forEach( item => {
+        let include = item.containValue && item.containValue.length >0? item.containValue.join(','): '';
+        let execlude = item.excludeValue && item.excludeValue.length>0? item.excludeValue.join(','): '';
+        item.containValue = include;
+        item.excludeValue = execlude;
+      });
+    }
+
+    // console.log("configPrecise接收参数");
+    // console.log(this.preciseGroupList);
+  },
 }
 </script>
 <style scoped>

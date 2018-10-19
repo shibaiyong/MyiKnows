@@ -11,41 +11,41 @@ var dataUtil = {
   getStatusData() {
     return [{
       "title": "任务状态",
-      "id": "missStatus",
+      "id": "status",
       "items": [
         {
           "name": "运行中",
-          "id": "A",
+          "id":1,
           "isSelected": true
         },
         {
           "name": "已停止",
-          "id": "B  ",
+          "id":0,
           "isSelected": false
         }
       ]
     }, {
       "title": "任务类型",
-      "id": "missType",
+      "id": "planType",
       "items": [
         {
           "name": "全部监测",
-          "id": "A",
+          "id": [1],
           "isSelected": true
         },
         {
           "name": "常规监测",
-          "id": "B",
+          "id": [2],
           "isSelected": false
         },
         {
           "name": "人物监测",
-          "id": "C",
+          "id": [3],
           "isSelected": false
         },
         {
           "name": "文稿监测",
-          "id": "D",
+          "id": [4],
           "isSelected": false
         }
       ]

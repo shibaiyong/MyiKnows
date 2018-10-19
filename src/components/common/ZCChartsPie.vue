@@ -1,5 +1,5 @@
 <template>
-  <div class="zc_charts_content" id="zc_charts_content">
+  <div class="zc_charts_content" :id="'zc_charts_content_'+id">
 
     <div :id="'zc_charts_pie'+id"
          class="zc_charts_pie"
@@ -66,6 +66,7 @@
               color: '#555',
               formatter: '{b}: {d}%'
             },
+            cursor: 'default',
             data: data.sort(function (a, b) {
               return b.value - a.value;
             }),
@@ -93,7 +94,7 @@
 
       initPieChart() {
 
-        let content = document.getElementById('zc_charts_content');
+        let content = document.getElementById('zc_charts_content_'+this.id);
 
         let empty = document.getElementById(this.id);
 
@@ -153,5 +154,7 @@
   .zc_charts_empty {
     display: none;
      text-align: center;
+    font-size: 14px;
+    color:#606266 ;
    }
 </style>
