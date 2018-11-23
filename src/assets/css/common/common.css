@@ -144,6 +144,9 @@ input:-webkit-autofill {
 .el-date-table td.start-date span {
   background-color: #1D2088 !important;
 }
+.el-autocomplete-suggestion{
+  width: 620px !important;
+}
 /* todo: 与UI的js效果冲突 */
 /* .el-date-table td span:hover{
   color: #1d2088;

@@ -110,9 +110,9 @@
           grid: {
             show: false,
             top: this.category.length>0?30:0,
-            bottom: 30,
+            bottom: 50,
             left: this.category.length>0?40:0,
-            right: 0,
+            right: 0,          
           },
           /*提示框组件*/
           tooltip: {
@@ -146,12 +146,11 @@
               return result;
             },
             extraCssText: 'box-shadow: 1px 1px 10px 2px #F5F5F5;line-height:25px;text-align: left;'
-          },
-
+          }, 
           xAxis: {
             type: 'category',
             show: true,
-            boundaryGap: true,
+            boundaryGap: true,           
             axisLine: {
               lineStyle: {
                 color: '#CDCDCD', width: 2
@@ -161,6 +160,7 @@
             axisLabel: {
               color: '#979797',
               margin: 15,
+              interval: 0, 
               formatter : function(params){
                 var newParamsName = "";// 最终拼接成的字符串
                 var paramsNameNumber = params.length;// 实际标签的个数
@@ -251,7 +251,7 @@
 
           empty.style.display = 'block';
           empty.style.lineHeight = content.offsetHeight + 'px';
-
+          
         }
       }
 

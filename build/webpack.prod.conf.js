@@ -16,12 +16,14 @@ const env = require('../config/prod.env')
 const webpackConfig = merge(baseWebpackConfig, {
   module: {
     rules: utils.styleLoaders({
-      sourceMap: config.build.productionSourceMap,
+      // sourceMap: config.build.productionSourceMap,
+      sourceMap: false, // 关闭sourceMap
       extract: true,
       usePostCSS: true
     })
   },
-  devtool: config.build.productionSourceMap ? config.build.devtool : false,
+  // devtool: config.build.productionSourceMap ? config.build.devtool : false,
+  devtool: false, // 关闭
   output: {
     path: config.build.assetsRoot,
     filename: utils.assetsPath('js/[name].[chunkhash].js'),
@@ -34,8 +36,9 @@ const webpackConfig = merge(baseWebpackConfig, {
     }),
     new UglifyJsPlugin({
       uglifyOptions: {
+        comments: false, //去掉注释
         compress: {
-          warnings: false
+          warnings: false //忽略警告
         }
       },
       sourceMap: config.build.productionSourceMap,
@@ -105,7 +108,7 @@ const webpackConfig = merge(baseWebpackConfig, {
       name: 'app',
       async: 'vendor-async',
       children: true,
-      minChunks: 3
+      minChunks: 4
     }),
 
     // copy custom static assets
@@ -115,7 +118,11 @@ const webpackConfig = merge(baseWebpackConfig, {
         to: config.build.assetsSubDirectory,
         ignore: ['.*']
       }
-    ])
+    ]),
+    new webpack.DllReferencePlugin({
+      context: __dirname,
+      manifest: require('./vendor-manifest.json')
+    })
   ]
 })
 

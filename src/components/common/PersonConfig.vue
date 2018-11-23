@@ -100,6 +100,7 @@ const briefsTypeWarnText = '请选择简报推送方式！';
 const chooseWarnListText = "预警模型不能为空！";
 const hitKeysWordEmptyText = '请输入命中关键词！';
 const hitKeysWordEnoughText = '命中关键词最多支持3个！';
+const wranInfoText = '请选择预警触发条件！';
 const warnTypeWarnText = '请选择预警方式！';
 const warnTimeWarnText = '预警时间不合法，请重新输入！';
 const preciseGroupWarnText = '包含词或排除词不能为空！';
@@ -312,25 +313,31 @@ export default {
           // 是否开启专题模型
           if(params.wranCheck){
             // 预警模型列表验证
-            if(params.wranModels && params.wranModels.length == 0){
-              this.$message.error(wranModelsText);
-              this.isSaving = false;
-              return;
+            let isModelChecked = false;
+            if(params.wranModels && params.wranModels.length > 0){
+              isModelChecked = true;
             }
             // 预警命中关键字验证
-            if(params.wanSelfcheck){
+            let isSlefChecked = false;
+            if(params.wranSelfcheck){
               if(params.wranSelfcheck && params.wranSelf.length == 0){
                 this.$message.error(wranSelfEmptyText);
                 this.isSaving = false;
                 return;
               }
-              let fuzzyWordssList = params.wranSelf.split(" ");
+              let fuzzyWordssList = params.wranSelf;
               if(fuzzyWordssList.length > 3){
                 this.$message.error(wranSelfEnoughText);
                 this.isSaving = false;
                 return;
               }
+              isSlefChecked = true;
             }
+            if(!isModelChecked && !isSlefChecked){
+              this.$message.error(wranInfoText);
+              this.isSaving = false;
+              return;
+            }           
           }
           // 预警推送方式验证
           params.kpWarnSendType = [];
@@ -413,12 +420,18 @@ export default {
           //添加的人物验证
           params.personWords = [];
           this.personWords.forEach(item => {
+            let personJob = item.job.split('，');
+            let job = [];
+            if(!!personJob && personJob.length > 0){
+              personJob.forEach(e => {
+                job.push(e);
+              });
+            }
             params.personWords.push({
-              name: item.name.split(' '),
-              job: item.job.split(' ')
+              name: item.name.split('，'),
+              job: job
             })
           });
-
           // 地域范围验证
           params.regionWords = [];
           if(this.regionWords.length > 5){
@@ -512,12 +525,12 @@ export default {
               // 是否开启专题模型
               if(params.wranCheck){
                 // 预警模型列表验证
-                if(params.wranModels && params.wranModels.length == 0){
-                  this.$message.error(wranModelsText);
-                  this.isSaving = false;
-                  return;
+                let isModelChecked = false;
+                if(params.wranModels && params.wranModels.length > 0){
+                  isModelChecked = true;
                 }
                 // 预警命中关键字验证
+                let isSlefChecked = false;
                 if(params.wranSelfcheck){
                   if(params.wranSelfcheck && params.wranSelf.length == 0){
                     this.$message.error(wranSelfEmptyText);
@@ -530,7 +543,13 @@ export default {
                     this.isSaving = false;
                     return;
                   }
+                  isSlefChecked = true;
                 }
+                if(!isModelChecked && !isSlefChecked){
+                  this.$message.error(wranInfoText);
+                  this.isSaving = false;
+                  return;
+                }  
               }
               // 预警推送方式验证
               params.kpWarnSendType = [];
@@ -583,6 +602,13 @@ export default {
             }
             if(params.wranSelf.length > 3){
               this.$message.error(wranSelfEnoughText);
+              this.isSaving = false;
+              return;
+            }
+            if(params.wranModels.length > 0 || (params.wranSelfcheck && params.wranSelf.length>0)){
+
+            }else{
+              this.$message.error(wranInfoText);
               this.isSaving = false;
               return;
             }
@@ -652,7 +678,7 @@ export default {
         // 是否全部监控
         allMonitorRadio: true,
         // 已选监控范围
-        kpSiteRange: ['1','2','4','8','16','32','64'],
+        kpSiteRange: ['1','2','4','8'],
         // 无(通过js条件判断此条件)
         noneReportRadio: true,
         // 已选简报周期

@@ -1,6 +1,6 @@
 <template>
 <!-- 内容区最外层容器均采用rzl-contarner样式 -->
-<div class="" v-title="'监测方案'">
+<div class="">
   <div class="monitorConfig-content">
     <div class="monitorConfig-tabWraper rzl_bc_white">
       <ul class="monitor-type">

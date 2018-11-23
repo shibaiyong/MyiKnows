@@ -5,7 +5,9 @@
 ## Build Setup
 
 ``` bash
-#项目启动
+#项目启动(按以下顺序进行)
+npm install 
+npm run dll
 npm run dev
 
 # 打包详情

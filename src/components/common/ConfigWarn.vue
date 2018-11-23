@@ -14,7 +14,7 @@
       <div class="configWarn-left rzl_fc_darkgray font16">触发条件</div>
       <div class="configWarn-right warn-right">
         <div class="warn-add">
-          <el-checkbox v-model="warnObj.wranCheck">符合以下专题类型</el-checkbox>
+          <el-checkbox v-model="warnObj.wranCheck" @change="openWarnCheck">符合以下专题类型</el-checkbox>
             <div class="configWarn-add font14" :class="{disabled:!warnObj.wranCheck}" @click="addWarnMode">
             <i class="el-icon-circle-plus rzl_fc_navy font20"></i>添加模型
           </div>
@@ -181,6 +181,9 @@ export default {
     openWarn () {
       this._warnParams();
     },
+    openWarnCheck () {
+      this._warnParams();
+    },
     // 添加预警模型
     addWarnMode () {
       if(this.warnObj.wranCheck){
@@ -340,8 +343,8 @@ export default {
     this.warnObj.kpWarnStartTime = this.warnObj.kpWarnStartTime+'';
     this.warnObj.kpWarnEndTime = this.warnObj.kpWarnEndTime+'';
 
-    // console.log("canfigWarn获取参数：");
-    // console.log(this.warnObj);
+    
+    
   },
   created() {
     // 预警方式

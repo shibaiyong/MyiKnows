@@ -96,7 +96,7 @@
             </li>
           </ul>
           <!--分页-->
-          <div class="pagination" v-if="monitorResultList.length">
+          <div class="pagination" v-if="total>-1">
             <Pagination :totalNum="total"
                         @currentChange="currentChange"
                         ref="pagination"/>
@@ -158,7 +158,7 @@
           //监测结果列表
           monitorResultList:[],
           // 分页总数
-          total: 0,
+          total: -1,
           // 当前页
           page:1,
           dataload:false,
@@ -191,11 +191,16 @@
                 this.$message.error(response.message);
               }
             }).catch(error => {
-              // console.log(error);
+
             })
          },
           //选择媒体类型
           changeMediaType(id){
+            // 防止用户选择自定时间后未选择时间值的操作
+            if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
+              this.$message.error('请选择时间范围！');
+              return;
+            }
             this.isActive_MediaType = id;
             this.page=1;
             this.monitorResultList=[];
@@ -203,6 +208,11 @@
           },
           //选择警报等级
           changeAlertLevel(id){
+            // 防止用户选择自定时间后未选择时间值的操作
+            if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
+              this.$message.error('请选择时间范围！');
+              return;
+            }
             this.isActive_AlertLevel = id;
             this.page=1;
             this.monitorResultList=[];
@@ -236,21 +246,28 @@
           },
           //获取监测结果列表数据
           loadMonitorResultData(){
+            // 防止用户选择自定时间后未选择时间值的操作
+            if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
+              this.$message.error('请选择时间范围！');
+              return;
+            }
             this.noData = false;
             this.dataload = true;
-            let params = new URLSearchParams();
+            let params = {};
             let time=[];
             let start =  new Date(this.customTime[0]).getTime();
             let end =  new Date(this.customTime[1]).getTime();
-            if (start == end){
-              this.$message.error('结束时间须大于开始时间，请重新选择');
-              this.customTime =[];
-              this.dataload = false;
-              return false;
-            } else{
-              var starttime =  start;
-              var endtime =  end;
-            }
+            // if (start == end){
+            //   this.$message.error('结束时间须大于开始时间，请重新选择');
+            //   this.customTime =[];
+            //   this.dataload = false;
+            //   return false;
+            // } else{
+            //   var starttime =  start;
+            //   var endtime =  end;
+            // }
+            var starttime =  start;
+            var endtime =  end;
             time.push(start);
             time.push(end);
             let sortFie,sortType;
@@ -281,6 +298,7 @@
               pageSize:10
             };
             let _this = this;
+            this.monitorResultList=[];
             getMonitorResults(params).then(response => {
               _this.handleData_onitorResult(response);
               // if (response.code == 200) {
@@ -289,7 +307,7 @@
               //   this.$message.error(response.message);
               // }
             }).catch(error => {
-              // console.log(error);
+
             })
           },
           handleData_onitorResult(data){
@@ -321,7 +339,7 @@
             if (!time || time == null || time == "" || time == undefined) {
               return "未知时间"
             }
-            return iKnowsUtil.dataFormat(new Date(time).getTime())
+            return iKnowsUtil.dataFormat(time)
           },
           //跳转到详情页面
           toDetail(id,time){

@@ -22,9 +22,9 @@
                     <td class="textleft" :style="{'padding-left':'50px'}">{{ item.planName }}</td>
                     <td class="textleft">{{ item.reportName }}</td>
                     <td>
-                        <!--<button @click="transformData('view', item)" class="btn btn6030">查看</button>-->
-                        <button @click="toReportView(item)" class="btn btn6030">查看</button>
-                        <button @click="transformData('delete', item)" class="btn btn6030">删除</button>
+                        <button @click="toReportView(item)" class="btn btn6030 font12">查看</button>
+                        <button @click="download(item)" class="btn btn6030 font12">下载</button>
+                        <button @click="transformData('delete', item)" class="btn btn6030 font12">删除</button>
                     </td>
                 </tr>
             </tbody>
@@ -35,7 +35,7 @@
 <script>
     import axios from "axios";
     import CheckBox from "@/components/common/CheckBox"
-    import { deleteAllBulletinList, eventBus } from "@/assets/js/api.js"
+    import { deleteAllBulletinList, eventBus, downloadBulletinList } from "@/assets/js/api.js"
     export default {
         name:'dataTables',
         props:['data','transformData'],
@@ -58,17 +58,27 @@
         },
         methods:{
             toReportView (item) {
-              let pid = item.pid;
-              let timeType = item.reportType;
-              if(timeType >= 5){
-                timeType = timeType - 5;
-              }
-              let warnLevel = 4;
-              let token = localStorage.iKnowsToken || '';
-              if(!!token){
-                window.open(`http://iknows.inewsengine.com:8081/generateWord?timeType=${timeType}&pid=${pid}&token=${token}&warnLevel=4`);
-              }
-
+                let timeType = item.reportType
+                let planName = item.planName
+                let reportId = item.reportId
+                let pid = item.pid
+                if(timeType >= 5){
+                 timeType = timeType - 5;
+                }
+                //window.open(`/downloadReport?timeType=${timeType}&pid=${pid}&planName=${planName}`);
+                window.open(`/downloadReport?timeType=${timeType}&pid=${pid}&planName=${planName}&reportId=${reportId}`);
+            },
+            download(item){
+                let timeType = item.reportType
+                let token = localStorage.iKnowsToken
+                let downFlag = 1
+                let reportId = item.reportId
+                let pid = item.pid
+                if(timeType >= 5){
+                  timeType = timeType - 5;
+                }
+                //window.open(`http://49.4.90.208:8095/iknows/report/download?timeType=${timeType}&pid=${item.pid}&token=${token}&downFlag=1`);
+                window.open(`http://49.4.90.208:8095/iknows/report/download?timeType=${timeType}&pid=${pid}&token=${token}&reportId=${reportId}&downFlag=1`);
             },
             isTotal(total){//全选框对外触发的方法。复选框全部被选中。
                 this.checkAll = total;
@@ -91,9 +101,6 @@
                     }
                     }, () => {})
                 })
-
-
-
             }
 
         },
@@ -136,9 +143,10 @@
     }
     /* 按钮的公共样式 */
     .btn6030{
-        width:60px;
+        width:22%;
         height:30px;
-        margin:11px;
+        margin:4%;
+        /* font-size: 0.8%; */
     }
 
 

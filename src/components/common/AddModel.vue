@@ -114,7 +114,7 @@ export default {
     },
     // 勾选下方查询到的模型(同时将勾选的模型更新到已选中chooseModelList模型列表中)
     handleCheckedModelChange (value) {
-      // console.log("checkbox勾选："+value);
+      
       if(value.length > 5){
         // 获取最后一个选中项，将其选中状态取消
         let lastId = value.pop();

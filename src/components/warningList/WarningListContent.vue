@@ -77,7 +77,7 @@
         methods:{
           // 预警变化趋势数据
           loadDatas_WarningChange() {
-            let params = new URLSearchParams();
+            let params = {};
             params = {
               planId:this.$route.params.id,
             };
@@ -103,7 +103,7 @@
           },
           //预警分类占比数据
           loadDatas_WarningType(){
-            let params = new URLSearchParams();
+            let params = {};
             params = {
               planId:this.$route.params.id,
             };
@@ -123,7 +123,7 @@
           },
           //预警表格数据
           loadDatas_WarningTable(){
-            let params = new URLSearchParams();
+            let params = {};
             params = {
               pageNo:this.page,
               planId:this.$route.params.id,
@@ -149,8 +149,8 @@
                 if(value.source == ''){
                   value.source = '-'
                 }
-                let publishTime = new Date(value.publishTime).getTime();
-                let time =iKnowsUtil.dataFormat(publishTime);
+                // let publishTime = new Date(value.publishTime).getTime();
+                let time =iKnowsUtil.dataFormat(value.publishTime);
                 value.time = time;
                 if (value.level == 4) {
                   value.level = '重大'
@@ -215,6 +215,7 @@
               if (rowIndex == index) {
                 let id =  value.webpageCode;
                 let time = value.publishTime;
+                
                 let releaseDatetime= new Date(time).getTime();
                 console.log(releaseDatetime)
                 window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );

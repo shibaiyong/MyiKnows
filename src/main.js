@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from 'axios'
+require ('babel-polyfill')
 
 // vue对象挂载的属性或方法(慎用)
 import base from './assets/js/base'
@@ -12,13 +13,13 @@ import 'element-ui/lib/theme-chalk/index.css'
 import './assets/css/common/reset.css'
 import './assets/css/common/common.css'
 import './assets/css/common/fontSize.css'
+import convertPdf from "./assets/js/convertPdf.js"
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(base);
-Vue.prototype.$iknowsUtil = iknowsUtil;
-
-
+Vue.prototype.$iknowsUtil = iknowsUtil
+Vue.use(convertPdf);
 // 超时时间
 // axios.defaults.timeout = 5000
 // 携带cookie
@@ -29,10 +30,16 @@ axios.defaults.headers.get['Content-Type'] = 'application/json';
 // http请求拦截器
 axios.interceptors.request.use(config => {
   let token = localStorage.iKnowsToken;
-  // let token = 'feabae4d5a444625994b36789cbb337a';
+  let iemi = localStorage.iKnowsIemi;
+  let uname = localStorage.iKnowsUname;
   if (token) {
-    // config.headers.token = '195ad00c7def424db427e9d26354f360';
     config.headers.token = token;
+  }
+  if (iemi) {
+    config.headers.iemi = iemi;
+  }
+  if (uname) {
+    config.headers.uname = uname;
   }
   return config
 }, error => {

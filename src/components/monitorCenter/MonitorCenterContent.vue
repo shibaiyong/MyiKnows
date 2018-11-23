@@ -80,7 +80,7 @@
             <el-radio v-model="dateTypeRadio" label="0" @change="changeDateType()">1天</el-radio>
             <el-radio v-model="dateTypeRadio" label="1" @change="changeDateType()">7天</el-radio>
             <el-radio v-model="dateTypeRadio" label="3" @change="changeDateType()">30天</el-radio>
-            <el-radio v-model="dateTypeRadio" label="customTime" @change="changeDateType()">自定义</el-radio>
+            <!-- <el-radio v-model="dateTypeRadio" label="customTime" @change="changeDateType()">自定义</el-radio> -->
             <!-- <div class="customTime-date">
               <el-date-picker v-model="customTime" type="daterange"
                               :disabled="disabled"
@@ -92,8 +92,8 @@
           </div>
           <div class="date-rang">
             <span class=" rzl_fc_darkgray font16">生成格式 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-            <el-radio v-model="reportFormat" label="pdf" @change="changeDateType()">PDF</el-radio>
-            <el-radio v-model="reportFormat" label="word" @change="changeDateType()">Word</el-radio>
+            <!-- <el-radio v-model="reportFormat" label="0" @change="changeDateType()">PDF</el-radio> -->
+            <el-radio v-model="reportFormat" label="1" @change="changeDateType()">Word</el-radio>
           </div>
           <div class="dialog-button-box font16 rzl_fc_navy">
             <span class="rzl_bc_navy rzl_fc_white" @click="createReport()">生成</span>
@@ -101,10 +101,10 @@
           </div>
         </div>
         <div v-if="showCreateSuccessDialog" class="dialog-success-box">
-          <div class="dialog-title rzl_fc_darkgray font24">生成简报</div>
+          <div class="dialog-title rzl_fc_darkgray font24">已经成功生成简报</div>
           <div class="dialog-button-box dialog-success-button-box font16 rzl_fc_navy">
             <span class="rzl_bc_navy rzl_fc_white" @click="downloadBulletin()">查看结果</span>
-            <span class="rzl_bc_white rzl_fc_navy" @click="bulletinCenter()">简报中心</span>
+            <span class="rzl_bc_white rzl_fc_navy" @click="bulletinCenter()">下载简报</span>            
             <span class="rzl_bc_white rzl_fc_navy" @click="backHome()">返回</span>
           </div>
         </div>
@@ -122,7 +122,7 @@
   import dataUtil from '../../assets/js/dataUtlis'
   import Pagination from '@/components/common/Pagination'
   import {getPlanList} from '../../assets/js/api.js';
-  import {stopPlan} from '../../assets/js/api.js';
+  import {stopPlan, downloadBulletinList, createReport, qryReportSummary} from '../../assets/js/api.js';
 
   export default {
     name: "monitor-center",
@@ -141,7 +141,6 @@
         if (dom && this.parentHeight != 0 && this.parentHeight > dom.offsetHeight) {
           var a = this.parentHeight > 600 ? this.parentHeight : 600
           dom.style.minHeight = a + "px"
-          console.log(a)
         }
       }
     },
@@ -173,18 +172,14 @@
         },
         flag: true,
         hadStop:true,
-        pid:''
+        pid:'',
+        kpname:'',
+        reportId:''
       }
     },
     methods: {
       loadList() {
         var _this = this
-        // var params = new URLSearchParams();
-        // params.append('pageStart', this.pageStart);
-        // params.append('pageSize', 10);
-        // params.append('planType', this.planType);
-        // params.append('status', this.status);
-        // params.append('querystr', this.querystr);
         var params = {
           pageStart: this.pageStart,
           pageSize: 10,
@@ -220,12 +215,22 @@
         }
       },
       createReport() {
-        
+        let downFlag = this.reportFormat
+        let timeType = this.dateTypeRadio
+        let pid = this.pid
         if(this.dateTypeRadio=='' && this.customTime=='' || this.reportFormat==''){
           this.$mAlert('时间和报告格式必选')
           return
         }
-
+        let params = {
+          pid:pid,
+          timeType:timeType
+        }
+        createReport( params ).then( res => {
+          if(res.code == '200' && res.data){
+            this.reportId = res.data.uuid
+          }
+        })
         this.showCreateDialog = false
         this.showCreateSuccessDialog = true
         
@@ -233,22 +238,25 @@
       cancelCreateReport() {
         this.showCreateDialog = false;
       },
-
-      downloadBulletin( ) {
+      downloadBulletin() {
         this.showCreateSuccessDialog = false
         let timeType = this.dateTypeRadio
-        let token = localStorage.iKnowsToken
         let pid = this.pid
-        window.open(`http://iknows.inewsengine.com:8081/generateWord?timeType=${timeType}&pid=${pid}&token=${token}&warnLevel=4`)
+        let token = localStorage.iKnowsToken
+        let downFlag = 1
+        let planName = this.kpname
+        let reportId = this.reportId
+        //window.open(`/downloadReport?timeType=${timeType}&pid=${pid}&planName=${planName}`);
+        window.open(`/downloadReport?timeType=${timeType}&pid=${pid}&planName=${planName}&reportId=${reportId}`);
       },
       bulletinCenter() {
-        this.$router.push({
-          name: 'bulletincenter',
-          params: {
-            id: "11111111111111111"
-          }
-        })
-        // this.$router.push("/bulletincenter")
+        let timeType = this.dateTypeRadio
+        let pid = this.pid
+        let token = localStorage.iKnowsToken
+        let downFlag = 1
+        let reportId = this.reportId
+        //window.open(`http://49.4.90.208:8095/iknows/report/download?timeType=${timeType}&pid=${pid}&token=${token}&downFlag=${downFlag}`);
+        window.open(`http://49.4.90.208:8095/iknows/report/download?timeType=${timeType}&pid=${pid}&token=${token}&reportId=${reportId}&downFlag=${downFlag}`);
         this.showCreateSuccessDialog = false
       },
       backHome() {
@@ -277,7 +285,6 @@
         this.$mConfirm('是否确认停止该方案监测', {
           confirmButtonText: '停止',
           cancelButtonText: '取消',
-          // type: 'warning'
         }).then(() => {
           var _this = this
           var str = item.id
@@ -294,7 +301,8 @@
       },
       builderDoc(item) {
         this.showCreateDialog = true;
-        this.pid = item.id
+        this.pid = item.id;
+        this.kpname = item.kpName;
       },
       search() {
         if (this.showInputWarring) {
@@ -385,7 +393,6 @@
     mounted() {
       this.statusData = dataUtil.getStatusData()
       this.loadList()
-      // this.$refs.pagination.changeCurrentPage(1)
       var app = document.getElementById("app");
       var thiz = this;
       app.addEventListener("scroll", function (e) {

@@ -143,8 +143,8 @@
         /*最新舆情*/
         latestOpinionBtn: [
           {name: '最新', selected: true, value: 0},
-          {name: '重大', selected: false, value: 5},
-          {name: '较大', selected: false, value: 4},
+          {name: '重大', selected: false, value: 4},
+          {name: '较大', selected: false, value: 3},
         ],
         latestOpinionData: [],
         latestOpinionCategory: [
@@ -255,9 +255,7 @@
           if (response && response.code == 200 && response.data) {
             this.latestOpinionData = response.data.content;
             this.latestOpinionData.forEach((value, index) => {
-              let publishTime = new Date(value.publishTime).getTime();
-              let time =iKnowsUtil.dataFormat(publishTime);
-              value.publishtime = time;
+              value.publishtime = value.publishTime;
             })
           }
 
@@ -265,7 +263,25 @@
           console.log(error);
         })
       },
-
+      _dataFormat: function (dateTime) {
+        var date = new Date(dateTime);
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        var day = date.getDate();
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        if (minutes.length == 1) {
+          minutes = "0" + minutes
+        }
+        return checkTime(year) + "-" + checkTime(month) + "-" + checkTime(day) + " " + checkTime(hours) + ":" + checkTime(minutes)
+        // 补0
+        function checkTime(time) {
+          if (time < 10) {
+            time = "0" + time;
+          }
+          return time;
+        }
+      },
       //跳转到文章详情
       clickTableCell1(rowIndex) {
         let thiz = this;
@@ -273,6 +289,7 @@
           if (rowIndex == index) {
             let id =  value.articleId;
             let time = value.publishTime;
+            time = time.replace(/\-/ig, '/');
             let releaseDatetime= new Date(time).getTime();
             window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
           }
@@ -423,6 +440,7 @@
     },
 
     mounted() {
+
       this.loadData();
     },
     // mounted() {
@@ -703,6 +721,8 @@
     display: flex;
     justify-content: center;
     background-color: #fff;
+    /* height: 100%; */
+    overflow: hidden;
   }
   .monitorResultsTitle{
     height: 24px;

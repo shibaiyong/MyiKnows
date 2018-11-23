@@ -2,11 +2,11 @@ import axios from 'axios';
 import Vue from 'vue'
 
 // 开发环境
-// let baseUrl = 'http://10.50.2.26:8080/iknows';
+let baseUrl = 'http://10.50.2.26:8080/iknows';
 // 原始环境
 // let baseUrl = 'http://114.115.148.225:8080/iknows';
 // 正式环境
-let baseUrl = 'http://49.4.90.208:8095/iknows';
+// let baseUrl = 'http://49.4.90.208:8095/iknows';
 
 export const getDemoList = params => {
   return axios.get(`${baseUrl}/headline/list`, params).then(res => res.data)
@@ -172,6 +172,10 @@ export const modifyUserInfo = params => {
 export const getPlanList = params => {
   return axios.post(`${baseUrl}/monitor/pagePlan`, params).then(res => res.data)
 }
+//生成监测报告
+export const createReport = params => {
+  return axios.post(`${baseUrl}/report/save`, params).then(res => res.data)
+}
 //停止监测方案
 export const stopPlan = params => {
   return axios.get(`${baseUrl}/monitor/stopPlan`, params).then(res => res.data)
@@ -193,7 +197,17 @@ export const viewBulletinList = params => {
   return axios.post(`${baseUrl}/report/view`, params ).then(res => res.data)
 
 }
+//简报中心查看
+export const downloadBulletinList = params => {
+  return axios.get(`${baseUrl}/report/download`, {params:params} ).then(res => res.data)
+
+}
 //文章详情
 export const detail = params => {
   return axios.get(`${baseUrl}/monitor/detail`, params).then(res => res.data)
+}
+
+//查询下载报告页的摘要接口
+export const qryReportSummary = params => {
+  return axios.post(`${baseUrl}/monitor/analysis/qryReportSummary`, params).then(res => res.data)
 }

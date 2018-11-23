@@ -3,7 +3,7 @@
     <div class="blank_1 rzl_bc_undercoat"></div>
     <ul class="topNewsTab">
       <li v-for="(item,index) of topNewsTab" :key="index" @click="NewsTab(item.type)" v-bind:class='{active:item.type==isActive}'>
-        {{item.title}}
+        <span>{{item.title}}</span>
       </li>
     </ul>
     <div class="topNews rzl_bc_white" >
@@ -86,7 +86,7 @@
             if (!time || time == null || time == "" || time == undefined) {
               return "未知时间"
             }
-            return iKnowsUtil.dataFormat(new Date(time).getTime())
+            return iKnowsUtil.dataFormat(time)
           },
           //tab切换
           NewsTab(id){
@@ -98,7 +98,7 @@
           },
           //获取舆情头条数据
           loadTopNewsData(){
-            let params = new URLSearchParams();
+            let params = {}; 
             params = {
               searchType:this.isActive
             };
@@ -136,6 +136,7 @@
             let length = Data.length;
             let topNewsData =[];
             let loadPage = this.loadMorePage + 5;
+            
             if (loadPage < length ){
               Data.forEach(function (v,i) {
                 if(i<loadPage){
@@ -147,6 +148,7 @@
               })
               this.topNewsList = topNewsData;
               this.loadMorePage = loadPage
+              this.loadmore = true
             } else {
               Data.forEach(function (v,i) {
                 if(i<loadPage){
@@ -161,7 +163,7 @@
           },
           //跳转到详情页面
           toDetail(id,time){
-            let releaseDatetime = new Date(time).getTime();
+            let releaseDatetime = time;
              window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
               // this.$router.push({
               //   path: '/details',
@@ -190,6 +192,7 @@
   .topNews{
     padding: 30px;
     margin-bottom: 30px;
+    min-height: 600px;
   }
   .topNewsTab{
     display: flex;
@@ -205,9 +208,19 @@
     font-size: 18px;
     cursor: pointer;
   }
-  .active{
+  .topNewsTab li span{
+    line-height: 38px;
+    color: #999;
+    font-weight: 600;
+  }
+  .topNewsTab li.active{
     background: #ffffff;
     border-radius: 10px 10px 0 0;
+  }
+  .topNewsTab li.active span{
+    color: #2D2B4C;
+    border-bottom: 3px solid #2D2B4C;
+    padding-bottom: 6px;
   }
   .latestNews{
     height: 40px;

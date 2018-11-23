@@ -106,8 +106,8 @@ export default {
       });
     }
 
-    // console.log("configPrecise接收参数");
-    // console.log(this.preciseGroupList);
+    
+    
   },
 }
 </script>

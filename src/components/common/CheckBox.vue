@@ -1,7 +1,10 @@
 <template>
-    <div class="checkBox" @click="selected($event)">
+<div class="checkboxContainer" @click="selected($event)">
+    <div class="checkBox">
       <label v-show="isChecked"></label>
     </div>
+    <slot></slot>
+</div>
 </template>
 
 <script>
@@ -110,7 +113,7 @@
       vertical-align: middle;
       cursor: pointer;
     }
-    .checkBox label, .checkBox input{
+    .checkBox label{
       width:100%;
       height:100%;
       position:absolute;
@@ -121,11 +124,10 @@
       cursor: pointer;
     }
     
-    .checkBox input{
-      visibility: hidden;
-    }
     .checkBox label::after{
       content:'\2714';
     }
-    
+    .checkboxContainer{
+      display: inline-block;
+    }
 </style>

@@ -1,12 +1,12 @@
 <template>
   <div class="body-box">
     <div class="top-header">
-      <iTop/>
-      <iHeader/>
-    </div>
+        <iTop></iTop>
+        <iHeader></iHeader>
+      </div>
     <monitorCenterContent :parentHeight="height" class=" rzl_bc_undercoat rzl-contarner content"
                           id="monitorContentBox"/>
-    <IFooter/>
+    <IFooter></IFooter>
   </div>
 </template>
 
@@ -34,7 +34,7 @@
 
 <style scoped>
   .body-box {
-    display: flex;
+    /* display: flex; */
     justify-content: space-between;
     flex-direction: column;
     height: 100%;

@@ -239,7 +239,7 @@ export default{
 
         // 保存文稿监测方案
         planSave(params).then(response => {
-          // console.log(response);
+          
           if(response.code == 200){
             this.$alert('方案保存成功！', '提示：', {
               confirmButtonText: '确定',
@@ -403,7 +403,7 @@ export default{
         // 是否全部监控
         allMonitorRadio: true,
         // 已选监控范围
-        kpSiteRange: ['1','2','4','8','16','32','64'],
+        kpSiteRange: ['1','2','4','8'],
         // 无(通过js条件判断此条件)
         noneReportRadio: true,
         // 已选简报周期

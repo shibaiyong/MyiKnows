@@ -11,7 +11,7 @@
       <ul class="tab-config" v-if="tabList.length >0">
         <li v-for="(tabItem, index) in tabList" :key="index" class="font18"
           :class="{active: tabItem.isSelected, rzl_bc_white: tabItem.isSelected}"
-          @click="tabChange(tabItem.type)">{{tabItem.value}}</li>
+          @click="tabChange(tabItem.type)"><span>{{tabItem.value}}</span></li>
       </ul>
     </div>
     <router-view class="rzl-contarner rzl_bc_undercoat"></router-view>
@@ -111,18 +111,6 @@
       }
     },
     mounted() {
-      let id = this.$route.params.id || '';
-      if(id != '' && id != 'undefined'){
-        planType(id).then(response => {
-          let data = response.data;
-          this.topLabel = data.kpName;
-        }).catch(err => {
-          console.log(err);
-        });
-      }
-      this.clean = this.listen()
-    },
-    created () {
       let tabList = [
         {value: '监测结果', isSelected: false, type: 'monitorresults'},
         {value: '舆情分析', isSelected: false, type: 'monitoranalysis'},
@@ -136,14 +124,23 @@
           item.isSelected = true;
         }
       });
-
       let id = this.$route.params.id || '';
-      if(id == '' || id == 'undefined'){
-        this.tabList = [];
+      if(id != '' && id != 'undefined'){
+        planType(id).then(response => {
+          let data = response.data;
+          this.topLabel = data.kpName;
+          let kpType = data.kpType;
+          if(kpType == 4){
+            tabList.splice(2,1);
+          }
+          this.tabList = tabList;
+        }).catch(err => {
+          console.log(err);
+        });
       }else{
-        this.tabList = tabList;
+        this.tabList = [];
       }
-      
+      this.clean = this.listen();
     },
     beforeDestroy() {
       this.clean()
@@ -177,13 +174,21 @@
 .tab-config li{
   min-width: 126px;
   height: 100%;
-  line-height: 36px;
-  text-align: center;
-  font-weight: 700;
+  text-align: center; 
   cursor: pointer;
+}
+.tab-config li span{
+  display: inline-block;
+  line-height: 36px;
+  color: #999;
+  font-weight: 700;
 }
 .tab-config li.active{
   border-radius: 10px 10px 0 0;
+}
+.tab-config li.active span{
+  color: #2D2B4C;
+  border-bottom: 3px solid #2D2b4c;
 }
 .backTop{
   height: 40px;

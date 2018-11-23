@@ -79,8 +79,7 @@
     methods: {
       // 舆情折线图数据
       loadDatas_IntelliGence() {
-        let params = new URLSearchParams();
-        params = {};
+        let params = {};
         let _this = this;
         getHomeCount(params).then(response => {
           if (response.code == 200) {
@@ -107,8 +106,7 @@
 
       //近期预警趋势数据
       loadDatas_RecentTrends() {
-        let params = new URLSearchParams();
-        params = {};
+        let params = {};
         let _this = this;
         getRecentTrends(params).then(response => {
           if (response.code == 200) {
@@ -135,8 +133,7 @@
       },
       //表格
       loadDatas_hotIntelligence(){
-        let params = new URLSearchParams();
-        params = {};
+        let params = {};
         let _this = this;
         getHotIntelligence(params).then(response => {
           if (response.code == 200) {
@@ -154,9 +151,9 @@
           thiz.hotIntelligenceData = data.content;
           if (thiz.hotIntelligenceData) {
             thiz.hotIntelligenceData.forEach((value, index) => {
-              let publishTime = new Date(value.publishTime).getTime();
-              let time =iKnowsUtil.dataFormat(publishTime);
-              value.time = time;
+              // let publishTime = new Date(value.publishTime).getTime();
+              // let time =iKnowsUtil.dataFormat(value.publishTime);
+              value.time = value.publishTime;
               if (value.articleType==''|| value.articleType == null) {
                 value.articleType = '-'
               }
@@ -173,6 +170,7 @@
           if (rowIndex == index) {
             let id =  value.articleId;
             let time = value.publishTime;
+            time = time.replace(/\-/ig, '/');
             let releaseDatetime= new Date(time).getTime();
              window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
           }

@@ -147,6 +147,7 @@
 
         let style = Object.assign({}, this.baseCellStyle);
 
+        
 
         this.category.forEach(function (category, categoryIndex) {
 
@@ -241,7 +242,7 @@
 
       /*单元格行选中*/
       ZCRowSelect(selection){
-        // console.log(selection);
+        
         let selects = [];
         selection.forEach(function (item) {
           selects.push(item.rowIndex);
@@ -270,12 +271,31 @@
 
     mounted() {
       // /*监听屏幕拖拽*/
-      // let tableEl = this.$refs.zc_tables;
+      let tableEl = this.$refs.zc_tables;
       // window.addEventListener("resize", function () {
       //
       //   tableEl.clearSort();
       //
       // });
+
+      setTimeout(() => {
+        let category = this.category;
+        let wholeWidth = tableEl.bodyWidth;
+        let usedWidth = 0;
+        category.forEach(item =>{
+          if(item.width && item.width > 0){
+            usedWidth += item.width;
+          }      
+        });
+        category.forEach(item =>{
+          if(item.width && item.width > 0){          
+          }else{
+            item.width = parseInt(wholeWidth) - usedWidth;
+            console.log(item.width);
+          };
+        });
+        
+      }, 500);
     },
     created() {
 
@@ -296,13 +316,34 @@
   .zc_tables >>> .is-leaf .cell {
     font-weight: bolder;
   }
-
-  .zc_tables >>> .cell{
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+  .zc_tables >>>.is-scrolling-none table{
+    width: 100% !important;
   }
-
+  .zc_tables >>>.is-scrolling-none table>tbody{
+    width: 100% !important;
+  }
+  .zc_tables >>>.is-scrolling-none table >tbody tr{
+    width: 100% !important;
+  }
+  .zc_tables >>> .cell{
+    /* display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1; */
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+  }
+  /* .zc_tables >>>.is-scrolling-none .cell::after{
+    content: "..."; 
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
+    padding-left: 40px;
+    background: -webkit-linear-gradient(left, transparent, red 50%);
+    background: -o-linear-gradient(right, transparent, red 50%);
+    background: -moz-linear-gradient(right, transparent, red 50%);
+    background: linear-gradient(to right, transparent, red 50%);
+  } */
   .zc_tables >>> .el-checkbox__inner{
     background-color: #fff;
     border-color: #1D2088;

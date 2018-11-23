@@ -1,12 +1,14 @@
 import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
-
+import {formatDate} from './date.js'
   export default {
     install(Vue, options) {
       Vue.prototype.getPdf = function (id, name, time) {
         if (!time || time == "") {
-          time = new Date().Format('yyyy年MM月dd日');
+          time = formatDate(new Date(),'yyyy年MM月dd日');
         }
+
+
         time=time.indexOf("当天")!=-1?time.substr(0,time.length-2):time
         time=time.replace(/年/g,".")
         time=time.replace(/月/g,".")
@@ -16,13 +18,13 @@ import JsPDF from 'jspdf'
           allowTaint: true
         }).then(function (canvas) {
           var canvasTitle = document.createElement('canvas');
-          canvasTitle.width = canvas.width; //☜
+          canvasTitle.width = canvas.width; //
           canvasTitle.height = 140;
           var ctx = canvasTitle.getContext('2d');
           ctx.fillStyle = '#3B87F5';
           ctx.fillRect(0, 0, canvas.width, 140);
 
-          var txttitle = localStorage.getItem('currentTenant') + "传播分析报告";
+          var txttitle = name + "传播分析报告";
           ctx.font = "bold 36px Microsoft YaHei";
           var txtwidth = ctx.measureText(txttitle).width
           var gradient = ctx.createLinearGradient(0, 0, 12, 0);
@@ -66,27 +68,28 @@ import JsPDF from 'jspdf'
           let imgWidth = 595.28
           let imgHeight = 595.28 / contentWidth * contentHeight
           let pageData = canvas2.toDataURL('image/jpeg', 1.0)
-          let PDF = new JsPDF('', 'pt', 'a4')
-          var dpiX = 160;
-          var dpiY = 160;
-          // PDF.addImage(pageData, 'JPEG', 7 / dpiX, 5 / dpiY, imgWidth, imgHeight)
+          console.log(pageData)
+          // let PDF = new JsPDF('', 'pt', 'a4')
+          // var dpiX = 160;
+          // var dpiY = 160;
+          // // PDF.addImage(pageData, 'JPEG', 7 / dpiX, 5 / dpiY, imgWidth, imgHeight)
 
-          if(leftHeight < pageHeight) {
-            PDF.addImage(pageData, 'JPEG', 0, 0, imgWidth,imgHeight);
-          } else {
-            while(leftHeight > 0) {
-              //arg3-->距离左边距;arg4-->距离上边距;arg5-->宽度;arg6-->高度
-              PDF.addImage(pageData, 'JPEG', 0, position,imgWidth, imgHeight)
-              leftHeight -= pageHeight;
-              position -= 841.89;
-              //避免添加空白页
-              if(leftHeight > 0) {
-                //注②
-                PDF.addPage();
-              }
-            }
-          }
-          PDF.save(txt + time + '.pdf')
+          // if(leftHeight < pageHeight) {
+          //   PDF.addImage(pageData, 'JPEG', 0, 0, imgWidth,imgHeight);
+          // } else {
+          //   while(leftHeight > 0) {
+          //     //arg3-->距离左边距;arg4-->距离上边距;arg5-->宽度;arg6-->高度
+          //     PDF.addImage(pageData, 'JPEG', 0, position,imgWidth, imgHeight)
+          //     leftHeight -= pageHeight;
+          //     position -= 841.89;
+          //     //避免添加空白页
+          //     if(leftHeight > 0) {
+          //       //注②
+          //       PDF.addPage();
+          //     }
+          //   }
+          // }
+          // PDF.save(name + time + '.pdf')
 
         })
       }

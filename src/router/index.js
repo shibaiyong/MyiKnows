@@ -2,6 +2,8 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
+import Login from "@/components/login/Login"
+
 Vue.use(Router)
 
 export default new Router({
@@ -12,10 +14,15 @@ export default new Router({
       name: 'home',
       component: resolve => require(['@/components/home/Home'], resolve)
     },
+    // {
+    //   path: '/login',
+    //   name: 'login',
+    //   component: resolve => require(['@/components/login/Login'], resolve)
+    // },
     {
       path: '/login',
       name: 'login',
-      component: resolve => require(['@/components/login/Login'], resolve)
+      component:Login
     },
     // 舆情头条页面
     {
@@ -114,7 +121,7 @@ export default new Router({
     {
       path: '/bulletincenter',
       name: 'bulletincenter',
-      component: resolve => require(['@/components/bulletincenter/BulletinCenter'], resolve)  //简报中心
+      component: resolve => require(['@/components/BulletinCenter/BulletinCenter'], resolve)  //简报中心
     },
     //文章通用列表
     {
@@ -127,6 +134,12 @@ export default new Router({
       path: '/details',
       name: 'details',
       component: resolve => require(['@/components/details/ArticleDetails'], resolve)  //文章详情
+    },
+    /****************************下载报告***********************/
+    {
+      path:'/downloadReport',
+      name: 'downloadreport',
+      component: resolve => require(['@/components/downloadReport/downloadReport'], resolve)
     },
     /****************************组件demo页面***********************/
     // 定比例布局展示示例
@@ -193,6 +206,7 @@ export default new Router({
         }
       ]
     },
+    
     /****************************404页面***********************/
     {
       path: '/*',

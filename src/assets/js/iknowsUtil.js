@@ -71,22 +71,22 @@ var iknowsUtil = {
     }
     return str
   },
-  setCookie:function(name, deadTime, value){//设置cookie
+  setCookie: function (name, deadTime, value) {//设置cookie
 
     let currentTime = new Date();
     let endTime = new Date(currentTime.getTime() + deadTime * 24 * 3600 * 1000);
-    document.cookie = name + "=" + JSON.stringify(value) +";expires=" + endTime.toGMTString();
+    document.cookie = name + "=" + JSON.stringify(value) + ";expires=" + endTime.toGMTString();
   },
 
-  getCookie:function(key){//获取cookie
+  getCookie: function (key) {//获取cookie
 
-    if( document.cookie ){//如果cookie存在就获取
+    if (document.cookie) {//如果cookie存在就获取
       var str = document.cookie;
       var arr = str.split("; ");
-      for(var i = 0 ; i < arr.length ; i++){
+      for (var i = 0; i < arr.length; i++) {
         var item = arr[i].split("=");
-        if( item[0] == key){
-          return JSON.parse( item[1] );//将结果转成对象返回
+        if (item[0] == key) {
+          return JSON.parse(item[1]);//将结果转成对象返回
         }
       }
       return {};// 如果cookie存在，但是不存在key的值
@@ -94,16 +94,16 @@ var iknowsUtil = {
     return {};//如果cookie不存在  返回一个空对象
   },
 
-  deleteCookie:function( key ){
+  deleteCookie: function (key) {
     var date = new Date();
     date.setTime(date.getTime() - 1);
     var delValue = this.getCookie(key);
     if (!!delValue) {
-        document.cookie = key+'='+delValue+';expires='+date.toGMTString();
+      document.cookie = key + '=' + delValue + ';expires=' + date.toGMTString();
     }
   },
   //返回顶部
-  backTop: function(initObj, targetObj, time, callback){
+  backTop: function (initObj, targetObj, time, callback) {
     let _frame = null;
     function animate(_time) {
       _frame = requestAnimationFrame(animate);
@@ -113,10 +113,87 @@ var iknowsUtil = {
     let tween = new Tween.Tween(initObj)
       .to(targetObj, time)
       .easing(Tween.Easing.Cubic.Out)
-      .onUpdate(function() {
+      .onUpdate(function () {
         callback(initObj, _frame);
       })
       .start()
   },
+  //数字千分位格式化
+  toThousands: function (num) {
+
+    if (num == null || num == undefined) return "";
+    var flag = false;
+    var indexDot = num.toString().indexOf('.');
+    var dot;
+    if (indexDot > 0) {
+      dot = num.toString().substring(indexDot);
+      num = num.toString().substring(0, indexDot);
+    }
+    var result = '', counter = 0;
+    var reg = /^\-/;
+    var reg1 = /\(/g;
+    num = (num || 0).toString();
+    if (reg1.test(num)) {
+      num = num.replace(reg1, '');
+      flag = true;
+    } else {
+      flag = false;
+    }
+    var num1 = num;
+    num = num.replace(reg, '');
+    for (var i = num.length - 1; i >= 0; i--) {
+      counter++;
+      result = num.charAt(i) + result;
+      if (!(counter % 3) && i != 0) {
+        result = ',' + result;
+      }
+    }
+    if (num1 < 0) {
+      result = "-" + result
+    }
+    if (indexDot > 0) {
+      result = result + dot;
+    }
+    if (flag == true) {
+      result = '(' + result;
+    }
+    return result;
+  },
+  getQueryObjectByUrl: function () {
+    var url = window.location.href;
+    var obj = {
+      pathname: window.location.pathname,
+      getUrl: function () {
+        var i = 0;
+        var result = '';
+        for (prop in this) {
+          if (prop === 'getUrl' || prop === "pathname") {
+            continue;
+          }
+          if (i == 0)
+            result += '?' + prop + '=' + this[prop];
+          else
+            result += '&' + prop + '=' + this[prop];
+          i++;
+        }
+        result = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port + this.pathname + result;
+        return result;
+      }
+    };
+    if (url.indexOf("?") == -1)
+      return obj;
+    var search = url.substring(url.indexOf("?"));
+    if (!search || search === '')
+      return obj;
+    var keyValueArray = search.substring(1).split('&');
+    keyValueArray.forEach(function (item, i) {
+      var keyAndValue = item.split('=');
+      var key = keyAndValue[0];
+      var value = keyAndValue[1];
+      if (typeof (value) !== 'undefined' && value !== null && value !== '')
+        obj[key] = decodeURIComponent(value);
+    });
+    return obj;
+  }
 };
 export default iknowsUtil;

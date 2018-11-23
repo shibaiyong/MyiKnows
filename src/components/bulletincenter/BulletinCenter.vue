@@ -52,7 +52,7 @@
           })
         }else if( params == 'delete'){
           let arr = [];
-          arr.push( ids )
+          arr.push( ids.reportId )
           let reportIds = {
             reportIds : arr
           }
@@ -100,7 +100,7 @@
         // let bottomHeight = this.$refs.bottomHeight.offsetHeight
         // let documentHeight = this.$refs.documentHeight.offsetHeight
         // let pagecontainerHeight = this.$refs.pagecontainer.offsetHeight
-        // console.log()
+        
         // let middleHeight = documentHeight - topHeight - bottomHeight
         // middleHeight = middleHeight < 600 ? 520 : middleHeight; 
         // this.$refs.pagecontainer.style.height = pagecontainerHeight > middleHeight ? pagecontainerHeight + 'px' : middleHeight + 80 + 'px'

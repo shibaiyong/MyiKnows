@@ -146,6 +146,9 @@
     },
     filters: {
       formatDate(val){
+        if(!val){
+          return
+        }
         var value=new Date(val);
         var year= value.getFullYear();
         var month= value.getMonth()+1;
@@ -164,6 +167,7 @@
         if(minutes < 10){
           minutes = '0' + minutes;
         }
+        
         return year+'-'+month+'-'+day+' '+hour+':'+minutes;
       },
     },

@@ -156,7 +156,7 @@ export default {
       this._configParams();
     },
     timeCallBack(){
-      // console.log(this.configSelectorObj.timeSelf);
+      
       this._configParams();
     },
     // 选择全选
@@ -275,8 +275,8 @@ export default {
     this.configSelectorObj.kpRpSendType = kpRpSendType;
 
 
-    // console.log("configSelector接收参数")
-    // console.log(this.configSelectorObj);
+    
+    
   },
   created() {
     // 监控范围

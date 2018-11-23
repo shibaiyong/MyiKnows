@@ -14,6 +14,18 @@
   .font64{
     font-size: 54px;
   }
+  .font58 {
+    font-size: 58px;
+  }
+  .font44 {
+    font-size: 44px;
+  }
+  .font40 {
+    font-size: 40px;
+  }
+  .font28 {
+    font-size: 28px;
+  }
   .font24 {
     font-size: 24px;
   }
@@ -39,6 +51,18 @@
     .font64{
       font-size: 40px;
     }
+    .font58 {
+      font-size: 34px;
+    }
+    .font44 {
+      font-size: 30px;
+    }
+    .font40 {
+      font-size: 30px;
+    }
+    .font28 {
+      font-size: 20px;
+    }
     .font24 {
       font-size: 22px;
     }
@@ -56,5 +80,22 @@
     }
     .font12 {
       font-size: 12px;
+    }
+    .loginleft .shownumber p{
+      line-height: 28px !important;
+    }
+    .loginleft .companyInfo{
+      line-height: 21px !important;
+    }
+    #login .loginright .logo[data-v-08b4fdc3] {
+      margin: 20% auto 8% auto;
+    }
+    #login .loginright li input { 
+      height:46px;
+    }
+    #login .loginright li:last-child button {
+      
+      height:46px;
+      
     }
 }

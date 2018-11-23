@@ -72,12 +72,30 @@ export default{
       regionQuery(params).then(response => {
         if(response.code == 200){
           let data = response.data || [];
+          let regionLabel = '';
+          let len = 0;
+          let prefixLabel = '';
+          let suffixLabel = '';
+          // 最多显示40个字符
+          // data.push({
+          //   code: 432123,
+          //   regionLabel: '新疆维吾尔自治区-克孜勒苏柯尔克孜自治州-南昌不新技术产业开发区艾溪湖管理处溪湖南社区居委会（南昌高新开发区）'
+          // });         
           data.forEach( item => {
+            // 处理字符超长的问题
+            regionLabel = item.regionLabel;
+            len = regionLabel.length;           
+            if(len > 40){
+              suffixLabel = regionLabel.substr(regionLabel.lastIndexOf('-')+1, len); 
+              prefixLabel = regionLabel.substr(0, (40 - suffixLabel.length));
+              regionLabel = prefixLabel + '...' + suffixLabel;
+            }
             mappingAreaList.push({
-              regionCode: item.regionId,
-              value: item.regionName
+              regionCode: item.code,
+              value: regionLabel,
+              regionValue: item.regionLabel
             });
-          });
+          });         
           let results = queryString ? mappingAreaList.filter(this._areaFilter(queryString)) : mappingAreaList;
           // 调用 callback 返回建议列表的数据
           callBack(results);
@@ -88,7 +106,7 @@ export default{
     },
     _areaFilter(queryString) {
       return (mappingArea) => {
-        return (mappingArea.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+        return (mappingArea.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
       };
     },
     // 选中下拉列表中匹配的地域条件(todo?全部刷新 or 给出提示：针对已经筛选的地区用户二次筛选的情形)
@@ -99,8 +117,12 @@ export default{
         return chooseAreaInnerId != element.regionCode;
       });
       // 限定最多5个
-      if(chooseAreaList.length < 5){
-        chooseAreaList.push({regionCode: chooseAreaInnerId, regionName: item.value});
+      if(chooseAreaList.length >= 5){
+        this.$message.error(chooseAreaEnoughText);
+        this.configArea = '';
+        return;
+      }else{
+        chooseAreaList.push({regionCode: chooseAreaInnerId, regionName: item.regionValue});
       }
       this.chooseAreaList = chooseAreaList;
       this.configArea = '';
@@ -175,7 +197,7 @@ export default{
 }
 .configArea .configArea-right{
   margin-left: 20px;
-  width: 100%;
+  width: 85%;
   height: 100%;
   min-height: 38px;
   display: block;
@@ -202,8 +224,10 @@ export default{
 }
 .configArea  .configArea-chooseArea span{
   margin-right: 15px;
+  margin-bottom: 10px;
+  display: inline-block;
 }
 .configArea .tag-chooseArea{
-border-radius: 10px;
+  border-radius: 10px;
 }
 </style>

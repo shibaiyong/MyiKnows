@@ -61,7 +61,8 @@
         thiz.provincesData.forEach(function (item) {
           thiz.data.forEach(function (data) {
             let provinceName = thiz.cutProvinceName(data[thiz.label])
-            if (provinceName === item.name) {
+
+            if (provinceName == item.name) {
 
               thiz.max = Math.max(thiz.max, data[thiz.prop]);
 
@@ -144,7 +145,7 @@
             {
               type: 'map',
               geoIndex: 0,
-              data: this.mapData,
+              data: this.mapData
             }
           ],
         }
@@ -191,6 +192,14 @@
           newName = name.substring(0, name.indexOf('省'))
         } else if (name.indexOf('市') > 0) {
           newName = name.substring(0, name.indexOf('市'))
+        }else if (name.indexOf('宁夏') != -1 ){
+          newName = '宁夏'
+        }else if (name.indexOf('广西') != -1 ){
+          newName = '广西'
+        }else if (name.indexOf('新疆') != -1 ){
+          newName = '新疆'
+        }else if(name.indexOf('自治区') != -1){
+          newName = name.replace('自治区','');
         }
         return newName
       }
