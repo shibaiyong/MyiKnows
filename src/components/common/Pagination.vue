@@ -54,12 +54,12 @@ export default {
             inputNum:'',
         }
     },
-    updated(){
-        console.log('updated')
-    },
+    // updated(){
+    //     console.log('updated')
+    // },
     created(){
         //初始化----分页组件
-        console.log('created');
+        // console.log('created');
         this.showPage(this.currentPage);
 
     },

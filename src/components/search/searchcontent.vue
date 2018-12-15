@@ -10,15 +10,14 @@
             <button type="button" class="rzl_seach_button rzl_bc_navy font16 rzl_fc_white" @click="seachKey()">搜索</button>
             <i class="rzl_bc_shallowGreen rzl_fc_white inputI" v-if="wordnumber">!</i>
             <span class="font14 rzl_fc_errRed" v-if="wordnumber">请减少到20字以内。</span>
-            
           </div>
           <!--筛选条件-->
-          <!--媒体类型-->
+          <!--文章类型-->
           <div class="mediaSeach clearfix">
-            <span class="font16">媒体类型</span>
+            <span class="font16">文章类型</span>
             <ul class="clearfix">
               <li v-for="(item,index) of mediaType" :key="index" class="font14" @click="changeMediaType(item.type)" v-bind:class='{active:item.type==isActive_MediaType}'>
-                {{item.name}}({{item.count}})
+                {{item.name}}
               </li>
             </ul>
           </div>
@@ -45,66 +44,42 @@
               </el-date-picker>
             </div>
           </div>
-          <!--警报等级-->
+          <!--类型筛选-->
           <div class="mediaSeach clearfix" v-if="isShow">
-            <span class="font16">警报等级</span>
+            <span class="font16">类型筛选</span>
             <ul class="clearfix">
-              <li v-for="(item,index) of alertLevel" :key="index" class="font14" @click="changeAlertLevel(item.alertLevel)" v-bind:class='{active:item.alertLevel==isActive_AlertLevel}'>
+              <li v-for="(item,index) of alertLevel" :key="index" class="font14" @click="changeAlertLevel(item.alertLevel)" v-bind:class='{active:item.alertLevel==isActive}'>
                 {{item.name}}
               </li>
             </ul>
           </div>
-          <!--是否去重-->
-          <div class="mediaSeach clearfix">
-            <span class="font16">是否去重</span>
-            <ul class="clearfix">
-              <li v-for="(item,index) of isDuplicate" :key="index" class="font14" @click="changeIsDuplicate(item.type)" v-bind:class='{active:item.type==isActive_IsDuplicate}'>
-                {{item.name}}
-              </li>
-            </ul>
-          </div>
-          <!--情感倾向-->
-          <div class="mediaSeach clearfix">
-            <span class="font16">情感倾向</span>
-            <ul class="clearfix">
-              <li v-for="(item,index) of emotionalDirection" :key="index" class="font14" @click="changeEmotionalDirection(item.type)" v-bind:class='{active:item.type==isActive_EmotionalDirection}'>
-                {{item.name}}
-              </li>
-            </ul>
-          </div>
-          <!--时间热度-->
-          <div class="mediaSeach timeOrHot clearfix">
-            <ul class="clearfix">
-              <li v-for="(item,index) of timeOrhot" :key="index" class="font14 rzl_fc_navy" @click="changeTimeOrHot(item.type)" v-bind:class='{active:item.type==isActive_TimeOrHot}'>
-                {{item.name}}
-              </li>
-            </ul>
-          </div>
+         
+         
+          
           <!--舆情列表-->
-          <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14"  @click="loadNowData()">最 新</p>
+          <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font16"  >
+              <span>结果列表</span>
+              <span>
+                  <span class= "xuu">
+                      <span v-if="xu" @click="s_ort">按时间正序<i class="el-icon-sort-up"></i></span>
+                      <span v-else @click="s_ort" >按时间倒序<i style="margin-left:7px" class="el-icon-sort-down"></i></span>
+                  </span>
+                  <span>共{{dataTotal}}条数据</span>
+              </span>
+          </p>
           <div v-show="dataload"  class="noData font16">数据加载中...</div>
           <div v-show="noData"   class="noData font16">暂无相关数据</div>
           <ul id="topNewsList" class="topNewsList" v-if="monitorResultList.length >0">
-            <li  class="topNewsItems clearfix" v-for="(item,index) of monitorResultList" :key="index" @click="toDetail(item.webpageCode,item.releaseDatetime)">
+            <li  class="topNewsItems clearfix" v-for="(item,index) of monitorResultList" :key="index" @click="toDetail(item.webpageCode,item.publishTime)">
               <div class="topNewsLeft">
                 <p class="topNewsTitle font16 rzl_fc_darkgray" v-html ="heightLightShow(item.title)"></p>
                 <div class="topNewsTag rzl_fc_darkgray font14">
-                  <span>发布时间：<i>{{getDate(item.releaseDatetime)}}</i></span>
-                  <span>来源：<i>{{item.sourceCrawl}}</i></span>
+                  <span>发布时间：<i>{{getDate(item.publishTime)}}</i></span>
+                  <span>来源：<i>{{item.source}}</i></span>
                 </div>
                 <div class="topNewsContent font14" v-html ="heightLightShow(item.summary)">
                 </div>
-                <div class="topNewsTag rzl_fc_darkgray font14 mb20">
-                  <span>情感倾向：<i :class="{redLabel:item.tags == '负面'}">{{item.tags}}</i></span>
-                  <span>相似文章数量：{{item.similarityDocs}}</span>
-                </div>
-              </div>
-              <div class="topNewsRight t_center">
-                <span class="leavl1 font18 " v-if="item.status == 4">重大</span>
-                <span class="leavl2 font18 " v-else-if="item.status == 3">较大</span>
-                <span class="leavl3 font18 " v-else-if="item.status == 2">轻微</span>
-                <span class="leavl4 font18 " v-else-if="item.status == 1">一般</span>
-                <span class="leavl5 font18 " v-else>正常</span>
+               
               </div>
               <div class="topNewsRight mt_10">
                 <span class="infoBtn rzl_bc_navy rzl_fc_white font16" >查看详情</span>
@@ -126,7 +101,7 @@
 
 <script>
    // import ITabConfig from '@/components/common/TabConfig';
-   import { getMonitorResults ,getMonitorType,planType}from '@/assets/js/api';
+   import { getsearchResults ,getMonitorType,planType}from '@/assets/js/api';
    import Pagination from "@/components/common/Pagination";
    import iKnowsUtil from '@/assets/js/iknowsUtil';
    let vm;
@@ -137,35 +112,28 @@
         vm = this
         return{
           // 搜索框
-          queryTopNews: '',
+          queryTopNews: this.TopNews,
           // 监测名称
           monitorName:'苏州民生网全网监测',
           // 字数超出提示
           wordnumber: false,
           // 媒体类型
-          mediaType:[{
-            name:'全部',
-            count:0,
-            type:null
-          }],
+          mediaType:[
+              {name:'全文',type:1},
+              {name:'标题',type:2},
+              {name:'正文',type:3},
+              
+          ],
           // 时间范围
           timeRange:[],
-          // 警报等级
-          alertLevel:[],
-          // 是否去重
-          isDuplicate:[],
-          //情感倾向
-          emotionalDirection:[],
-          //时间热度排行
-          timeOrhot:[],
+          // 类型筛选
+          alertLevel:['全部', '标题', '正文'],
+          dataTotal:0,//搜索总条数
+          xu:false,//正序和倒序
           // 初始化默认选中数据
-          isActive_MediaType:null,
-          isActive_AlertLevel:0,
+          isActive_MediaType:1,
+          isActive:this.isActivee,
           isActive_TimeRange:2,
-          isActive_TimeOrHot:0,
-          // 去重功能暂时移除，默认为不去重
-          isActive_IsDuplicate: 0,
-          isActive_EmotionalDirection:0,
           // 时间控件是否禁用
           disabled: true,
           // 自定义时间范围值
@@ -190,6 +158,7 @@
           isShow:true
         }
       },
+      props: ['TopNews','isActivee'],
       methods:{
           //关键字搜索
           seachKey(){
@@ -200,43 +169,7 @@
                 this.$message.error('请输入关键字搜索');
               }
           },
-          //获取方案类型
-          loadPlanType(){
-            let id= this.$route.params.id;
-            if(id != '' && id != 'undefined'){
-              planType(id).then(response => {
-                let data = response.data;
-                let kpType = data.kpType;
-                if(kpType == 5 || kpType == 6){
-                  this.isShow = false
-                }else {
-                  this.isShow = true
-                }
-              }).catch(err => {
-                console.log(err);
-              });
-            }
-          },
-          // 媒体类型数据
-          loadMediaType(){
-            let params;
-            params = {
-              id:this.$route.params.id,
-            };
-            getMonitorType(params).then(response => {
-              if (response.code == 200) {
-                this.mediaType=response.data
-                this.mediaType = this.mediaType.reverse()
-              }else if(response.code == 103){
-                this.$message.error(response.msg);
-              }else {
-                this.$message.error(response.message);
-              }
-            }).catch(error => {
-
-            })
-         },
-          //选择媒体类型
+          //文章类型
           changeMediaType(id){
             // 防止用户选择自定时间后未选择时间值的操作
             if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
@@ -248,42 +181,7 @@
             this.monitorResultList=[];
             this.loadMonitorResultData()
           },
-          //选择警报等级
-          changeAlertLevel(id){
-            // 防止用户选择自定时间后未选择时间值的操作
-            if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
-              this.$message.error('请选择时间范围！');
-              return;
-            }
-            this.isActive_AlertLevel = id;
-            this.page=1;
-            this.monitorResultList=[];
-            this.loadMonitorResultData()
-          },
-          //选择去重方式
-          changeIsDuplicate(id){
-            // 防止用户选择自定时间后未选择时间值的操作
-            if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
-              this.$message.error('请选择时间范围！');
-              return;
-            }
-            this.isActive_IsDuplicate = id;
-            this.page=1;
-            this.monitorResultList=[];
-            this.loadMonitorResultData()
-          },
-           // 情感倾向
-           changeEmotionalDirection(id){
-             // 防止用户选择自定时间后未选择时间值的操作
-             if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
-               this.$message.error('请选择时间范围！');
-               return;
-             }
-             this.isActive_EmotionalDirection = id;
-             this.page=1;
-             this.monitorResultList=[];
-             this.loadMonitorResultData()
-           },
+          
           //选择时间范围
           changeTimeRange(id){
              this.isActive_TimeRange = id;
@@ -303,13 +201,20 @@
             this.monitorResultList=[];
             this.loadMonitorResultData()
           },
-          //时间热度排行
-          changeTimeOrHot(id){
-            this.isActive_TimeOrHot = id;
+          //类型筛选
+          changeAlertLevel(id){
+            // 防止用户选择自定时间后未选择时间值的操作
+            if(this.customTime.length !=2 && parseInt(this.isActive_TimeRange) === 4){
+              this.$message.error('请选择时间范围！');
+              return;
+            }
+            this.isActive = id;
             this.page=1;
             this.monitorResultList=[];
-            this.loadMonitorResultData();
+            this.loadMonitorResultData()
           },
+         
+          
           //最新数据
           loadNowData(){
             this.loadMonitorResultData();
@@ -340,14 +245,14 @@
             var endtime =  end;
             time.push(start);
             time.push(end);
-            let sortFie,sortType;
-            let isHot = this.isActive_TimeOrHot;
-            if (isHot == 0){
-              sortFie='releaseDatetime'
-              sortType = 0
-            } else if(isHot == 1) {
+            let sortFie,sortType;console.log(this.xu)
+            //let isHot = this.xuu;
+            if (this.xu === true){
               sortFie='releaseDatetime'
               sortType = 1
+            } else if(this.xuu ===false) {
+              sortFie='releaseDatetime'
+              sortType = 0
             }else {
               sortFie='weight'
               sortType = 0
@@ -355,57 +260,60 @@
             let page = this.page -1;
             let pagestart = page * 10;
             params = {
-              id:this.$route.params.id,
-              searchArticleTitle:this.queryTopNews,
-              level:this.isActive_AlertLevel,
-              carrier:this.isActive_MediaType,
-              timeType:this.isActive_TimeRange,
-              duplicateLabel:this.isActive_IsDuplicate,
-              sentiment:this.isActive_EmotionalDirection,
-              startTime:starttime,
-              endTime:endtime,
-              sortField:sortFie,
-              sortType:sortType,
-              pageStart:pagestart,
-              pageSize:10
+                searchValue:this.queryTopNews,
+                time:this.isActive_TimeRange,
+                match:this.isActive_MediaType,
+                carrier:this.isActive,
+                //type:0,
+                timeRangeStart:starttime,
+                timeRangeEnd:endtime,
+                pageStart:pagestart,
+                pageSize:10,
+                sortField:'',
+                sortType:sortType
+
             };
+            this.$nextTick(()=>{
+                params.searchValue = this.queryTopNews;
+                params.carrier = this.isActive
+            })
             let _this = this;
             this.monitorResultList=[];
 
-            getMonitorResults(params).then(response => {
+            getsearchResults(params).then(response => {
               _this.handleData_onitorResult(response);
-              // if (response.code == 200) {
-              //   _this.handleData_onitorResult(response.data);
-              // }else {
-              //   this.$message.error(response.message);
-              // }
+               if (response.code == 200) {
+                 _this.handleData_onitorResult(response.data);
+               }else {
+                 this.$message.error(response.message);
+               }
             }).catch(error => {
 
             })
           },
           handleData_onitorResult(data){
             this.total = -1;
+            this.dataTotal = 0;
             let Data = data.content;
             if (Data != '' && Data != null) {
 
               Data.forEach(function (v) {
                 var sentiment = v.sentiment;
                 // v.sentiment = sentiment.toFixed(2);
-                if (sentiment <= 0.7 && sentiment >= 0.3) {
-                  v.tags = '中性'
-                } else if (sentiment < 0.3) {
-                  v.tags = '负面'
-                } else {
-                  v.tags = '正面'
-                }
+                // if (sentiment <= 0.7 && sentiment >= 0.3) {
+                //   v.tags = '中性'
+                // } else if (sentiment < 0.3) {
+                //   v.tags = '负面'
+                // } else {
+                //   v.tags = '正面'
+                // }
               });
-              var highlightWords = data.highlightWords;
+              //var highlightWords = data.highlightWords;
               this.monitorResultList = Data;
-              this.total = data.totalElements;
+              this.total = this.dataTotal= data.totalElements;
               this.dataload = false;
               this.noData = false;
-              this.highlightWords = highlightWords;
-
+              this.highlightWords = this.queryTopNews.split(' ');
               // this.highlightWords = ['阿根廷','习近平','彭丽媛'];
             }else {
               this.noData = true;
@@ -426,11 +334,15 @@
             let userName = this.$iknowsUtil.getUserName();
             let planId = this.$route.params.id;
             let keyWords = vm.queryTopNews;
-            window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ Time +'&planId='+planId +'&keyWords='+keyWords );
+            window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ Time +'&keyWords='+keyWords );
           },
           // 分页
           currentChange(i){
+          if(i>10000/this.pageSize){
+              this.page = 10000/this.pageSize
+          }else{
           this.page = i;
+          }
           this.loadMonitorResultData()
         },
           // 关键词高亮
@@ -439,7 +351,7 @@
               var arr = this.highlightWords;
               if (arr){
                 for (var i = 0; i<arr.length; i++){
-                  val = val.replace(new RegExp(arr[i],'g'),"<span class='highlightWords'>"+ arr[i] +"</span>");
+                  val = val.replace(new RegExp(arr[i],'g'),"<span class='red'>"+ arr[i] +"</span>");
                 }
                 return val
               }
@@ -449,6 +361,12 @@
             }
 
        },
+        //时间热度排行
+            s_ort(){
+                this.xu = !this.xu;
+                this.monitorResultList=[];
+                this.loadMonitorResultData();
+            }
       },
       watch:{
        queryTopNews:{
@@ -463,6 +381,12 @@
            }
          },
          deep:true
+       },
+       TopNews(val){
+           this.queryTopNews = val
+       },
+       isActivee(val){
+           this.isActive = val
        }
      },
 
@@ -472,73 +396,70 @@
         this.timeDefaultShow.setMonth(new Date().getMonth() - 1);
         // 时间范围
         this.timeRange=[{
-          type:1,
-          name:'今日'
-        },{
-          type:2,
-          name:'近7天'
-        },{
-          type:3,
-          name:'近30天'
-        },{
-          type:4,
-          name:'自定义'
+                type:1,
+                name:'今日'
+            },{
+                type:2,
+                name:'近7天'
+            },{
+                type:3,
+                name:'近30天'
+            },{
+                type:4,
+                name:'自定义'
         }];
         // 警报等级
-        this.alertLevel=[{
-          name:'全部',
-          alertLevel:0
-        },{
-          name:'重大',
-          alertLevel:4
-        },{
-          name:'较大',
-          alertLevel:3
-        },{
-          name:'轻微',
-          alertLevel:2
-        },{
-          name:'一般',
-          alertLevel:1
-        },
-//          {
-//          name:'正常',
-//          alertLevel:5
-//        }
+        this.alertLevel=[
+            {
+                name:'全部',
+                alertLevel:1
+            },{
+                name:'网媒',
+                alertLevel:6
+            },{
+                name:'微信',
+                alertLevel:8
+            },{
+                name:'微博',
+                alertLevel:7
+            },{
+                name:'APP',
+                alertLevel:9
+            }
         ];
         //是否去重
-        this.isDuplicate=[
-          {
-            name:'混合排重',
-            type:3
-          },{
-            name:'不排重',
-            type:0
-          }
-          // ,{  name:'标题排重',
-          //   type:1
-          // },{
-          //   name:'正文排重',
-          //   type:2
-          // }
+        // this.isDuplicate=[
+        //   {
+        //     name:'混合排重',
+        //     type:3
+        //   },{
+        //     name:'不排重',
+        //     type:0
+        //   }
+        //   // ,{  name:'标题排重',
+        //   //   type:1
+        //   // },{
+        //   //   name:'正文排重',
+        //   //   type:2
+        //   // }
 
-        ];
+        // ];
         //情感倾向
-        this.emotionalDirection=[
-          {
-            name:'全部',
-            type:0
-          },{
-            name:'正面',
-            type:3
-          },{
-            name:'负面',
-            type:1
-          },{
-            name:'中性',
-            type:2
-          }
-        ];
+        // this.emotionalDirection=[
+        //   {
+        //     name:'全部',
+        //     type:0
+        //   },{
+        //     name:'正面',
+        //     type:3
+        //   },{
+        //     name:'负面',
+        //     type:1
+        //   },{
+        //     name:'中性',
+        //     type:2
+        //   }
+        // ];
         //时间热度排行
         this.timeOrhot=[
           {
@@ -548,15 +469,14 @@
             name:'时间升序↑',
             type:1
           },
-        //   {
-        //   name:'热度',
-        //   type:2
-        // }
+        
         ]
       },
-      mounted(){
-        this.loadPlanType();
-        this.loadMediaType();
+      mounted(){//console.log(this.queryTopNews)
+           //this.isActive = this.isActive;console.log(this.isActive)
+        //this.queryTopNews = this.props.queryTopNewss
+        //this.loadPlanType();
+        //this.loadMediaType();
         this.loadMonitorResultData();
       }
     }
@@ -650,10 +570,18 @@
   .latestNews{
     height: 40px;
     line-height: 40px;
-    text-align: center;
+    display: flex;
+    margin-top:20px;
+    justify-content: space-between;
     font-weight: 600;
-    margin-top: 20px;
     cursor: pointer;
+    padding: 0px 16px 0 24px;
+  }
+  .xuu{
+      margin-right: 34px;
+  }
+  .xuu:hover{
+      color:#11B7D3
   }
   .topNewsList{
     min-height: 260px;
@@ -664,7 +592,7 @@
   }
   .topNewsLeft{
     float: left;
-    width: 70%;
+    width: 80%;
     cursor: pointer;
   }
   .topNewsTitle{
@@ -696,6 +624,7 @@
     width: 15%;
     margin-top: 100px;
     text-align: right;
+    margin-left: 56px;
   }
   .topNewsRight span{
     font-weight: 600;

@@ -2,7 +2,7 @@
   <div class="topNews" id="top" ref='documentHeight'>
     <div class="top-header" ref='topHeight'>
       <ITop></ITop>
-      <IHeader  @onClickListener="" :items="items"></IHeader>
+      <IHeader  @onClickListener="" :navIndex=2></IHeader>
     </div>
     <TopNewsContent :parentHeight="height"></TopNewsContent>
     <div v-show="show" @click="returnToTopFn" class="f-db backTop">
@@ -11,7 +11,6 @@
     <div  ref='bottomHeight'>
       <IFooter ></IFooter>
     </div>
-
   </div>
 </template>
 
@@ -20,10 +19,10 @@
   import ITop from '@/components/common/Top';
   import IHeader from '@/components/common/Header';
   import IFooter from '@/components/common/Footer';
-  import TopNewsContent from '@/components/IntelligenceTopNews/IntelligenceTopNewsContent';
+  import TopNewsContent from '@/components/intelligenceTopNews/IntelligenceTopNewsContent';
   import iKnowsUtil from '@/assets/js/iknowsUtil';
   export default {
-    name: "IntelligenceTopNews",
+    name: "intelligenceTopNews",
     components: {ITop, IHeader, IFooter, TopNewsContent},
     data() {
       return {
@@ -90,7 +89,9 @@
     box-sizing: border-box;
     position: fixed;
     bottom: 180px;
-    right: 60px;
+    /*-ms-right: 16px;*/
+    right: 16px;
+
     border-radius: 50%;
     background: rgba(91, 91, 91, 0.5);
   }

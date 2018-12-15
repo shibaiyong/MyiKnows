@@ -11,18 +11,34 @@
     <!-- 预警部分的信息 -->
     <!-- 触发条件 -->
     <div class="configWarn-content warn-content" v-show="warnObj.kpIsWarn">
-      <div class="configWarn-left rzl_fc_darkgray font16">触发条件</div>
-      <div class="configWarn-right warn-right">
+      <!-- <div class="configWarn-left rzl_fc_darkgray font16">触发条件</div> -->
+        <div class="warnKeysWord-checked font14">
+            自定义预警词
+        <!-- <el-checkbox v-model="warnObj.wranSelfcheck" @change="changeWarnSelfCheck">命中以下任意关键词</el-checkbox> -->
+        </div>
+        <div class="warnKeysWord-right">
+          <el-autocomplete class="warnKeysWord-input" v-model="warnObj.wranSelf"
+            :fetch-suggestions="queryKeysWordSearch"
+            :trigger-on-focus="false"
+            placeholder=""></el-autocomplete>
+          <el-popover placement="right-start" trigger="hover" content="最多200个关键词，空格或逗号(中英文均可)隔开，or关系!">
+            <el-button slot="reference" class="configWarn-hint">
+              <i class="el-icon-question rzl_fc_lightGrey font20"></i>
+            </el-button>
+          </el-popover>
+          <div class="warnKeysWord-warn rzl_fc_errRed font16" v-show="warnKeysWordWarn">{{warnKeysWordWarnText}}</div>
+        </div>
+      <!-- <div class="configWarn-right warn-right">
         <div class="warn-add">
           <el-checkbox v-model="warnObj.wranCheck" @change="openWarnCheck">符合以下专题类型</el-checkbox>
             <div class="configWarn-add font14" :class="{disabled:!warnObj.wranCheck}" @click="addWarnMode">
             <i class="el-icon-circle-plus rzl_fc_navy font20"></i>添加模型
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <!-- 已选专题类型 -->
-    <div class="configWarn-content" v-show="warnObj.kpIsWarn && warnObj.wranCheck">
+    <!-- <div class="configWarn-content" v-show="warnObj.kpIsWarn && warnObj.wranCheck">
       <div class="configWarn-right chooseWarnMode-right">
         <div class="warn-chooseWarn" v-show="warnObj.wranCheck">
           <el-tag size="medium" v-for="(chooseWarn, index) in warnObj.wranModels" :key="index" closable
@@ -32,9 +48,9 @@
           </el-tag>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- 命中关键词 -->
-    <div class="configWarn-content warnKeysWord-content" v-show="warnObj.kpIsWarn && warnObj.wranCheck">
+    <!-- <div class="configWarn-content warnKeysWord-content" v-show="warnObj.kpIsWarn && warnObj.wranCheck">
       <div class="warnKeysWord-checked">
         <el-checkbox v-model="warnObj.wranSelfcheck" @change="changeWarnSelfCheck">命中以下任意关键词</el-checkbox>
       </div>
@@ -44,17 +60,17 @@
           :fetch-suggestions="queryKeysWordSearch"
           :trigger-on-focus="false"
           placeholder=""></el-autocomplete>
-        <el-popover placement="right-start" trigger="hover" content="最多3个关键词，空格隔开，or关系!">
+        <el-popover placement="right-start" trigger="hover" content="最多200个关键词，空格隔开，or关系!">
           <el-button slot="reference" class="configWarn-hint">
             <i class="el-icon-question rzl_fc_lightGrey font20"></i>
           </el-button>
         </el-popover>
         <div class="warnKeysWord-warn rzl_fc_errRed font16" v-show="warnKeysWordWarn">{{warnKeysWordWarnText}}</div>
       </div>
-    </div>
+    </div> -->
 
     <!-- 预警方式 -->
-    <div class="configWarn-content warnType-content" v-show="false">
+    <!-- <div class="configWarn-content warnType-content" v-show="false">
       <div class="configWarn-left rzl_fc_darkgray font16">预警推送方式</div>
       <div class="configWarn-right warnType-right">
         <el-checkbox-group v-model="warnObj.kpWarnSendType" @change="handleCheckedWarnChange">
@@ -62,33 +78,64 @@
         </el-checkbox-group>
         <div class="warnType-warn rzl_fc_errRed font16" v-show="warnTypeWarn">{{warnTypeWarnText}}</div>
       </div>
-    </div>
-    <!-- 预警时间 -->
+    </div> -->
+    
     <div class="configWarn-content warnTime-content" v-show="warnObj.kpIsWarn">
-      <div class="configWarn-left rzl_fc_darkgray font16 warnTime-left">预警时间</div>
-      <div class="configWarn-right warnTime-right">
-        <div class="warnTime-all" @click="chooseWarnTime()">
-          <el-button circle class="circle-radio" :class="{active: warnObj.kpWranTimeCheck}" ></el-button>
-          <span class="font14 rzl_fc_darkgray">预警时间</span>
-        </div>
-        <el-autocomplete class="warnTime-input"
-          v-model="warnObj.kpWarnStartTime"
-          :maxlength="2"
-          :disabled="!warnObj.kpWranTimeCheck"
-          :fetch-suggestions="querykpWarnStartTimeSearch"
-          :trigger-on-focus="false" placeholder=""></el-autocomplete>
-        <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
-        <span class="warnTime-middle font14 rzl_fc_darkgray">至</span>
-        <el-autocomplete class="warnTime-input  warnTime-input-last"
-          v-model="warnObj.kpWarnEndTime"
-          :maxlength="2"
-          :disabled="!warnObj.kpWranTimeCheck"
-          :fetch-suggestions="querykpWarnEndTimeSearch"
-          :trigger-on-focus="false" placeholder=""></el-autocomplete>
-        <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
-        <div class="warnTime-warn rzl_fc_errRed font16" v-show="warnTimeWarn">{{warnTimeWarnText}}</div>
+      <div class="configWarn-left rzl_fc_darkgray font16 warnTime-left">预警方式</div>
+      <div class="configWarn-right warnType-right">
+        <el-checkbox-group v-model="warnObj.kpWarnSendType" @change="handleCheckedWarnChange">
+          <el-checkbox v-for="(warnOption, index) in warnTypeOptions" :label="warnOption.type" :key="index">{{warnOption.value}}</el-checkbox>
+        </el-checkbox-group>
+        <div class="configWarn-right warnTime-right">
+            <div class="warnTime-all" @click="chooseWarnTime()">
+              <!-- <el-button circle class="circle-radio" :class="{active: warnObj.kpWranTimeCheck}" ></el-button> -->
+              <span class="font14 rzl_fc_darkgray">预警时间</span>
+            </div>
+            <el-autocomplete class="warnTime-input"
+              v-model="warnObj.kpWarnStartTime"
+              :maxlength="2"
+              :disabled="!warnObj.kpWranTimeCheck"
+              :fetch-suggestions="querykpWarnStartTimeSearch"
+              :trigger-on-focus="false" placeholder=""></el-autocomplete>
+            <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
+            <span class="warnTime-middle font14 rzl_fc_darkgray">至</span>
+            <el-autocomplete class="warnTime-input  warnTime-input-last"
+              v-model="warnObj.kpWarnEndTime"
+              :maxlength="2"
+              :disabled="!warnObj.kpWranTimeCheck"
+              :fetch-suggestions="querykpWarnEndTimeSearch"
+              :trigger-on-focus="false" placeholder=""></el-autocomplete>
+            <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
+            <div class="warnTime-warn rzl_fc_errRed font16" v-show="warnTimeWarn">{{warnTimeWarnText}}</div>
+          </div>
+        <div class="warnType-warn rzl_fc_errRed font16" v-show="warnTypeWarn">{{warnTypeWarnText}}</div>
       </div>
     </div>
+    <!-- 预警时间 -->
+    <!-- <div class="configWarn-content warnTime-content" v-show="warnObj.kpIsWarn">
+        <div class="configWarn-right warnTime-right">
+          <div class="warnTime-all" @click="chooseWarnTime()">
+            <el-button circle class="circle-radio" :class="{active: warnObj.kpWranTimeCheck}" ></el-button>
+            <span class="font14 rzl_fc_darkgray">预警时间</span>
+          </div>
+          <el-autocomplete class="warnTime-input"
+            v-model="warnObj.kpWarnStartTime"
+            :maxlength="2"
+            :disabled="!warnObj.kpWranTimeCheck"
+            :fetch-suggestions="querykpWarnStartTimeSearch"
+            :trigger-on-focus="false" placeholder=""></el-autocomplete>
+          <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
+          <span class="warnTime-middle font14 rzl_fc_darkgray">至</span>
+          <el-autocomplete class="warnTime-input  warnTime-input-last"
+            v-model="warnObj.kpWarnEndTime"
+            :maxlength="2"
+            :disabled="!warnObj.kpWranTimeCheck"
+            :fetch-suggestions="querykpWarnEndTimeSearch"
+            :trigger-on-focus="false" placeholder=""></el-autocomplete>
+          <span class="warnTime-middle font14 rzl_fc_darkgray">点</span>
+          <div class="warnTime-warn rzl_fc_errRed font16" v-show="warnTimeWarn">{{warnTimeWarnText}}</div>
+        </div>
+    </div> -->
     <!-- 周末预警 -->
     <div class="configWarn-content weekDay-content" v-show="warnObj.kpIsWarn">
       <div class="configWarn-right chooseWarnMode-right">
@@ -98,10 +145,10 @@
         </div>
       </div>
     </div>
-    <IAddModel :isAddModel="isAddModel"
+    <!-- <IAddModel :isAddModel="isAddModel"
       :checkedWarnList="checkedWarnList"
       @save-model="handleSaveModel"
-      @cancel-model="handleCancelModel"></IAddModel>
+      @cancel-model="handleCancelModel"></IAddModel> -->
   </div>
 </template>
 <script>
@@ -109,10 +156,10 @@
 // const wranSelfEnoughText = '命中关键词最多支持3个！';
 // const warnTimeWarnText = '预警时间不合法，请重新输入！';
 // const warnTypeWarnText = '请选择预警方式！';
-import IAddModel from '@/components/common/AddModel';
+// import IAddModel from '@/components/common/AddModel';
 export default {
   name: 'i-configWarn',
-  components: { IAddModel},
+  // components: { IAddModel},
   props: {
     warnInfoObj: {
       type: Object,
@@ -241,25 +288,39 @@ export default {
     // 勾选预警方式
     handleCheckedWarnChange (value) {
       let kpWarnSendType = [];
+      let timeIsActive = false;
       this.warnTypeOptions.forEach(item => {
         value.forEach(element => {
           if( item.type == element){
             kpWarnSendType.push(item.type);
           }
+          // 如果选中app预警则自动激活时间，预警区间为9至18时
+          if(element == '2'){
+            timeIsActive = true;            
+          }
         });
       });
+      if(timeIsActive){
+        this.warnObj.kpWranTimeCheck = true;
+        this.warnObj.kpWarnStartTime = '9';
+        this.warnObj.kpWarnEndTime = '18';
+      }else{
+        this.warnObj.kpWarnStartTime = '';
+        this.warnObj.kpWarnEndTime = '';
+        this.warnObj.kpWranTimeCheck = false;
+      }
       this.warnObj.kpWarnSendType = kpWarnSendType;
       this._warnParams();
     },
     // 开启预警时间
-    chooseWarnTime () {
-      this.warnObj.kpWranTimeCheck = !this.warnObj.kpWranTimeCheck;
-      if(!this.warnObj.kpWranTimeCheck){
-        this.warnObj.kpWarnStartTime = '';
-        this.warnObj.kpWarnEndTime = '';
-      }
-      this._warnParams();
-    },
+    // chooseWarnTime () {
+    //   this.warnObj.kpWranTimeCheck = !this.warnObj.kpWranTimeCheck;
+    //   if(!this.warnObj.kpWranTimeCheck){
+    //     this.warnObj.kpWarnStartTime = '';
+    //     this.warnObj.kpWarnEndTime = '';
+    //   }
+    //   this._warnParams();
+    // },
     // 预警时间开始
     querykpWarnStartTimeSearch (queryString, callBack){
       this.warnObj.kpWarnStartTime = queryString;
@@ -294,13 +355,13 @@ export default {
         params.wranCheck = this.warnObj.wranCheck;
         // 已选择专题类型
         params.wranModels = [];
-        if(this.warnObj.wranCheck){
-          this.warnObj.wranModels.forEach(item => {
-            params.wranModels.push(item);
-          });
-        }
+        // if(this.warnObj.wranCheck){
+        //   this.warnObj.wranModels.forEach(item => {
+        //     params.wranModels.push(item);
+        //   });
+        // }
         // 命中关键词 ['恐怖组织', '世界银行', '爆炸']
-        params.wranSelfcheck = this.warnObj.wranSelfcheck;
+        params.wranSelfcheck = true;
         params.wranSelf = [];
         if(params.wranSelfcheck){
             params.wranSelf = this.warnObj.wranSelf.split(" ");
@@ -309,18 +370,22 @@ export default {
         params.kpWarnSendType = this.warnObj.kpWarnSendType;
 
         // 预警时间是否开启
-        params.kpWranTimeCheck = this.warnObj.kpWranTimeCheck;
+        // params.kpWranTimeCheck = this.warnObj.kpWranTimeCheck;
         // 预警时间
-        if(this.warnObj.kpWranTimeCheck ){
-          params.kpWarnStartTime = this.warnObj.kpWarnStartTime;
-          params.kpWarnEndTime = this.warnObj.kpWarnEndTime;
-        }
+        params.kpWarnStartTime = this.warnObj.kpWarnStartTime || '';
+        params.kpWarnEndTime = this.warnObj.kpWarnEndTime || '';
+        // if(this.warnObj.kpWranTimeCheck ){
+        //   params.kpWarnStartTime = this.warnObj.kpWarnStartTime;
+        //   params.kpWarnEndTime = this.warnObj.kpWarnEndTime;
+        // }
         // 同末预警
         params.kpHolidayWarn = this.warnObj.kpHolidayWarn;
       }else{
         // 关闭预警
         params.kpIsWarn = false;
       }
+      console.log('预警参数==');
+      console.log(params);
       this.$emit('warn-params', {
         params: params
       });
@@ -329,7 +394,11 @@ export default {
   mounted() {
     this.warnObj = this.warnInfoObj;
     this.checkedWarnList = this.warnObj.wranModels;
-    this.keysWord = this.warnObj.wranSelfcheck || false;
+    this.keysWord = true;
+    if(!!this.warnObj.wranSelf){
+      let wranSelf = this.warnObj.wranSelf.replace(/,/ig,",").replace(/，/ig, ",").replace(/\s/ig, ",");
+      this.warnObj.wranSelf = wranSelf;
+    }
 
     // 预警推送方式转为字符串数组
     let kpWarnSendType = [];
@@ -341,17 +410,13 @@ export default {
     }
     //时间转换为字符串
     this.warnObj.kpWarnStartTime = this.warnObj.kpWarnStartTime+'';
-    this.warnObj.kpWarnEndTime = this.warnObj.kpWarnEndTime+'';
-
-    
-    
+    this.warnObj.kpWarnEndTime = this.warnObj.kpWarnEndTime+'';  
   },
   created() {
     // 预警方式
     const warnTypeOptions = [
-      {type:'1' ,value:'邮件'},
-      {type:'2',value:'微信'},
-      {type:'4',value:'APP'},
+      {type:'1' ,value:'web预警'},
+      {type:'2',value:'APP预警'},
     ];
     this.warnTypeOptions = warnTypeOptions;
   },
@@ -376,6 +441,7 @@ export default {
   font-weight: 600;
 }
 .configWarn-right{
+  position: relative;
   margin-left: 20px;
   width: 100%;
   height: 100%;
@@ -443,6 +509,12 @@ export default {
   top: 2px;
   margin-right: 10px;
 }
+.configWarn .warnTime-right{
+  /* margin-left: 158px; */
+  position: absolute;
+  top: 34px;
+  left: 90px;
+}
 .configWarn .chooseWarnMode-right{
   margin-left: 158px;
   height: 38px;
@@ -463,10 +535,15 @@ export default {
   line-height: 20px;
 }
 .configWarn .warnKeysWord-checked{
+  width: 130px;
   margin-left: 158px;
+  line-height: 38px;
 }
 .configWarn .warnKeysWord-input{
   margin-left: 20px;
+}
+.configWarn .warnType-right >>>.el-checkbox{
+  display: block;
 }
 .configWarn .warnTime-content{
   height: 28px;
@@ -476,7 +553,7 @@ export default {
   line-height: 28px;
 }
 .configWarn .warnTime-all{
-  width: 102px;
+  width: 82px;
   height: 28px;
   line-height: 28px;
   cursor: pointer;
@@ -513,6 +590,9 @@ export default {
   height: 100%;
   line-height: 28px;
 }
+.configWarn .warnType-right >>>.el-checkbox+.el-checkbox{
+  margin-left: 0;
+}
 .configWarn .weekDay-warn{
   display: inline-block;
   line-height: 28px;
@@ -522,7 +602,7 @@ export default {
   background-color: #1D2088;
 }
 .configWarn .weekDay-content{
-  margin-top: 10px;
+  margin-top: 40px;
 }
 .tag-chooseWarn{
   margin-right: 15px;

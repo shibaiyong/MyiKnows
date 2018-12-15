@@ -11,10 +11,10 @@
 </div>
 </template>
 <script>
-import ITop from "../common/Top.vue";
-import IHeader from '../common/Header.vue';
-import IUserEditContent from "../user/UserEditContent.vue";
-import IFoot from "../common/Footer.vue";
+import ITop from "@/components/common/Top.vue";
+import IHeader from '@/components/common/Header.vue';
+import IUserEditContent from "@/components/user/UserEditContent.vue";
+import IFoot from "@/components/common/Footer.vue";
 export default {
     name:"useredit",
     components:{ITop,IHeader,IUserEditContent,IFoot},

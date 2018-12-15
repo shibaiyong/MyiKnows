@@ -2,7 +2,7 @@
   <div class="home" >
     <div class="top-header">
       <ITop></ITop>
-      <IHeader  :items="items"></IHeader>
+      <IHeader  :items="items" :navIndex=1></IHeader>
     </div>
     <HomeContent></HomeContent>
     <IFooter></IFooter>

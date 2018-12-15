@@ -12,7 +12,12 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: resolve => require(['@/components/home/Home'], resolve)
+      component: resolve => require(['@/components/Home/Home'], resolve)
+    },
+    {
+      path: '/Home/:userName',
+      name: 'home',
+      component: resolve => require(['@/components/Home/Home'], resolve)
     },
     // {
     //   path: '/login',
@@ -26,9 +31,9 @@ export default new Router({
     },
     // 舆情头条页面
     {
-      path: '/intelligencetopnews',
+      path: '/intelligencetopnews/:userName',
       name: 'intelligencetopnews',
-      component: resolve => require(['@/components/intelligenceTopNews/intelligenceTopNews'], resolve)
+      component: resolve => require(['@/components/intelligenceTopNews/IntelligenceTopNews'], resolve)
     },
     // 消息中心
     {
@@ -36,92 +41,136 @@ export default new Router({
       name: 'messagecenter',
       component: resolve => require(['@/components/messageCenter/MessageCenter'], resolve)
     },
-    // 监测中心
-    {
-      path: '/monitorcenter',
-      name: 'monitorcenter',
-      component: resolve => require(['@/components/monitorCenter/MonitorCenter'], resolve)
-    },
     // 列表页面
     {
       path: '/monitorresults',
       name: 'monitorresultsList',
       component: resolve => require(['@/components/monitorResults/MonitorResults'], resolve)
     },
+    // 监测中心--监测列表
+    {
+      path: '/center/:userName',
+      name: 'center',
+      redirect: '/center/config/:userName',
+      component: resolve => require(['@/components/monitorCenter/MonitorCenter'], resolve),
+      children:[
+        // 监测中心--监测列表页面
+        {
+          path: '/center/monitorcenter/:type/:userName',
+          name: 'monitorcenter',
+          component: resolve => require(['@/components/monitorCenter/MonitorCenter'], resolve)
+        },
+      ]
+    },
     // 监测中心-二级页面
     {
-      path: '/center',
+      path: '/center/:userName',
       name: 'center',
-      redirect: '/center/monitorresults',
+      redirect: '/center/monitorresults/:userName',
       component: resolve => require(['@/components/monitorCenter/MonitorView'], resolve),
       children: [
         // 监测中心--方案配置页面
         {
-          path: '/center/config',
+          path: '/center/config/:id/:userName',
           name: 'config',
           component: resolve => require(['@/components/config/Config'], resolve)
         },
-        // 监测中心--方案配置页面
+        // 监测中心--方案配置修改页面
         {
-          path: '/center/config/:id',
+          path: '/center/config/:id/:userName',
           name: 'config',
           component: resolve => require(['@/components/config/Config'], resolve)
         },
         // 监测中心-舆情分析页面
         {
-          path: '/center/monitoranalysis/:id',
+          path: '/center/monitoranalysis/:id/:userName',
           name: 'monitoranalysis',
           component: resolve => require(['@/components/monitorAnalysis/MonitorAnalysis'], resolve)
         },
-        // 监测中心-舆情分析页面
+        // 监测中心-事件监测页面
         {
-          path: '/center/monitoranalysis/:id',
+          path: '/center/monitoranalysis/:id/:userName',
           name: 'monitoranalysis',
           component: resolve => require(['@/components/monitorAnalysis/MonitorAnalysis'], resolve)
         },
         // 监测中心-监测结果页面
         {
-          path: '/center/monitorresults',
-          name: 'monitorresults',
-          component: resolve => require(['@/components/monitorResults/MonitorResultsContent'], resolve)
-        },
-        // 监测中心-监测结果页面
-        {
-          path: '/center/monitorresults/:id',
+          path: '/center/monitorresults/:id/:userName',
           name: 'monitorresults',
           component: resolve => require(['@/components/monitorResults/MonitorResultsContent'], resolve)
         },
         // 监测中心-预警列表页面
         {
-          path: '/center/warninglist',
+          path: '/center/warninglist/:userName',
           name: 'warninglist',
           component: resolve => require(['@/components/warningList/WarningList'], resolve)
         },
         // 监测中心-预警列表页面
         {
-          path: '/center/warninglist/:id',
+          path: '/center/warninglist/:id/:userName',
           name: 'warninglist',
           component: resolve => require(['@/components/warningList/WarningList'], resolve)
         },
       ]
     },
+
+    // 事件监测的结果展示页面。
+    {
+      path: '/event/:userName',
+      name: 'event',
+      redirect: '/event/monitorresults/:userName',
+      component: resolve => require(['@/components/eventCenter/EventView'], resolve),
+      children: [
+        // 监测中心(事件)-监测分析页面
+        {
+          path: '/event/eventanalysis/:id/:userName',
+          name: 'eventanalysis',
+          // component: resolve => require(['@/components/monitorAnalysis/MonitorAnalysis'], resolve)
+          component: resolve => require(['@/components/eventCenter/EventAnalysis'], resolve)
+        },
+        // 监测中心(事件)-监测结果页面
+        {
+          path: '/event/monitorresults/:id/:userName',
+          name: 'monitorresults',
+          component: resolve => require(['@/components/monitorResults/MonitorResultsContent'], resolve)
+        },
+        // 监测中心(事件)-预警列表页面
+        {
+          path: '/event/warninglist/:id/:userName',
+          name: 'warninglist',
+          component: resolve => require(['@/components/warningList/WarningList'], resolve)
+        },
+        // 监测中心(事件)-配置修改页面
+        {
+          path: '/event/config/:id/:userName',
+          name: 'config',
+          component: resolve => require(['@/components/config/Config'], resolve)
+        },
+      ]
+    },
     //用户中心查看页
     {
-      path: '/userview',
+      path: '/userview/:userName',
       name: 'userview',
       component: resolve => require(['@/components/user/UserView'], resolve)
     },
+    //
+    {
+      path: '/search/:userName',
+      name: 'search',
+      component: resolve => require(['@/components/search/search'], resolve)
+    },
     //用户中心编辑页
     {
-      path: '/useredit',
+      path: '/useredit/:userName',
       name: 'useredit',
       component: resolve => require(['@/components/user/UserEdit'], resolve)  //简报中心
     },
     //简报中心
     {
-      path: '/bulletincenter',
+      path: '/bulletincenter/:userName',
       name: 'bulletincenter',
-      component: resolve => require(['@/components/BulletinCenter/BulletinCenter'], resolve)  //简报中心
+      component: resolve => require(['@/components/bulletinCenter/BulletinCenter'], resolve)  //简报中心
     },
     //文章通用列表
     {
@@ -131,15 +180,20 @@ export default new Router({
     },
     //文章详情
     {
-      path: '/details',
+      path: '/details/:userName',
       name: 'details',
       component: resolve => require(['@/components/details/ArticleDetails'], resolve)  //文章详情
     },
     /****************************下载报告***********************/
     {
-      path:'/downloadReport',
+      path:'/downloadReport/:userName',
       name: 'downloadreport',
       component: resolve => require(['@/components/downloadReport/downloadReport'], resolve)
+    },
+    {
+      path:'/eventReport/:userName',
+      name:'eventReport',
+      component: resolve => require(['@/components/downloadReport/eventReport'], resolve)
     },
     /****************************组件demo页面***********************/
     // 定比例布局展示示例
@@ -187,7 +241,7 @@ export default new Router({
     {
       path: '/test',
       name: 'test',
-      component: resolve => require(['@/components/test/test2'], resolve),
+      component: resolve => require(['@/components/test/UserConfigureDemo'], resolve),
       children: [  //这里就是二级路由的配置
         {
           path: '/test/A',
@@ -206,7 +260,7 @@ export default new Router({
         }
       ]
     },
-    
+
     /****************************404页面***********************/
     {
       path: '/*',

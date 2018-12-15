@@ -2,10 +2,10 @@
   <div class="body-box">
     <div class="top-header">
         <iTop></iTop>
-        <iHeader></iHeader>
+        <iHeader :navIndex=3></iHeader>
       </div>
-    <monitorCenterContent :parentHeight="height" class=" rzl_bc_undercoat rzl-contarner content"
-                          id="monitorContentBox"/>
+    <monitorCenterContent :parentHeight="height" :type="type" id="monitorContentBox" class="rzl_bc_undercoat  content"/>
+    <!-- <router-view class="rzl_bc_undercoat rzl-contarner content" :type="type" id="monitorContentBox"></router-view>                       -->
     <IFooter></IFooter>
   </div>
 </template>
@@ -15,7 +15,7 @@
   import iHeader from '@/components/common/Header'
   import titleLabel from '@/components/common/TitleLabel'
   import monitorCenterContent from '@/components/monitorCenter/MonitorCenterContent'
-  import dataUtil from '../../assets/js/dataUtlis'
+  import dataUtil from '@/assets/js/dataUtlis'
   import IFooter from '@/components/common/Footer';
 
   export default {
@@ -24,10 +24,24 @@
     data() {
       return {
         height: 0,
+        type: '',
+      }
+    },
+    watch: {
+      $route: {
+        handler: function(val, oldVal){
+          this.type = this.$route.params.type;
+        },
+        // 深度观察监听
+        deep: true
+      },
+      type(newVal,oldVal){
+        this.type = newVal;
       }
     },
     mounted() {
-      this.height = document.getElementById("monitorContentBox").offsetHeight
+      // this.height = document.getElementById("monitorContentBox").offsetHeight;
+      this.type = this.$route.params.type;
     }
   }
 </script>

@@ -6,11 +6,23 @@
         <div class="addPerson-title rzl_fc_darkgray font24">添加模型</div>
         <!-- 人物名称关键字 -->
         <div class="addPerson-name">
-          <div class="addPerson-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>人物名称关键词</div>
+          <div class="addPerson-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>人物姓名</div>
           <div class="addPerson-right">
             <el-autocomplete class="addPerson-input" v-model="personName" :fetch-suggestions="queryPersonSearch" :trigger-on-focus="false"
               placeholder=""></el-autocomplete>
-            <el-popover placement="right-start" trigger="hover" content="人物名称不得超过10个字!">
+            <el-popover placement="right-start" trigger="hover" content="人物姓名不得超过10个字!">
+              <el-button slot="reference" class="addPerson-hint">
+                <i class="el-icon-question  rzl_fc_lightGrey font20"></i>
+              </el-button>
+            </el-popover>
+          </div>
+        </div>
+         <!-- 人物单位关键词 -->
+         <div class="addPerson-job">
+          <div class="addPerson-left rzl_fc_darkgray font16">&nbsp;&nbsp;工作单位</div>
+          <div class="addPerson-right">
+            <el-input class="addPerson-input" v-model="personDept" placeholder=""></el-input>
+            <el-popover placement="right-start" trigger="hover" content="人物工作单位关键词不可超过4个，每个小于10字，用空格隔开!">
               <el-button slot="reference" class="addPerson-hint">
                 <i class="el-icon-question  rzl_fc_lightGrey font20"></i>
               </el-button>
@@ -19,7 +31,7 @@
         </div>
         <!-- 人物职位关键词 -->
         <div class="addPerson-job">
-          <div class="addPerson-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>人物职位关键词</div>
+          <div class="addPerson-left rzl_fc_darkgray font16">&nbsp;&nbsp;职位关键词</div>
           <div class="addPerson-right">
             <el-input class="addPerson-input" v-model="personJob" placeholder=""></el-input>
             <el-popover placement="right-start" trigger="hover" content="人物职位关键词不可超过4个，每个小于10字，用空格隔开!">
@@ -29,10 +41,11 @@
             </el-popover>
           </div>
         </div>
+       
         <!-- 添加历史 -->
-        <div class="addPerson-history rzl_fc_darkgray font16">添加历史</div>
+        <!-- <div class="addPerson-history rzl_fc_darkgray font16">添加历史</div> -->
         <!-- 历史列表 -->
-        <div class="addPerson-contentList" v-show="addPersonHistoryList.length > 0">
+        <!-- <div class="addPerson-contentList" v-show="addPersonHistoryList.length > 0">
           <ul class="addPerson-personList">
             <li class="rzl_bc_undercoat">
               <div class="personList-name name-header rzl_fc_darkgray font14">姓名</div>
@@ -42,12 +55,9 @@
             <li v-for="(person, index) in addPersonHistoryList" :key="index" class="rzl_bd_lightGrey">
               <div class="personList-name rzl_fc_darkgray font14 ">{{person.name}}</div>
               <div class="personList-job rzl_fc_darkgray font14">{{person.job}}</div>
-              <!--<div class="personList-operate font14">-->
-                <!--<button type="button" class="delHistory-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="delHistory(index)">删除</button>-->
-              <!--</div>-->
             </li>
           </ul>
-        </div>
+        </div> -->
         <div class="addPerson-button rzl_bc_white">
           <button type="button" class="addPerson-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy" @click="savePerson">保存</button>
           <button type="button" class="addPerson-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="cancelPerson">取消</button>
@@ -57,11 +67,13 @@
   </div>
 </template>
 <script>
-import {recommendUsers} from '../../assets/js/api.js';
-const nameEmptyText = '人物名称关键词不能为空!';
-const nameEnoughText = '人物名称关键词最多支持10个字符!';
-const jobEmptyText = "人物职位关键词不能为空";
-const jobEnoughText = "您输入的人物职位关键词不符合要求，请重新输入！";
+import {recommendUsers} from '@/assets/js/api.js';
+const nameEmptyText = '人物姓名不能为空!';
+const nameEnoughText = '人物姓名最多支持10个字符!';
+const jobEmptyText = "人物职位不能为空";
+const jobEnoughText = "您输入的人物职位不符合要求，请重新输入！";
+const deptEmptyText = "人物工作单位不能为空";
+const deptEnoughText = "您输入的人物工作单位不符合要求，请重新输入！";
 const jobFullText = "最多支持添加5个目标人物!";
 export default {
   name: 'i-addPerson',
@@ -84,6 +96,8 @@ export default {
       personName: '',
       // 人物职位关键词
       personJob: '',
+      // 人物单位关键词
+      personDept: '',
       // 目前添加的人物列表
       personWordsAdded: [],
       // 借用查询功能
@@ -101,26 +115,26 @@ export default {
       // 调用 callback 返回建议列表的数据
       callBack(results);
       // 调用接口获取查询到的历史
-      this._loadPersonHistoryList();
+      // this._loadPersonHistoryList();
     },
     _areaFilter(queryString) {
       return (mappingPerson) => {
         return (mappingPerson.name.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
         };
     },
-    _loadPersonHistoryList (){
-      let params = {
-        userName: this.personName
-      };
-      recommendUsers(params).then(response => {
-        console.log(response);
-        if(response.code == 200){
-          this.addPersonHistoryList = response.data || [];
-        }
-      }).catch(error => {
-//        this.$message.error('系统异常，请重新偿试！');
-      });
-    },
+    // _loadPersonHistoryList (){
+    //   let params = {
+    //     userName: this.personName
+    //   };
+    //   recommendUsers(params).then(response => {
+    //     console.log(response);
+    //     if(response.code == 200){
+    //       this.addPersonHistoryList = response.data || [];
+    //     }
+    //   }).catch(error => {
+    //    this.$message.error('系统异常，请重新尝试！');
+    //   });
+    // },
     // 删除历史
 //    delHistory(index){
 //      this.addPersonHistoryList.splice(index,1);
@@ -136,23 +150,39 @@ export default {
         this.$message.error(nameEnoughText);
         return
       }
+
+      // 人物单位验证
+      if( this.personDept.length > 0){
+        let depts = this.personDept.split(' ');
+        if(depts.length > 4){
+          this.$message.error(deptEnoughText);
+          return
+        }
+        depts = depts.filter(item => {
+          return item.length > 10;
+        });
+        if(depts.length > 0){
+          this.$message.error(deptEnoughText);
+          return
+        }
+      }
+
       // 人物职位验证
-      if(this.personJob == '' || this.personJob.length == 0){
-        this.$message.error(jobEmptyText);
-        return
+      if( this.personJob.length > 0){
+        let jobs = this.personJob.split(' ');
+        if(jobs.length > 4){
+          this.$message.error(jobEnoughText);
+          return
+        }
+        jobs = jobs.filter(item => {
+          return item.length > 10;
+        });
+        if(jobs.length > 0){
+          this.$message.error(jobEnoughText);
+          return
+        }
       }
-      let jobs = this.personJob.split(' ');
-      if(jobs.length > 4){
-        this.$message.error(jobEnoughText);
-        return
-      }
-      jobs = jobs.filter(item => {
-        return item.length > 10;
-      });
-      if(jobs.length > 0){
-        this.$message.error(jobEnoughText);
-        return
-      }
+      
 
       // 不超过5个
       if(this.personWordsAdded.length >=5){
@@ -163,9 +193,11 @@ export default {
       this.$emit('save-person',{
         name: this.$iknowsUtil.trim(this.personName),
         job: this.$iknowsUtil.trim(this.personJob),
+        dept: this.$iknowsUtil.trim(this.personDept),
       });
       this.personName = '';
       this.personJob = '';
+      this.personDept = '';
       document.getElementById('configMask').style.display= 'none';
     },
     // 取消人物
@@ -173,6 +205,7 @@ export default {
       this.$emit('cancel-person',{});
       this.personName = '';
       this.personJob = '';
+      this.personDept = '';
       document.getElementById('configMask').style.display= 'none';
     },
   },
@@ -180,6 +213,7 @@ export default {
     this.personWordsAdded = this.personWords;
     this.personName = '';
     this.personJob = '';
+    this.personDept = '';
   },
 }
 </script>
@@ -206,11 +240,11 @@ export default {
   }
 .addPerson .addPerson-content-layout{
   position: fixed;
-  top: calc((100% - 760px)/2);
+  top: calc((100% - 560px)/2);
   left: calc((100% - 900px)/2);
   z-index: 1999;
   width: 900px;
-  height: 760px;
+  height: 560px;
   padding: 30px 60px 40px 60px;
   border-radius: 20px;
   box-sizing: border-box;

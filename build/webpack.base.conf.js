@@ -11,6 +11,9 @@ function resolve (dir) {
 
 
 module.exports = {
+  externals: {
+    "echarts": "echarts" //默认是配置引用的库（这里是echarts）暴露出的全局变量
+  },
   context: path.resolve(__dirname, '../'),
   entry: {
     app: ['babel-polyfill','./src/main.js']

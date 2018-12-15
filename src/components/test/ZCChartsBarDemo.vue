@@ -13,7 +13,7 @@
 </template>
 <script>
 
-  import zcBar from '../common/ZCChartsBar.vue'
+  import zcBar from '@/components/common/ZCChartsBar.vue'
 
   export default {
     name: 'test',

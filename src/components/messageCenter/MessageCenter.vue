@@ -16,7 +16,7 @@
   import iHeader from '@/components/common/Header'
   import titleLabel from '@/components/common/TitleLabel'
   import messageCenterContent from '@/components/messageCenter/MessageCenterContent'
-  import dataUtil from '../../assets/js/dataUtlis'
+  import dataUtil from '@/assets/js/dataUtlis'
   import IFooter from '@/components/common/Footer'
   import { getLastMessage } from '@/assets/js/api.js'
 

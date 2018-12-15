@@ -1,6 +1,7 @@
 <template>
   <div id="login">
-    
+
+
     <div class="loginleft">
 
       <div class="shownumber font28"><p class="font58">{{toThousands(numberStart)}}</p>今日数据总量</div>
@@ -10,7 +11,7 @@
           <span class="font14">技术咨询: 座机 010-62602000-2032</span>
           <span class="font14">地址: 北京市朝阳区酒仙桥北路甲10号院106号楼荣之联大厦</span>
         </li>
-        <li class="font14">Copyright©1692018.UEC Group Co.,Ltd.京ICP备14049550号</li>
+        <li class="font14">Copyright©1692018.UEC Group Co.,Ltd.京ICP备14049550号-7</li>
       </ul>
     </div>
     <div class="loginright">
@@ -31,22 +32,22 @@
         </li>
         <li class="remeberme">
           <CheckBox :label="'选中'" :dataArr="dataArr" :all="isChecked"><a href="javascript:void(0)" class="font14">记住密码</a></CheckBox>
-          
+
         </li>
-        <li><button class="font16" @click="gotoLogin">登录</button></li>
+        <li><button class="font16" @click="gotoLogin($event)">登录</button></li>
       </ul>
     </div>
     <messageBox :visible="isVisible" :textOptions="textOptions">
       <input slot="content" type="text" v-model="email"/>
     </messageBox>
-  </div> 
+  </div>
 </template>
 
 <script>
 import iknowsUtil from "@/assets/js/iknowsUtil";
-import messageBox from "@/components/common/messageBox";
+import messageBox from "@/components/common/MessageBox";
 import CheckBox from "@/components/common/CheckBox";
-import { login, getTotalData } from "@/assets/js/api.js";
+import { login, getTotalData} from "@/assets/js/api.js";
 import sha256 from "js-sha256";
 
 export default {
@@ -114,7 +115,7 @@ export default {
         //如果验证没有通过，中断登录操作
         return false;
       }
-      
+
       let password256 = sha256(this.userInfo.password);
       let params = {
         userName: this.userInfo.userName,
@@ -122,18 +123,26 @@ export default {
       };
       login(params).then(res => {
         if (res.code == "200" && res.data != null) {
-          let token = res.data.token;
+          let data = res.data;
+          let token = data.token;
+          let userName = this.userInfo.userName;
+          document.getElementById('app').setAttribute('userName',userName)
           //将请求到的token,保存到localStorage
-          localStorage.iKnowsToken = token;
-          localStorage.iKnowsUserName = this.userInfo.userName;
+          localStorage.setItem('iKnows'+userName+'Token', token);          
+          localStorage.setItem('iKnows'+userName, userName);
+          //将请求到的用户配置信息,保存到localStorage，0未配置 1已配置
+          if (data.configured == 0){
+            localStorage.setItem('iKnows'+userName+'Config', 0);
+          } else {
+            localStorage.setItem('iKnows'+userName+'Config', 1);
+          }
           //登录成功后，跳转到首页
-          this.$router.push({ path: "/" });
+          this.$router.push({ path: "/home/"+userName });
         } else {
           this.$mAlert("用户名和密码不正确");
         }
       });
     },
-
     rememberMe() {
       //记住密码
       let userInfoStr = JSON.stringify(this.userInfo);
@@ -355,7 +364,7 @@ export default {
   font-weight: bold;
 }
 .loginleft .shownumber p{
-  
+
   line-height: 67px;
   font-weight: bold;
 }

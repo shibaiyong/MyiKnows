@@ -39,6 +39,7 @@
       </div>
     </div>
     <div class="blank_1 rzl_bc_undercoat"></div>
+    <UserConfigure :show="showUserConfigure" @save-configure-success="configureSuccess"></UserConfigure>
   </div>
 </template>
 
@@ -48,11 +49,13 @@
   import barChart from '@/components/common/ZCChartsBar';
   import hotTable from '@/components/common/ZCTable';
   import iKnowsUtil from '@/assets/js/iknowsUtil';
+  import UserConfigure from '@/components/common/UserConfigure';
   export default {
     name: 'Home-content',
-    components: {lineChart,barChart,hotTable},
+    components: {lineChart,barChart,hotTable,UserConfigure},
     data() {
       return {
+        showUserConfigure:false,
         intelligenceLineData:[],
         intelligenceCategory:[],
         recentTrendsData:[],
@@ -84,7 +87,10 @@
         getHomeCount(params).then(response => {
           if (response.code == 200) {
             _this.handleData_IntelliGence(response.data)
-          }else {
+          }
+          
+          else if(response.code != 103) {
+
             this.$message.error(response.message);
           }
         }).catch(error => {
@@ -111,7 +117,7 @@
         getRecentTrends(params).then(response => {
           if (response.code == 200) {
             _this.handleData_RecentTrends(response.data)
-          }else {
+          }else if(response.code != 103){
             this.$message.error(response.message);
           }
         }).catch(error => {
@@ -138,14 +144,14 @@
         getHotIntelligence(params).then(response => {
           if (response.code == 200) {
             _this.handleData_hotIntelligence(response.data)
-          }else {
+          }else if(response.code != 103) {
             this.$message.error(response.message);
           }
         }).catch(error => {
           console.log(error);
         })
       },
-      handleData_hotIntelligence(data){
+      handleData_hotIntelligence(data) {
         let thiz = this;
         setTimeout(function () {
           thiz.hotIntelligenceData = data.content;
@@ -159,8 +165,6 @@
               }
             })
           }
-
-
         },100)
       },
       //跳转到文章详情
@@ -172,20 +176,38 @@
             let time = value.publishTime;
             time = time.replace(/\-/ig, '/');
             let releaseDatetime= new Date(time).getTime();
-             window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
+            let userName = thiz.$iknowsUtil.getUserName();
+             window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
           }
         })
       },
       // 更多-跳转到舆情列表
       loadMore(){
-        this.$router.push('/intelligencetopnews');
+        let userName = this.$iknowsUtil.getUserName();
+        this.$router.push('/intelligencetopnews/'+userName);
+      },
+      //配置成功页面跳转
+      configureSuccess(){
+        let userName = this.$iknowsUtil.getUserName();
+        this.$router.push({ path: "/center/config" });
       }
-
     },
     mounted(){
-      this.loadDatas_IntelliGence();
-      this.loadDatas_RecentTrends();
-      this.loadDatas_hotIntelligence();
+     
+      let userName = this.$iknowsUtil.getUserName();
+      if(localStorage['iKnows'+userName+'Config']== 0 && localStorage['iKnows'+userName+'Config'] != ''){
+        this.showUserConfigure = true;
+      }else{
+        this.showUserConfigure = false;
+      }
+      if(!userName){
+        this.$router.push('/login');
+      }else{
+        this.loadDatas_IntelliGence();
+        this.loadDatas_RecentTrends();
+        this.loadDatas_hotIntelligence();
+      }
+
     }
   }
 </script>

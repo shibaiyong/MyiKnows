@@ -11,10 +11,10 @@
 </div>
 </template>
 <script>
-import ITop from "../common/Top.vue";
-import IHeader from '../common/Header.vue';
-import IUserViewContent from "../user/UserViewContent.vue";
-import IFoot from "../common/Footer.vue";
+import ITop from "@/components/common/Top.vue";
+import IHeader from '@/components/common/Header.vue';
+import IUserViewContent from "@/components/user/UserViewContent.vue";
+import IFoot from "@/components/common/Footer.vue";
 export default {
     name:"userview",
     components:{ITop,IHeader,IUserViewContent,IFoot},

@@ -6,14 +6,17 @@
          ref="zc_charts_bar">
     </div>
 
-    <div :id="id" class="zc_charts_empty">没有更多柱状图数据</div>
+    <div :id="id" class="zc_charts_empty">
+      <span class="noData">暂无相关数据</span>
+      <span class="isLoading"><i class="el-icon-loading"></i>  数据加载中</span>
+    </div>
 
   </div>
 
 </template>
 
 <script>
-  import echarts from 'echarts'
+  // import echarts from 'echarts'
   import iKnowsUtil from '@/assets/js/iknowsUtil';
   export default {
     name: "z-c-charts-bar",
@@ -37,7 +40,19 @@
     watch:{
 
       data(val,oldVal){
-        this.initBarChart();
+        let el = document.getElementById(this.id);
+        let noData = el.getElementsByClassName('noData')[0];
+        let isLoading = el.getElementsByClassName('isLoading')[0];
+
+        if(val.length){
+          noData.style.display = 'none';
+          isLoading.style.display = 'block';
+          this.initBarChart();
+        }else{
+          noData.style.display = 'block';
+          isLoading.style.display = 'none';
+        }
+
       }
     },
     methods:{
@@ -111,8 +126,8 @@
             show: false,
             top: this.category.length>0?30:0,
             bottom: 50,
-            left: this.category.length>0?40:0,
-            right: 0,          
+            left: this.category.length>0?70:0,
+            right: 30,
           },
           /*提示框组件*/
           tooltip: {
@@ -146,11 +161,11 @@
               return result;
             },
             extraCssText: 'box-shadow: 1px 1px 10px 2px #F5F5F5;line-height:25px;text-align: left;'
-          }, 
+          },
           xAxis: {
             type: 'category',
             show: true,
-            boundaryGap: true,           
+            boundaryGap: false,
             axisLine: {
               lineStyle: {
                 color: '#CDCDCD', width: 2
@@ -159,8 +174,8 @@
             axisTick: {show: false},
             axisLabel: {
               color: '#979797',
-              margin: 15,
-              interval: 0, 
+              margin: 10,
+              // interval: 0,
               formatter : function(params){
                 var newParamsName = "";// 最终拼接成的字符串
                 var paramsNameNumber = params.length;// 实际标签的个数
@@ -205,7 +220,7 @@
               show:this.category.length>0?true:false,
               color: '#979797',
               fontSize: 12,
-              margin: 0
+              margin: 25
             },
             splitLine: {
               lineStyle: {
@@ -251,7 +266,7 @@
 
           empty.style.display = 'block';
           empty.style.lineHeight = content.offsetHeight + 'px';
-          
+
         }
       }
 
@@ -288,5 +303,8 @@
     text-align: center;
     font-size: 14px;
     color:#606266 ;
+  }
+  .noData{
+    display: none;
   }
 </style>

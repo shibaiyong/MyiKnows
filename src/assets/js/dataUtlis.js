@@ -24,32 +24,34 @@ var dataUtil = {
           "isSelected": false
         }
       ]
-    }, {
-      "title": "任务类型",
-      "id": "planType",
-      "items": [
-        {
-          "name": "全部监测",
-          "id": [1],
-          "isSelected": true
-        },
-        {
-          "name": "常规监测",
-          "id": [2],
-          "isSelected": false
-        },
-        {
-          "name": "人物监测",
-          "id": [3],
-          "isSelected": false
-        },
-        {
-          "name": "文稿监测",
-          "id": [4],
-          "isSelected": false
-        }
-      ]
-    }]
+    }
+    // , {
+    //   "title": "任务类型",
+    //   "id": "planType",
+    //   "items": [
+    //     {
+    //       "name": "全部监测",
+    //       "id": [1],
+    //       "isSelected": true
+    //     },
+    //     {
+    //       "name": "常规监测",
+    //       "id": [2],
+    //       "isSelected": false
+    //     },
+    //     {
+    //       "name": "人物监测",
+    //       "id": [3],
+    //       "isSelected": false
+    //     },
+    //     {
+    //       "name": "文稿监测",
+    //       "id": [4],
+    //       "isSelected": false
+    //     }
+    //   ]
+    // }
+  ]
   },
   getMonitorListData() {
     return [

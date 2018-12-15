@@ -7,7 +7,7 @@
   </div>
 </template>
 <script>
- import {getDemoList} from '../../assets/js/api.js';
+ import {getDemoList} from '@/assets/js/api.js';
  export default {
    name: 'test',
    data () {

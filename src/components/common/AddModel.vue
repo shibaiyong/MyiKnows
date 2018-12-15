@@ -44,7 +44,7 @@
   </div>
 </template>
 <script>
-import {modelShow} from '../../assets/js/api.js';
+import {modelShow} from '@/assets/js/api.js';
 const addModelEnoughText = "最多支持勾选5个模型！";
 export default {
   name: 'i-addModel',
@@ -114,7 +114,7 @@ export default {
     },
     // 勾选下方查询到的模型(同时将勾选的模型更新到已选中chooseModelList模型列表中)
     handleCheckedModelChange (value) {
-      
+
       if(value.length > 5){
         // 获取最后一个选中项，将其选中状态取消
         let lastId = value.pop();
@@ -157,7 +157,7 @@ export default {
           }
         }
       }).catch(error => {
-//        this.$message.error('系统异常，请重新偿试！');
+//        this.$message.error('系统异常，请重新尝试！');
       });
     },
     // 保存模型
@@ -195,7 +195,7 @@ export default {
         this.allModelOptions = response.data || [];
       }
     }).catch(error => {
-//        this.$message.error('系统异常，请重新偿试！');
+//        this.$message.error('系统异常，请重新尝试！');
     });
   }
 }

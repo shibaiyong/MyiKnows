@@ -1,7 +1,7 @@
 <template>
   <div id="downloadreport" class="rzl-contarner" style="min-width: 200px">
     <h2></h2>
-    <div class="reportTitle font40">{{titleName}}舆情报告</div>
+    <div class="reportTitle font40">{{titleName}}</div>
     <div class=""></div>
     <!-- 整体信息报道量走势 -->
     <div id="downloadContent">
@@ -107,14 +107,12 @@
 </template>
 
 <script>
-
-import messageBox from "@/components/common/messageBox";
 import lineChart from '@/components/common/ZCChartsLine';
 import barChart from '@/components/common/ZCChartsBar';
-import IPie from '../common/ZCChartsPie.vue';
-import IMap from '../common/ZCChartsMap.vue'
-import ITable from '../common/ZCTable.vue'
-import IWorld from '../common/ZCChartsWorld.vue'
+import IPie from '@/components/common/ZCChartsPie.vue';
+import IMap from '@/components/common/ZCChartsMap.vue'
+import ITable from '@/components/common/ZCTable.vue'
+import IWorld from '@/components/common/ZCChartsWorld.vue'
 
 import {  getMonitorAnalysis_mediaTrend,getMonitorAnalysis_warningAnalysis,
           getMonitorAnalysis_mediaDistribution,getMonitorAnalysis_emotionTrend,
@@ -124,7 +122,7 @@ import {  getMonitorAnalysis_mediaTrend,getMonitorAnalysis_warningAnalysis,
 import sha256 from "js-sha256";
 
 export default {
-  name: "login",
+  name: "downloadReport",
   data() {
     return {
       titleName:'',
@@ -166,7 +164,7 @@ export default {
       hotAreaData: [],
       hotAreaRankData: [],
       hotAreaCategory: [
-        {prop: 'areaName', label: '地区', style: {padding: '0 0',},},
+        {prop: 'areaName', label: '地区',width: 180, style: {padding: '0 0',},},
         {prop: 'articleNum', label: '热度指数', style: {padding: '0 0'}},
       ],
       /*词云分布*/
@@ -189,6 +187,7 @@ export default {
     let queryObj = this.$iknowsUtil.getQueryObjectByUrl();
     let resource = queryObj.resource || '';
     console.log(resource);
+
     let pid = this.$route.query.pid
     let type = this.$route.query.timeType
     this.titleName = this.$route.query.planName
@@ -199,9 +198,9 @@ export default {
     //2.媒体分布
     this.loadPublishData(pid, type, reportid,resource)
     //3.预警变化走势
-    this.loadDatas_WarningChange(pid, type,resource)
+    this.loadDatas_WarningChange(pid, type,resource, reportid)
     //4.情感指数趋势
-    this.loadEmotionTrendData(pid, type,resource)
+    this.loadEmotionTrendData(pid, type, reportid,resource)
     /*5.媒体排行柱状图*/
     this.loadSourceRankData(pid, type, reportid,resource)
     /*6.发布热区地图*/
@@ -209,7 +208,7 @@ export default {
     /*词云分布*/
     this.loadWordCloudData(pid, type, reportid,resource)
     //预警分析占比
-    this.loadDatas_WarningType(pid,resource)
+    this.loadDatas_WarningType(pid,resource, reportid)
   },
   methods: {
     qryReportSummary(id,type,reportid,resource){
@@ -243,11 +242,12 @@ export default {
     },
 
     /*2.7.3	预警分析柱状图*/
-    loadDatas_WarningChange(id, type,resource) {
-      let params = new URLSearchParams();
+    loadDatas_WarningChange(id, type,resource, reportid) {
+      let params = {};
       params = {
         planId:id,
         resource: resource || '',
+        reportId: reportid
       };
 
       getWarnChange(params).then(response => {
@@ -292,9 +292,9 @@ export default {
       })
     },
     /*情感指数折线图*/
-    loadEmotionTrendData(id, type,resource) {
+    loadEmotionTrendData(id, type,reportid,resource) {
 
-      let params = {timeType: type,resource: resource, pid: id};
+      let params = {timeType: type,resource: resource, pid: id,reportId: reportid};
       getMonitorAnalysis_emotionTrend(params).then(response => {
 
         if (response && response.code == 200 && response.data) {
@@ -348,11 +348,12 @@ export default {
       })
     },
     //预警分类占比数据
-    loadDatas_WarningType(id,resource){
-      let params = new URLSearchParams();
+    loadDatas_WarningType(id,resource, reportid){
+      let params = {};
       params = {
         resource: resource,
-        planId:id
+        planId:id,
+        reportId: reportid
       };
 
       getWarnLevel(params).then(response => {
@@ -395,8 +396,8 @@ export default {
     sumPublics1( arr, fat ){
       let fatt = fat ? fat : '/';
       if(arr.length == 0){
-        this.totleReportNumber = 0;
-        this.totleReportDate = '';
+        this.warningTrendNumber = 0;
+        this.warningTrendDate = '';
         return '';
       }
       for(let i = 0;i < arr.length; i++){

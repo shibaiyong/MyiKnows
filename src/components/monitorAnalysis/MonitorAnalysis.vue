@@ -12,7 +12,7 @@
     </div>
 
 
-    <div class="floatBox">
+    <div class="floatBox" v-if="isArticleShow">
       <!--最新舆情-->
       <div class="analysis_item">
 
@@ -108,12 +108,12 @@
 </template>
 
 <script>
-  import ILine from '../common/ZCChartsLine'
-  import IBar from '../common/ZCChartsBar.vue'
-  import IPie from '../common/ZCChartsPie.vue'
-  import IMap from '../common/ZCChartsMap.vue'
-  import IWorld from '../common/ZCChartsWorld.vue'
-  import ITable from '../common/ZCTable.vue'
+  import ILine from '@/components/common/ZCChartsLine'
+  import IBar from '@/components/common/ZCChartsBar.vue'
+  import IPie from '@/components/common/ZCChartsPie.vue'
+  import IMap from '@/components/common/ZCChartsMap.vue'
+  import IWorld from '@/components/common/ZCChartsWorld.vue'
+  import ITable from '@/components/common/ZCTable.vue'
   import iKnowsUtil from '@/assets/js/iknowsUtil';
 
   import {getMonitorAnalysis_mediaTrend} from '../../assets/js/api.js'
@@ -124,7 +124,7 @@
   import {getMonitorAnalysis_sourceRank} from '../../assets/js/api.js'
   import {getMonitorAnalysis_emotionTrend} from '../../assets/js/api.js'
   import {getMonitorAnalysis_wordCloud} from '../../assets/js/api.js'
-
+  import {planType} from '@/assets/js/api.js';
 
   export default {
 
@@ -139,6 +139,7 @@
           {prop: 'weixin', label: '微信'},
           {prop: 'weibo', label: '微博'},
           {prop: 'app', label: 'APP'},
+          {prop: 'total', label: '全部'}
         ],
         /*最新舆情*/
         latestOpinionBtn: [
@@ -179,7 +180,7 @@
         hotAreaData: [],
         hotAreaRankData: [],
         hotAreaCategory: [
-          {prop: 'areaName', label: '地区', style: {padding: '0 0',},},
+          {prop: 'areaName', label: '地区',width: 180,  style: {padding: '0 0',},},
           {prop: 'articleNum', label: '热度指数', style: {padding: '0 0'}},
         ],
         /*来源排行*/
@@ -194,6 +195,8 @@
         ],
         /*词云分布*/
         worldCloudData: [],
+        // 最新舆情预警分析显隐
+        isArticleShow:true
 
 
       }
@@ -205,6 +208,7 @@
       loadData() {
 
         let pid = this.$route.params.id;
+
         // 0:今日,1:近7天,2:近15天,3:近30天    默认为1
         this.loadOverviewData(pid, 1);
         /*媒体分组汇总趋势图*/
@@ -223,9 +227,24 @@
         this.loadWordCloudData(pid, 1);
         /*词云分布*/
 
+        // 判断是否是文稿监测
+        this.isArticle(pid);
+
       },
 
-
+      // 判断是否是文稿监测
+      isArticle(id){
+          planType(id).then(response => {
+            let data = response.data;
+            if (data.kpType == 4){
+              this.isArticleShow = false
+            }else {
+              this.isArticleShow = true
+            }
+          }).catch(err => {
+            console.log(err);
+          });
+      },
       /*2.7.1	媒体分组汇总趋势图*/
       loadOverviewData(id, type) {
 
@@ -236,7 +255,11 @@
           console.log(response);
           if (response && response.code == 200 && response.data) {
 
+            response.data.forEach(function (item) {
+              item.total = (item.website + item.weixin+item.weibo+item.app);
+            });
             this.overviewData = response.data;
+
           }
 
         }).catch(error => {
@@ -285,13 +308,15 @@
       //跳转到文章详情
       clickTableCell1(rowIndex) {
         let thiz = this;
+        let pid = thiz.$route.params.id;
         thiz.latestOpinionData.forEach(function (value,index) {
           if (rowIndex == index) {
             let id =  value.articleId;
             let time = value.publishTime;
             time = time.replace(/\-/ig, '/');
             let releaseDatetime= new Date(time).getTime();
-            window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
+            let userName = thiz.$iknowsUtil.getUserName();
+            window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ releaseDatetime+'&planId='+pid );
           }
         })
       },
@@ -316,7 +341,8 @@
       /*最新舆情更多按钮*/
       latestOpinionMoreBtnClick() {
         let id = this.$route.params.id;
-        window.location.replace('/center/monitorresults/'+id);
+        let userName = this.$iknowsUtil.getUserName();
+        window.location.replace('/center/monitorresults/'+id+'/'+userName);
       },
 
       /*2.7.3	预警分析柱状图*/
@@ -440,7 +466,6 @@
     },
 
     mounted() {
-
       this.loadData();
     },
     // mounted() {

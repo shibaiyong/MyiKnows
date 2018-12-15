@@ -194,6 +194,17 @@ var iknowsUtil = {
         obj[key] = decodeURIComponent(value);
     });
     return obj;
-  }
+  },
+  getUserName (){    
+    let pathName = window.location.pathname;    
+    let userName = '';    
+    if(pathName.indexOf('login') == -1 ){      
+      let list = pathName.split('/') || [];      
+      if(list && list.length > 0){        
+        userName = list[list.length-1] || '';      
+      }    
+    }    
+    return userName;  
+  },
 };
 export default iknowsUtil;

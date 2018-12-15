@@ -4,9 +4,11 @@ import Vue from 'vue'
 // 开发环境
 let baseUrl = 'http://10.50.2.26:8080/iknows';
 // 原始环境
-// let baseUrl = 'http://114.115.148.225:8080/iknows';
+ //let baseUrl = 'http://114.115.148.225:8080/iknows';
 // 正式环境
 // let baseUrl = 'http://49.4.90.208:8095/iknows';
+
+export const url = baseUrl
 
 export const getDemoList = params => {
   return axios.get(`${baseUrl}/headline/list`, params).then(res => res.data)
@@ -44,6 +46,10 @@ export const messageDelete = params => {
 //配置方案类型
 export const planType = id => {
   return axios.get(`${baseUrl}/plan/type/${id}`).then(res => res.data)
+}
+//配置方案重名验证
+export const planCheckName = params => {
+  return axios.get(`${baseUrl}/plan/checkName`, {params: params}).then(res => res.data)
 }
 //模糊方案组合推荐
 export const recommendGroup = params => {
@@ -100,7 +106,10 @@ export const getHotIntelligence = params => {
   return axios.get(`${baseUrl}/portal/listTop`, params).then(res => res.data)
 }
 /**************************************监测结果列表********************************************/
-
+//检索接口
+export const getsearchResults = params => {
+  return axios.post(`${baseUrl}/search/list`, params).then(res => res.data)
+}
 //监测结果列表
 export const getMonitorResults = params => {
   return axios.post(`${baseUrl}/monitor/list`, params).then(res => res.data)
@@ -115,17 +124,21 @@ export const getWarnList = params => {
 }
 //预警列表-预警分类占比接口
 export const getWarnLevel = params => {
-  return axios.get(`${baseUrl}/warn/statisticLevel`, {params:params}).then(res => res.data)
+  return axios.post(`${baseUrl}/warn/statisticLevel`, params).then(res => res.data)
 }
 //预警列表-预警变化趋势接口
 export const getWarnChange = params => {
-  return axios.get(`${baseUrl}/warn/statisticCarrier`, {params:params}).then(res => res.data)
+  return axios.post(`${baseUrl}/warn/statisticCarrier`, params).then(res => res.data)
 }
 //预警列表-预警列表已读接口
 export const warnListRead = params => {
   return axios.get(`${baseUrl}/warn/read`, {params:params}).then(res => res.data)
 }
 /**************************************舆情分析********************************************/
+
+export const getReport_detail = params => {
+  return axios.get(`${baseUrl}/report/detail`, {params:params}).then(res => res.data)
+};
 //2.7.1	媒体分组汇总趋势图
 export const getMonitorAnalysis_mediaTrend = params => {
   return axios.post(`${baseUrl}/monitor/analysis/qryMediaTrend`, params).then(res => res.data)
@@ -206,8 +219,60 @@ export const downloadBulletinList = params => {
 export const detail = params => {
   return axios.get(`${baseUrl}/monitor/detail`, params).then(res => res.data)
 }
-
+//文章标签词条
+export const detailLabels = params => {
+  return axios.post(`${baseUrl}/monitor/detailLabels`,params).then(res => res.data)
+}
+//查询微信原文链接
+export const getWeixinUrl = params => {
+  return axios.get(`${baseUrl}/monitor/weixinUrl`, params).then(res => res.data)
+}
 //查询下载报告页的摘要接口
 export const qryReportSummary = params => {
   return axios.post(`${baseUrl}/monitor/analysis/qryReportSummary`, params).then(res => res.data)
 }
+
+//用户信息配置-所有分类
+export const userConfigureAllClassification = params => {
+  return axios.get(`${baseUrl}/classification/listAll`).then(res => res.data)
+}
+
+//用户信息配置-所有地区
+export const userConfigureAllRegion= params => {
+  return axios.get(`${baseUrl}/region/listAll`).then(res => res.data)
+}
+
+
+//用户信息配置-保存选中分类
+export const userConfigureSaveClassification= params => {
+  return axios.post(`${baseUrl}/user/updateClassification`,params).then(res => res.data)
+}
+
+//用户信息配置-保存选中关注地区
+export const userConfigureSaveConcernRegion= params => {
+  return axios.post(`${baseUrl}/user/updateConcernRegion`,params).then(res => res.data)
+}
+
+//用户信息配置-保存选中本地地区
+export const userConfigureSaveLocalRegion= params => {
+  return axios.post(`${baseUrl}/user/updateRegion`,params).then(res => res.data)
+}
+
+
+//用户信息配置-保存选中本地地区
+export const userConfigureSaveSeccess= params => {
+  return axios.post(`${baseUrl}/user/configured`,params).then(res => res.data)
+}
+
+/**************************************监测中心********************************************/
+
+/*事件监测->监测分析->首发媒体*/
+export const getEventFirstMedia= params => {
+  return axios.post(`${baseUrl}/monitor/analysis/firstMedia`,params).then(res => res.data)
+}
+
+/*事件监测->监测分析->事件脉络*/
+export const getEventContextData= params => {
+  return axios.post(`${baseUrl}/monitor/analysis/list`,params).then(res => res.data)
+}
+

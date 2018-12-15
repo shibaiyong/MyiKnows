@@ -2,13 +2,14 @@
 <template>
   <div class="configCondition">
     <!-- 日期范围 -->
-    <div class="configCondition-content kpTimeRange-content">
+    <div class="configCondition-content kpTimeRange-content" v-show="configSelectorObj.kpTimeRange!=0">
       <div class="configCondition-left rzl_fc_darkgray font16"><i class="rzl_fc_errRed require-color">*</i>日期范围</div>
       <div class="configCondition-right kpTimeRange-right">
-        <el-radio v-model="configSelectorObj.kpTimeRange" label="1" @change="changekpTimeRange()">持续(1年)</el-radio>
+        <!-- <el-radio v-model="configSelectorObj.kpTimeRange" label="1" @change="changekpTimeRange()">持续(1年)</el-radio>
         <el-radio v-model="configSelectorObj.kpTimeRange" label="2" @change="changekpTimeRange()">1天</el-radio>
         <el-radio v-model="configSelectorObj.kpTimeRange" label="3" @change="changekpTimeRange()">7天</el-radio>
-        <el-radio v-model="configSelectorObj.kpTimeRange" label="4" @change="changekpTimeRange()">30天</el-radio>
+        <el-radio v-model="configSelectorObj.kpTimeRange" label="4" @change="changekpTimeRange()">30天</el-radio> -->
+        <el-radio v-model="configSelectorObj.kpTimeRange" label="6" @change="changekpTimeRange()">3天</el-radio>
         <el-radio v-model="configSelectorObj.kpTimeRange" label="5" @change="changekpTimeRange()">自定义</el-radio>
         <div class="timeSelf-date">
           <el-date-picker v-model="configSelectorObj.timeSelf" type="daterange"
@@ -70,9 +71,6 @@
   </div>
 </template>
 <script>
-// const kpTimeRangeWarnText = '请选择日期范围！';
-// const monitorTypeWarnText = "请选择监控范围！";
-// const briefsTypeWarnText = '请选择简报推送方式！';
 export default {
   name: 'i-configSelector',
   props: {
@@ -108,11 +106,12 @@ export default {
       // 限定时间范围
       dateScope: {
         disabledDate(time) {
-          return time.getTime() < Date.now() - 8.64e7 * 60;
+          return time.getTime() < Date.now() - 8.64e7 * 30 || time.getTime() > Date.now() + 8.64e7 * 30;
         }
       },
       startTime: '',
       endTime: '',
+      timeStatus: false,
       // 时间范围提示
       kpTimeRangeWarn: false,
       // 时间范围提示信息。
@@ -140,7 +139,6 @@ export default {
       this.configSelectorObj = this.selectObj;
     },
     configSelectorObj(newVal, oldVal){
-      console.log(newVal);
       this._configParams();
     },
   },
@@ -209,7 +207,7 @@ export default {
     _configParams () {
       let params = {};
       // 时间范围类型
-      params.kpTimeRange = this.configSelectorObj.kpTimeRange;
+      params.kpTimeRange = this.configSelectorObj.kpTimeRange;     
       params.timeSelf = [];
 
       // 为true表示采用自定义时间（lang类型）
@@ -254,6 +252,7 @@ export default {
   },
   mounted() {
     this.configSelectorObj = this.selectObj;
+    this.configSelectorObj.kpTimeRange = this.selectObj.kpTimeRange + '';
     // 监控范围转为字符串数组
     let kpSiteRange = [];
     this.configSelectorObj.kpSiteRange.forEach(item => {
@@ -272,11 +271,7 @@ export default {
     this.configSelectorObj.kpRpSendType.forEach(item => {
       kpRpSendType.push(item+'');
     });
-    this.configSelectorObj.kpRpSendType = kpRpSendType;
-
-
-    
-    
+    this.configSelectorObj.kpRpSendType = kpRpSendType;  
   },
   created() {
     // 监控范围
@@ -303,7 +298,6 @@ export default {
     ];
     this.kpRpSendTypeOptions = kpRpSendTypeOptions;
   },
-
 }
 </script>
 <style scoped>

@@ -9,7 +9,8 @@
     <div class="topNews rzl_bc_white" >
       <!--<input type="text" v-model="queryTopNews"  placeholder="" class="rzl_seach_Input font16" >-->
       <!--<button  type="button" class="rzl_seach_button rzl_bc_navy font16 rzl_fc_white">搜索</button>-->
-      <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14">最 新</p>
+      <p class="latestNews rzl_bc_undercoat rzl_fc_darkgray font14" @click="loadNowData()">最 新</p>
+      <div v-show="dataload"  class="noData font16">数据加载中...</div>
       <div v-if="topNewsList.length >0">
         <ul  class="topNewsList" >
           <li class="topNewsItems clearfix" v-for="(item,index) of topNewsList" :key="index" @click="toDetail(item.id,item.publishTime)">
@@ -18,7 +19,7 @@
               <div class="topNewsTag rzl_fc_darkgray font14">
                 <span>发布时间：<i>{{getDate(item.publishTime)}}</i></span>
                 <span class="source">来源：<i>{{item.source}}</i></span>
-                <!--<span>热度指数：<i>{{item.score}}</i></span>-->
+                <span  v-if="localHotNum">舆情预测指数：<i>{{item.predicIndex}}</i></span>
               </div>
               <div class="topNewsContent font14">
                 {{item.content}}
@@ -33,8 +34,7 @@
         </ul>
         <div class="rzl_fc_navy t-center loadMore" v-show="loadmore" @click="loadMore()">加载更多</div>
       </div>
-      <div v-else class="noData font16" >暂无相关数据</div>
-
+      <div v-show="nodata" class="noData font16" >暂无相关数据</div>
     </div>
     <div class="blank_1 rzl_bc_undercoat"></div>
   </div>
@@ -77,7 +77,10 @@
             // 初始化默认10条
             loadMorePage:10,
             topNewsArray:[],
-            loadmore:true
+            loadmore:true,
+            dataload:false,
+            nodata:false,
+            localHotNum:false
           }
         },
         methods:{
@@ -90,6 +93,11 @@
           },
           //tab切换
           NewsTab(id){
+            if (id == 2){
+              this.localHotNum = true
+            } else {
+              this.localHotNum = false
+            }
             this.isActive = id;
             this.topNewsArray=[];
             this.loadMorePage=10;
@@ -98,15 +106,20 @@
           },
           //获取舆情头条数据
           loadTopNewsData(){
-            let params = {}; 
+            this.dataload = true;
+            this.nodata = false;
+            this.topNewsList=[];
+            let params = {};
             params = {
               searchType:this.isActive
             };
             let _this = this;
             getIntelligentTopNews(params).then(response => {
               if (response.code == 200) {
-                _this.handleData_TopNews(response.data);
-                _this.topNewsArray = response.data;
+                setTimeout(function () {
+                  _this.handleData_TopNews(response.data);
+                  _this.topNewsArray = response.data;
+                },100);
               }else {
                 this.$message.error(response.message);
               }
@@ -118,17 +131,29 @@
           // 处理数据首次显示10条
           handleData_TopNews(data){
             let Data = data;
-            let topNewsData =[];
-            let loadPage = this.loadMorePage;
-            Data.forEach(function (v,i) {
-              if (i<loadPage){
-                if (v.score == '' || v.score== null){
-                  v.score = '-'
+            if (Data != ''&& Data != null){
+              let topNewsData =[];
+              let loadPage = this.loadMorePage;
+              Data.forEach(function (v,i) {
+                if (i<loadPage){
+                  if (v.score == '' || v.score== null){
+                    v.score = '0'
+                  }
+                  topNewsData.push(v)
                 }
-                topNewsData.push(v)
+              })
+              if (Data.length < 10){
+                this.loadmore = false
+              }else {
+                this.loadmore = true
               }
-            })
-            this.topNewsList = topNewsData;
+              this.topNewsList = topNewsData;
+              this.dataload = false;
+            } else {
+              this.nodata = true;
+              this.dataload = false;
+            }
+
           },
           // 加载更多分页数据处理
           handleData_TopNewsPage(){
@@ -136,18 +161,18 @@
             let length = Data.length;
             let topNewsData =[];
             let loadPage = this.loadMorePage + 5;
-            
+
             if (loadPage < length ){
               Data.forEach(function (v,i) {
                 if(i<loadPage){
                   if (v.score == '' || v.score== null){
-                    v.score = '-'
+                    v.score = '0'
                   }
                   topNewsData.push(v)
                 }
               })
               this.topNewsList = topNewsData;
-              this.loadMorePage = loadPage
+              this.loadMorePage = loadPage;
               this.loadmore = true
             } else {
               Data.forEach(function (v,i) {
@@ -164,7 +189,8 @@
           //跳转到详情页面
           toDetail(id,time){
             let releaseDatetime = time;
-             window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
+            let userName = this.$iknowsUtil.getUserName();
+             window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
               // this.$router.push({
               //   path: '/details',
               //   query: {
@@ -177,6 +203,10 @@
           loadMore(){
             this.handleData_TopNewsPage()
           },
+          //获取最新数据
+          loadNowData(){
+            this.loadTopNewsData();
+          }
 
         },
         mounted(){
@@ -227,6 +257,7 @@
     line-height: 40px;
     text-align: center;
     font-weight: 600;
+    cursor: pointer;
   }
   .topNewsList{
     min-height: 260px;
@@ -251,7 +282,7 @@
     font-weight: 600;
   }
   .topNewsTag span.source{
-    width: 60%;
+    width: 30%;
   }
   .topNewsTag span i{
     color: #252525;
@@ -260,7 +291,7 @@
   .topNewsContent{
     margin: 20px 0;
     line-height: 22px;
-    max-height: 45px;
+    max-height: 44px;
     overflow: hidden;
   }
   .topNewsRight{
@@ -285,7 +316,7 @@
     cursor: pointer;
   }
   .noData{
-    height: 370px;
+    height: 600px;
     text-align: center;
     padding-top: 30px;
     color: #606266;

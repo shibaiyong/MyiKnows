@@ -2,7 +2,7 @@
 <div class="container" ref='documentHeight'>
   <div class="top-header" ref='topHeight'>
     <iTop/>
-    <iHeader/>
+    <iHeader  :navIndex=4></iHeader>
   </div>
   <div id="pageCenter" class="rzl-contarner" ref='middleHeight'>
     <div class="pagecontainer" ref='pagecontainer'>
@@ -35,7 +35,7 @@
         defaultPageIndex:1,
         pageSize:10,
         contentHeight:814
-      } 
+      }
     },
     updated(){
     },
@@ -56,7 +56,7 @@
           let reportIds = {
             reportIds : arr
           }
-          this.$mConfirm('此操作将永久删除该已经该条消息, 是否继续?', {
+          this.$mConfirm('是否确认删除该方案监测, 是否继续? ', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
           }).then(() => {
@@ -68,7 +68,7 @@
               }
             }, () => {})
           })
-          
+
         }
       },
 
@@ -100,9 +100,9 @@
         // let bottomHeight = this.$refs.bottomHeight.offsetHeight
         // let documentHeight = this.$refs.documentHeight.offsetHeight
         // let pagecontainerHeight = this.$refs.pagecontainer.offsetHeight
-        
+
         // let middleHeight = documentHeight - topHeight - bottomHeight
-        // middleHeight = middleHeight < 600 ? 520 : middleHeight; 
+        // middleHeight = middleHeight < 600 ? 520 : middleHeight;
         // this.$refs.pagecontainer.style.height = pagecontainerHeight > middleHeight ? pagecontainerHeight + 'px' : middleHeight + 80 + 'px'
       }
     },

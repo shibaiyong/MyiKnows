@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-import {regionQuery} from '../../assets/js/api.js';
+import {regionQuery} from '@/assets/js/api.js';
 const chooseAreaEnoughText = "地域范围最多支持5个！";
 export default{
   name: 'i-configArea',
@@ -101,8 +101,8 @@ export default{
           callBack(results);
         }
       }).catch(err => {
-        this.$message.error('地域查询失败，请重新偿试！');
-      });    
+        this.$message.error('地域查询失败，请重新尝试！ ');
+      });
     },
     _areaFilter(queryString) {
       return (mappingArea) => {
@@ -197,7 +197,7 @@ export default{
 }
 .configArea .configArea-right{
   margin-left: 20px;
-  width: 85%;
+  width: 100%;
   height: 100%;
   min-height: 38px;
   display: block;

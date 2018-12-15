@@ -12,7 +12,7 @@
 </template>
 <script>
 
-  import zcMap from '../common/ZCChartsMap.vue'
+  import zcMap from '@/components/common/ZCChartsMap.vue'
 
   export default {
     name: 'test',

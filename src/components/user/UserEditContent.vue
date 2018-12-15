@@ -1,35 +1,50 @@
 <template>
-     <div class="rzl_bc_white viewcontent">
-        <div class="usertop"><p class="font18">用户中心</p></div>
-        <table class="userinfo rzl_fc_darkgray font16">
-            <tr class="errorTip"><td></td><td v-show="errorUserNameShow" class="paddingleft10">{{ errorUserNameMessage }}</td></tr>
-            <tr>
-                <td class="fieldcolumn"><label>用户名：</label></td>
-                <td class="valuecolumn">
-                    <input :class="{'valuecolumn_txt' : true, 'verify': errorUserNameShow }" type="text" v-model="userInfo.userName">
-                </td>
-            </tr>
-            <tr>
-                <td class="fieldcolumn"><label >姓名：</label></td>
-                <td class="valuecolumn">
-                    <input class="valuecolumn_txt" type="text" v-model="userInfo.realName">
-                </td>
-            </tr>
-            <tr class="errorTip"><td></td><td v-show="errorMobileShow" class="paddingleft10">{{ errorMobileMessage }}</td></tr>
-             <tr>
-                <td class="fieldcolumn"><label>联系电话：</label></td>
-                <td class="valuecolumn">
-                    <input :class="{'valuecolumn_txt' : true, 'verify': errorMobileShow }" type="text" v-model="userInfo.mobile" >
-                </td>
-            </tr>
-            <tr class="errorTip"><td></td><td v-show="errorEmailShow" class="paddingleft10">{{ errorEmailMessage }}</td></tr>
-             <tr>
-                <td class="fieldcolumn"><label>电子邮箱：</label></td>
-                <td class="valuecolumn">
-                    <input :class="{'valuecolumn_txt' : true, 'verify': errorEmailShow }" type="text" v-model="userInfo.email">
-                </td>
-            </tr>
-            <!-- <tr>
+  <div class="rzl_bc_white viewcontent">
+    <div class="usertop">
+      <p class="font18">用户中心</p>
+    </div>
+    <table class="userinfo rzl_fc_darkgray font16">
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorUserNameShow" class="paddingleft10">{{ errorUserNameMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>用户名：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorUserNameShow }" type="text" disabled="disabled" v-model="userInfo.userName">
+        </td>
+      </tr>
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorRealNameShow" class="paddingleft10">{{ errorRealNameMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>姓名：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorRealNameShow }" type="text" v-model="userInfo.realName">
+        </td>
+      </tr>
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorMobileShow" class="paddingleft10">{{ errorMobileMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>联系电话：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorMobileShow }" type="text" v-model="userInfo.mobile">
+        </td>
+      </tr>
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorEmailShow" class="paddingleft10">{{ errorEmailMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>电子邮箱：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorEmailShow }" type="text" v-model="userInfo.email">
+        </td>
+      </tr>
+      <!-- <tr>
                 <td class="fieldcolumn"><label >微信：</label></td>
                 <td class="btncolumn" v-if="userInfo.webchat===''">
                     <input type="button" @click="goBindWebChat()" value="绑定" >
@@ -38,47 +53,54 @@
                     <label class="font16" />{{userInfo.webchat}}</label>
                 </td>
             </tr> -->
-            <tr class="errorTip"><td></td><td v-show="errorOldPassShow" class="paddingleft10">{{ errorOldPassMessage }}</td></tr>
-            <tr>
-                <td class="fieldcolumn"><label >旧密码：</label></td>
-                <td class="valuecolumn">
-                    <input :class="{'valuecolumn_txt' : true, 'verify': errorOldPassShow }" type="password" v-model="userInfo.oldPassword">
-                </td>
-            </tr>
-            <tr class="errorTip"><td></td><td v-show="errorNewPassShow" class="paddingleft10">{{ errorNewPassMessage }}</td></tr>
-            <tr>
-                <td class="fieldcolumn"><label >新密码：</label></td>
-                <td class="valuecolumn">
-                    <input :class="{'valuecolumn_txt' : true, 'verify': errorNewPassShow }" type="password" v-model="userInfo.newPassword">
-                </td>
-            </tr>
-            <tr class="errorTip"><td></td><td v-show="errorComfirmNewPassShow" class="paddingleft10">{{ errorComfirmNewPassMessage }}</td></tr>
-            <tr>
-                <td class="fieldcolumn"><label >确认新密码：</label></td>
-                <td class="valuecolumn">
-                    <input :class="{'valuecolumn_txt' : true, 'verify': errorComfirmNewPassShow }" type="password" v-model="confirmNewPassWord">
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td class="btncolumn" colspan="2">
-                    <button class="btncolletion rzl_content_button" @click="saveUserInfo()" >保存</button>
-                    <button class="rzl_content_button" @click="goBack()" >返回</button>
-                </td>
-            </tr>
-        </table>
-    </div>
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorOldPassShow" class="paddingleft10">{{ errorOldPassMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>旧密码：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorOldPassShow }" type="password" v-model="userInfo.oldPassword">
+        </td>
+      </tr>
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorNewPassShow" class="paddingleft10">{{ errorNewPassMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>新密码：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorNewPassShow }" type="password" v-model="userInfo.newPassword">
+        </td>
+      </tr>
+      <tr class="errorTip">
+        <td></td>
+        <td v-show="errorComfirmNewPassShow" class="paddingleft10">{{ errorComfirmNewPassMessage }}</td>
+      </tr>
+      <tr>
+        <td class="fieldcolumn"><label>确认新密码：</label></td>
+        <td class="valuecolumn">
+          <input :class="{'valuecolumn_txt' : true, 'verify': errorComfirmNewPassShow }" type="password" v-model="confirmNewPassWord">
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td class="btncolumn" colspan="2">
+          <button class="btncolletion rzl_content_button" @click="saveUserInfo()">保存</button>
+          <button class="rzl_content_button" @click="goBack()">返回</button>
+        </td>
+      </tr>
+    </table>
+  </div>
 </template>
 <script>
 
-import { modifyUserInfo } from "@/assets/js/api.js"
-import { getUserInfo } from "@/assets/js/api.js"
-import sha256 from "js-sha256"
-var i = 0;
-export default {
+  import { modifyUserInfo,getUserInfo } from "@/assets/js/api.js"
+  import sha256 from "js-sha256"
+  var i = 0;
+  export default {
   name:"UserEdit_content",
     data(){
-
         return {
             userInfo:{
                 userName:'',
@@ -91,6 +113,8 @@ export default {
             confirmNewPassWord:'',
             errorUserNameShow:false,
             errorUserNameMessage:'',
+            errorRealNameShow:false,
+            errorRealNameMessage:'',
             errorMobileShow:false,
             errorMobileMessage:'',
             errorEmailShow:false,
@@ -104,60 +128,20 @@ export default {
             saveDisabled:true
         };
     },
-    created(){
-        //this.$watch('userInfo',this.getUserInfo)
-    },
-    mounted(){
-        this.getUserInfo()
-    },
     methods:{
-        // 调用方法
-        goBindWebChat(userid){
-           alert('chat')
-        },
-        saveUserInfo(){
-            let userInfo = this.userInfo
-            let verityResult = this.formValidation() //执行表单验证，获取验证结果
-            this.checkRepeat()                       //检测用户是否修改了信息
-            let params = new URLSearchParams()
-
-            params.append('userName', userInfo.userName)
-            params.append('realName', userInfo.realName)
-            params.append('mobile', userInfo.mobile)
-            params.append('email', userInfo.email)
-            if(userInfo.oldPassword && userInfo.newPassword){
-                params.append('oldPassword', sha256( userInfo.oldPassword ))
-                params.append('newPassword', sha256( userInfo.newPassword ))
-            }
-            
-            if( !verityResult || this.saveDisabled ){//判断验证结果
-                return false
-            }
-
-            modifyUserInfo( params ).then( res => {
-
-                if(res.code == '200'){
-                    this.getUserInfo()
-                    this.$message({
-                        message: '用户信息修改成功',
-                        type: 'success'
-                    })
-                }
-                
-           })
-        },
+        // 返回
         goBack(){
             //this.$router.push({name:'userview',});
             this.$router.go(-1);
         },
+        // 获取用户信息
         getUserInfo(){
             getUserInfo().then(res => {
-
                 if(res.code == '200'){
-                    
                     this.userInfo = Object.assign({},this.userInfo, res.data);
                     this.confirmNewPassWord = '';
-                    localStorage.iKnowsUserInfo = JSON.stringify( this.userInfo ) 
+                    let userName = this.$iknowsUtil.getUserName();
+                    localStorage.setItem('iKnows'+userName+'Info',JSON.stringify( this.userInfo ));
                 }else{
                     //获取用户信息失败时,使用默认值
                     Object.assign(this.userInfo,{
@@ -169,101 +153,134 @@ export default {
                 }
             })
         },
-        formValidation(){//用户名支持数字，字母，区分大小写；密码支持数字，字母，区分大小写。
+        // 验证用户信息
+        formValidation(){
+            this.errorUserNameShow=false;
+            this.errorRealNameShow=false;
+            this.errorMobileShow=false;
+            this.errorEmailShow=false;
+            this.errorOldPassShow=false;
+            this.errorNewPassShow=false;
+            this.errorComfirmNewPassShow=false;
+          //用户名支持数字，字母，区分大小写；密码支持数字，字母，区分大小写。
+            let userName = this.userInfo.userName;
+            let realName = this.userInfo.realName;
+            let mobile = this.userInfo.mobile;
+            let email = this.userInfo.email;
+            let oldPassword = this.userInfo.oldPassword;
+            let newPassWord = this.userInfo.newPassword;
+            let confirmNewPassWord = this.confirmNewPassWord;
+            let userReg = /^[a-zA-Z\d_]{3,20}$/;
+            let passwordReg = /^[a-zA-Z\d]{6,20}$/;
+            let mobileReg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
+            //验证邮箱合法性(匹配邮箱中名称可以包含汉字、字母、数字，域名只允许为英文和数字)
+            let emailReg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
 
-        let userName = this.userInfo.userName
-        let mobile = this.userInfo.mobile
-        let email = this.userInfo.email
-        let oldPassword = this.userInfo.oldPassword
-        let newPassWord = this.userInfo.newPassword
-        let confirmNewPassWord = this.confirmNewPassWord
+            let verifyUserName = userReg.test( userName );
+            let verifyRealName = userReg.test( realName );
+            let verifyMobile = mobileReg.test( mobile );
+            let verifyEmail = emailReg.test( email );
+            let verifyPassWord = passwordReg.test( newPassWord );
 
-        let userReg = /^[a-zA-Z\d_]{3,20}$/
-        let passwordReg = /^[a-zA-Z\d]{6,20}$/
-        let mobileReg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/
-        //验证邮箱合法性(匹配邮箱中名称可以包含汉字、字母、数字，域名只允许为英文和数字)
-        let emailReg = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
-        
-        let verifyUserName = userReg.test( userName )
-        let verifyMobile = mobileReg.test( mobile )
-        let verifyEmail = emailReg.test( email )
-        let verifyPassWord = passwordReg.test( newPassWord )
+            if( !verifyUserName ){
+              this.errorUserNameMessage = '用户名长度3-20个字符，支持英文大小写、数字、下划线';
+              this.errorUserNameShow = true;
+              return false;
+            }
+            if( !verifyRealName ){
+              this.errorRealNameMessage = '姓名长度3-20个字符，支持英文大小写、数字、下划线';
+              this.errorRealNameShow = true;
+              return false;
+            }
 
-        if( !verifyUserName ){
-          this.errorUserNameMessage = '用户名长度3-20个字符，支持英文大小写、数字、下划线'
-          this.errorUserNameShow = true
-          return false
-        }else{
-          this.errorUserNameShow = false
-        }
+            if( !verifyMobile ){
+              this.errorMobileMessage = '手机号不合法';
+              this.errorMobileShow = true;
+              return false;
+            }
 
-        if( !verifyMobile ){
-          this.errorMobileMessage = '手机号不合法'
-          this.errorMobileShow = true
-          return false
-        }else{
-          this.errorMobileShow = false
-        }
+            if( !verifyEmail ){
+              this.errorEmailMessage = '邮箱不合法';
+              this.errorEmailShow = true;
+              return false
+            }
+            // 新旧密码均不能为空（三个）
+            if( oldPassword == '' || oldPassword.length < 6 || oldPassword.length >20){
+                this.errorOldPassMessage = '密码长度6-20个字符，支持英文大小写、数字、符号';
+                this.errorOldPassShow = true;
+                return false
+            }
 
-        if( !verifyEmail ){
-          this.errorEmailMessage = '邮箱不合法'
-          this.errorEmailShow = true
-          return false
-        }else{
-          this.errorEmailShow = false
-        }
-        
-        if( oldPassword == '' && newPassWord != '' ){
-            this.errorOldPassMessage = '密码长度6-20个字符，支持英文大小写、数字、符号'
-            this.errorOldPassShow = true
-            return false
-        }else{
-            this.errorOldPassShow = false
-        }
+            if( !verifyPassWord || newPassWord == '' ){
+                this.errorNewPassMessage = '密码长度6-20个字符，支持英文大小写、数字、符号';
+                this.errorNewPassShow = true;
+                return false
+            }
 
-        if( !verifyPassWord && newPassWord != '' ){
-            this.errorNewPassMessage = '密码长度6-20个字符，支持英文大小写、数字、符号'
-            this.errorNewPassShow = true
-            return false
-        }else{
-            this.errorNewPassShow = false
-        }
+            if( (newPassWord != confirmNewPassWord) && (newPassWord || confirmNewPassWord) ){
+                this.errorComfirmNewPassMessage = '两次密码输入不一致';
+                this.errorComfirmNewPassShow = true;
+                return false
+            }
 
-        if( (newPassWord != confirmNewPassWord) && (newPassWord || confirmNewPassWord) ){
-            this.errorComfirmNewPassMessage = '两次密码输入不一致'
-            this.errorComfirmNewPassShow = true
-            return false
-        }else{
-            this.errorComfirmNewPassShow = false
-        }
-        
         return true
       },
-    
-      checkRepeat(){//检测用户是否修改了信息
-          let userInfo = JSON.parse( localStorage.iKnowsUserInfo );
-          for(let key in userInfo){
+        // 保存
+        saveUserInfo(){
 
-              if(!this.userInfo[key] || typeof this.userInfo[key]=='object') continue;
-              if( userInfo[key] != this.userInfo[key] ){
-                this.saveDisabled = false
-                return
-              }else{
-                this.saveDisabled = true
+          let userInfo = this.userInfo;
+          let form =  this.formValidation() ;//执行表单验证，获取验证结果
+          if (form === true){
+            let params = {};
+            params.userName= userInfo.userName;
+            params.realName= userInfo.realName;
+            params.mobile= userInfo.mobile;
+            params.email= userInfo.email;
+            if(userInfo.oldPassword && userInfo.newPassword){
+              params.oldPassword= sha256( userInfo.oldPassword );
+              params.newPassword= sha256( userInfo.newPassword );
+            }
+
+            modifyUserInfo( params ).then( res => {
+              if(res.code == '200'){
+                // this.getUserInfo();
+                this.$message({
+                  message: '用户信息修改成功',
+                  type: 'success'
+                });
+                setTimeout(() => {                 
+                  let userName = this.$iknowsUtil.getUserName();
+                  this.$router.push({path:'/userview/'+userName});
+                }, 500);
+
+              }else {
+                this.$message({
+                  message: res.message,
+                  type: 'error'
+                });
               }
+
+            })
           }
-      }
+          // this.checkRepeat()                       //检测用户是否修改了信息
+
+        },
+    },
+    mounted(){
+      this.getUserInfo();
     }
 }
 </script>
 <style scoped type="css">
-.viewcontent{
+  .viewcontent{
     width: 100%;
     height:98%;
+    min-height: 600px;
 }
 .viewcontent .usertop{
     width: 100%;
     padding-left:20px;
+    padding-top: 20px;
 }
 .viewcontent .userinfo{
     width: 100%;
@@ -283,6 +300,7 @@ export default {
 .viewcontent .userinfo .valuecolumn .valuecolumn_txt{
     width: 400px;
     border: 1px solid #CDCDCD;
+    height: 38px;
     line-height: 38px;
     border-radius: 10px;
     padding: 0 10px;

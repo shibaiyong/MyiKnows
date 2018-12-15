@@ -36,7 +36,10 @@
     </g>
 </svg>
     </div>
+    
     <div class="right-box">
+      
+
       <div class="logout" :class="{ buttonSelect: selectIndex==index }" @click="clickButton(index)"
            v-for="(item,index) in listData" @mouseover="mouseover(index)" @mouseout="mouseout()">
         <img :src="item.path" :class="{ imgSelect: selectIndex==index }"/>
@@ -44,6 +47,22 @@
       </div>
       <div class="welcome font16" :class="{active: userInfoIsActive}" @click="goUserInfo">
         欢迎，{{name}}
+      </div>
+      <div class="search ">
+        <input placeholder="输入关键词搜索" v-model="input21" class="font14" maxlength=100 />
+        <!--el-dropdown @command="handleCommand">
+          <span class="el-dropdown-link font14">
+            {{tab}}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown" class="menu">
+            <el-dropdown-item command="全部">全部</el-dropdown-item>
+            <el-dropdown-item command="网媒">网媒</el-dropdown-item>
+            <el-dropdown-item command="微信">微信</el-dropdown-item>
+            <el-dropdown-item command="微博">微博</el-dropdown-item>
+            <el-dropdown-item command="APP">APP</el-dropdown-item>
+            </el-dropdown-menu>
+        </el-dropdown-->
+        <i class="el-icon-search" @click="searc"></i>
       </div>
     </div>
   </div>
@@ -56,7 +75,7 @@
    * 2 声明   components: {iTop},
    * 3 在html中引用  <iTop/>
    * */
-  import {logout} from '../../assets/js/api.js'
+  import {logout} from '@/assets/js/api.js'
 
   export default {
     name: "top",
@@ -65,6 +84,8 @@
         selectIndex: -1,
         userInfoIsActive: false,
         name: "",
+        tab:'全部',
+        input21:'',
         listData: [
           {name: "退出", path: require("../../assets/logout.png")},
           // {name: "帮助", path: require("../../assets/question.png")},
@@ -81,7 +102,17 @@
         this.selectIndex = -1
       },
       goUserInfo: function () {
-        this.$router.push('/userview');
+        let userName = this.$iknowsUtil.getUserName();
+        this.$router.push('/userview/'+userName);
+      },
+      searc:function(){
+        let userName = this.$iknowsUtil.getUserName();
+        
+        this.$router.push({ path: "/search/"+userName,query:{tab:this.tab,message:this.input21} });
+      },
+      //选择搜索渠道
+      handleCommand:function(commed){
+        this.tab = commed;
       },
       clickButton: function (index) {
         // if (this.selectIndex == index) {
@@ -89,8 +120,11 @@
         // }
         switch (index) {
           case 0:
-            logout();
-            localStorage.setItem("iKnowsUserName", "")
+            logout();  
+            let userName = this.$iknowsUtil.getUserName();         
+            delete localStorage['iKnows'+userName+'Token'];    
+            delete localStorage['iKnows'+userName+'Config']; 
+            delete localStorage['iKnows'+userName];
             this.$router.push("/login")
             break
           // case 1:
@@ -108,14 +142,15 @@
       }
     },
     mounted() {
-      var name = localStorage.getItem("iKnowsUserName")
+      let name = this.$iknowsUtil.getUserName();  
       if (name) {
         this.name = name
       } else {
         this.name = ".."
       }
-      var path = this.$route.path;
-      switch (path) {
+      
+      let pathName = this.$route.name;
+      switch (pathName) {
       //   case "/logout":
       //     this.selectIndex = 0
       //     break
@@ -128,14 +163,15 @@
       //   case "/backmanager":
       //     this.selectIndex = 3
       //     break
-        case "/userview":
+        case "userview":
           this.userInfoIsActive = true;
           break;
-        case "/useredit":
+        case "useredit":
           this.userInfoIsActive = true;
           break;
        }
-    }
+    },
+   
   }
 </script>
 
@@ -169,18 +205,18 @@
     float: right;
     display: inline-block;
     position: absolute;
-    top: 40px;
+    top: 22px;
     right: 80px;
-    height: 28px;
-    line-height: 28px;
+    height: 32px;
+    line-height: 32px;
     vertical-align: middle;
   }
 
   .top .right-box div {
     cursor: pointer;
     float: right;
-    height: 28px;
-    line-height: 28px;
+    height: 32px;
+    line-height: 32px;
     display: inline-block;
     vertical-align: middle;
   }
@@ -202,6 +238,7 @@
     display: inline-block;
     height: 28px;
     line-height: 28px;
+    font-size:14px;
   }
 
   .top .right-box .welcome {
@@ -214,5 +251,53 @@
   }
   .top .right-box .active{
     color: #1DD1EF;
+  }
+  .search{
+    width:200px;
+    height:44px;
+    border: 1px solid #E4E4E4;
+    border-radius: 22px;
+    margin-right:24px;
+  }
+  .search .el-dropdown{
+    float:left!important;
+    
+    padding:0 16px;
+    
+  }
+  .search .el-dropdown>span{
+    border-right:1px solid #D8D8D8;
+    display: inline-block;
+    width:60px;
+  }
+  .search input{
+    outline:none;
+    width:152px;
+    font-size: 14px;
+    height:32px;
+    margin-left: 16px;
+    color:#333
+  }
+  .search>input::input-placeholder{color:#ccc!important;} 
+  .menu{
+    background-color:#fff!important;
+    width:auto!important;
+  }
+  .search .el-dropdown-link{
+    
+  }
+  .menu>.el-dropdown-menu__item:not(.is-disabled):hover{
+    background-color:#fff;
+  }
+  .menu>.el-dropdown-menu__item{
+    height:auto!important;
+    line-height: 36px!important;
+  }
+ .el-icon-search{
+    display: inline-block;
+    padding: 9px 0;
+   
+   
+    vertical-align: middle;
   }
 </style>

@@ -1,0 +1,43 @@
+
+折线图组件文档
+
+一.组件存放目录
+  src/components/common/ZCChartsLine.vue
+
+二.组件使用方法
+
+  参数
+  data:必传,折线图数据数组
+  category:必传,用于表示当前折线图的个数
+  axis:必传,横坐标字典值
+
+
+  实例
+
+    <zcLine :data="lineData" axis="create_time" :category="category"></zcLine>
+
+        this.lineData = [
+          {
+            "comprehensive_num": 0,
+            "read_num": 1,
+            "trans_num": 2,
+            "comment_num": 3,
+            "click_num":3,
+            "create_time": "01/01"
+          },
+          ......
+        ];
+
+        this.category = [
+          {prop: 'trans_num', label: '网站'},
+          {prop: 'comment_num', label: '微信'},
+          {prop: 'read_num', label: '微博'},
+          {prop: 'comprehensive_num', label: 'APP'},
+          {prop: 'click_num', label: '数字报'},
+        ],
+
+
+
+
+
+

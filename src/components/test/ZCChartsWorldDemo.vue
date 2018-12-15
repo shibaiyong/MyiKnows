@@ -12,7 +12,7 @@
 </template>
 <script>
 
-  import zcWorld from '../common/ZCChartsWorld.vue'
+  import zcWorld from '@/components/common/ZCChartsWorld.vue'
 
   export default {
     name: 'test',

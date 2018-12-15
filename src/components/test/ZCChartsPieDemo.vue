@@ -12,7 +12,7 @@
 </template>
 <script>
 
-  import zcPie from '../common/ZCChartsPie.vue'
+  import zcPie from '@/components/common/ZCChartsPie.vue'
 
   export default {
     name: 'test',

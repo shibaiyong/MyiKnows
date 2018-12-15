@@ -6,14 +6,17 @@
          ref="zc_charts_map">
     </div>
 
-    <div class="zc_charts_empty" :id="id">没有更多地图数据</div>
+    <div class="zc_charts_empty" :id="id">
+      <span class="noData">暂无相关数据</span>
+      <span class="isLoading"><i class="el-icon-loading"></i>  数据加载中</span>
+    </div>
 
   </div>
 
 </template>
 
 <script>
-  import echarts from 'echarts'
+  // import echarts from 'echarts'
   import china from 'echarts/map/js/china';
 
   export default {
@@ -47,7 +50,19 @@
     watch: {
 
       data(val, oldVal) {
-        this.initMapChart();
+        let el = document.getElementById(this.id);
+        let noData = el.getElementsByClassName('noData')[0];
+        let isLoading = el.getElementsByClassName('isLoading')[0];
+
+        if(val.length){
+          noData.style.display = 'none';
+          isLoading.style.display = 'block';
+          this.initMapChart();
+        }else{
+          noData.style.display = 'block';
+          isLoading.style.display = 'none';
+        }
+
       }
     },
     methods: {
@@ -238,4 +253,8 @@
     font-size: 14px;
     color:#606266 ;
   }
+  .noData{
+    display: none;
+  }
+
 </style>

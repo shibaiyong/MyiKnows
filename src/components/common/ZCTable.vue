@@ -89,6 +89,12 @@
 
 
     },
+    watch:{
+
+      data(val,oldVal){
+
+      }
+    },
     data() {
       return {
         currentPage:1,
@@ -147,7 +153,7 @@
 
         let style = Object.assign({}, this.baseCellStyle);
 
-        
+
 
         this.category.forEach(function (category, categoryIndex) {
 
@@ -196,7 +202,7 @@
 
             let tableCell = cell.children[0];
 
-            tableCell.style.color = '#1D2088';
+            tableCell.style.color = '#11B7D3';
             // tableCell.style.fontWeight = 'bolder';
             tableCell.style.textDecoration = 'underline';
 
@@ -242,7 +248,7 @@
 
       /*单元格行选中*/
       ZCRowSelect(selection){
-        
+
         let selects = [];
         selection.forEach(function (item) {
           selects.push(item.rowIndex);
@@ -285,16 +291,17 @@
         category.forEach(item =>{
           if(item.width && item.width > 0){
             usedWidth += item.width;
-          }      
+          }
         });
         category.forEach(item =>{
-          if(item.width && item.width > 0){          
+
+          if(item.width && item.width > 0){
           }else{
             item.width = parseInt(wholeWidth) - usedWidth;
-            console.log(item.width);
+            // console.log(item.width);
           };
         });
-        
+
       }, 500);
     },
     created() {
@@ -334,10 +341,10 @@
     white-space: nowrap;
   }
   /* .zc_tables >>>.is-scrolling-none .cell::after{
-    content: "..."; 
-    position: absolute; 
-    bottom: 0; 
-    right: 0; 
+    content: "...";
+    position: absolute;
+    bottom: 0;
+    right: 0;
     padding-left: 40px;
     background: -webkit-linear-gradient(left, transparent, red 50%);
     background: -o-linear-gradient(right, transparent, red 50%);

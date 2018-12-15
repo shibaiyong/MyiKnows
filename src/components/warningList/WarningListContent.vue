@@ -29,7 +29,7 @@
           </div>
         </div>
         <!--<button class="rzl_bc_white btn allRead font14" @click="allRead()">全部标记为已读</button>-->
-        <div class="warningTable rzl_bc_white">
+        <div class="warningTable rzl_bc_white" >
           <warningTable id="warningTable"
                         :data="tableData"
                         :category="category"
@@ -63,10 +63,10 @@
             warningTypeDatas:[],
             tableData:[],
             category:[
-              {prop: 'level', label: '预警等级'},
+              {prop: 'level', label: '预警等级', width: 180},
               {prop:'title',label:'文章标题',showHover:true,},
-              {prop:'time',label:'发布时间'},
-              {prop:'source',label:'文章来源'}],
+              {prop:'time',label:'发布时间', width: 200},
+              {prop:'source',label:'文章来源', width: 200}],
             operations:[],
             itemsStyle:[],
             isRead:[],
@@ -145,33 +145,37 @@
               thiz.page= data.number;
               thiz.totalPages=data.totalElements;
               thiz.tableData = data.content;
-              thiz.tableData.forEach((value, index) => {
-                if(value.source == ''){
-                  value.source = '-'
-                }
-                // let publishTime = new Date(value.publishTime).getTime();
-                let time =iKnowsUtil.dataFormat(value.publishTime);
-                value.time = time;
-                if (value.level == 4) {
-                  value.level = '重大'
-                  let obj = {
-                    index:index,
-                    style:{color:"#ff0000"}
+              if (thiz.tableData != null) {
+                thiz.tableData.forEach((value, index) => {
+                  if(value.source == ''){
+                    value.source = '-'
                   }
-                  thiz.itemsStyle.push(obj)
-                }else if(value.level == 3){
-                  value.level = '较大'
-                }else if(value.level == 2){
-                  value.level = '轻微'
-                }else if(value.level == 1){
-                  value.level = '一般'
-                };
-                if(value.readStatus == 0){
-                  value.readStatus = '未读'
-                }else if(value.readStatus == 1){
-                  value.readStatus = '已读'
-                }
-              })
+                  // let publishTime = new Date(value.publishTime).getTime();
+                  let time =iKnowsUtil.dataFormat(value.publishTime);
+                  value.time = time;
+                  if (value.level == 4) {
+                    value.level = '重大'
+                    let obj = {
+                      index:index,
+                      style:{color:"#ff0000"}
+                    }
+                    thiz.itemsStyle.push(obj)
+                  }else if(value.level == 3){
+                    value.level = '较大'
+                  }else if(value.level == 2){
+                    value.level = '轻微'
+                  }else if(value.level == 1){
+                    value.level = '一般'
+                  };
+                  if(value.readStatus == 0){
+                    value.readStatus = '未读'
+                  }else if(value.readStatus == 1){
+                    value.readStatus = '已读'
+                  }
+                })
+              }else {
+                thiz.tableData=[];
+              }
               thiz.category = [
                 {
                   prop: 'level',
@@ -211,28 +215,30 @@
           // 点击跳转详情
           clickTableCell(rowIndex) {
             let thiz = this;
+            let pid = thiz.$route.params.id;
             thiz.tableData.forEach(function (value,index) {
               if (rowIndex == index) {
                 let id =  value.webpageCode;
                 let time = value.publishTime;
-                
+
                 let releaseDatetime= new Date(time).getTime();
-                console.log(releaseDatetime)
-                window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
+                let userName = thiz.$iknowsUtil.getUserName();
+                window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ releaseDatetime+'&planId='+pid );
               }
             })
           },
           // 查看按钮
           operateData(rowIndex,index){
             let thiz = this;
+            let pid = thiz.$route.params.id;
             thiz.tableData.forEach(function (value,index) {
               if (rowIndex == index) {
                 let id =  value.webpageCode;
                 let time = value.publishTime;
                 let time1 = value.time;
-                console.log(time);
                 let releaseDatetime= new Date(time).getTime();
-                window.open('/details?webpageCode='+id+'&releaseDatetime='+ releaseDatetime );
+                let userName = thiz.$iknowsUtil.getUserName();
+                window.open('/details/'+userName+'?webpageCode='+id+'&releaseDatetime='+ releaseDatetime +'&planId='+pid);
               }
             })
           },

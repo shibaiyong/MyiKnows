@@ -7,7 +7,12 @@
          ref="zc_charts_line">
     </div>
 
-    <div :id="id" class="zc_charts_empty">没有更多折线图数据</div>
+    <div :id="id" class="zc_charts_empty">
+      <!--<span v-else><i class="el-icon-loading"></i>  数据加载中</span>-->
+      <span class="noData">暂无相关数据</span>
+      <span class="isLoading"><i class="el-icon-loading"></i>  数据加载中</span>
+
+    </div>
 
   </div>
 
@@ -15,7 +20,7 @@
 
 <script>
 
-  import echarts from 'echarts'
+  // import echarts from 'echarts'
   import iKnowsUtil from '@/assets/js/iknowsUtil';
   export default {
     name: "z-c-charts-line",
@@ -39,8 +44,18 @@
 
       data(val, oldVal) {
 
-        this.initLineChart()
+        let el = document.getElementById(this.id);
+        let noData = el.getElementsByClassName('noData')[0];
+        let isLoading = el.getElementsByClassName('isLoading')[0];
 
+        if(val.length){
+          noData.style.display = 'none';
+          isLoading.style.display = 'block';
+          this.initLineChart()
+        }else{
+          noData.style.display = 'block';
+          isLoading.style.display = 'none';
+        }
       }
 
     },
@@ -118,7 +133,7 @@
             show: false,
             top: this.category.length>0?40:5,
             bottom: 30,
-            left: this.category.length>0?60:20,
+            left: this.category.length>0?54:20,
             right: 20
           },
           /*提示框组件*/
@@ -137,7 +152,6 @@
               fontSize: 14,
             },
             formatter(params) {
-
               let result = '';
               params.forEach(function (item, index) {
                 if (item.data < 1){
@@ -181,15 +195,22 @@
               show:this.category.length>0?true:false,
               color: '#979797',
               fontSize: 12,
-              margin: 0
+              margin: 2,
+              formatter: function (value, index) {
+                if (value >= 10000 && value < 100000000) {
+                  value = value / 10000 + "万";
+                } else if (value >= 100000000) {
+                  value = value / 100000000 + "亿";
+                }
+                return value;
+              }
             },
             splitLine: {
               lineStyle: {
                 type: 'dashed',
               }
             },
-
-
+            scale: true,
           },
 
           series: this.setupSeries(),
@@ -240,6 +261,10 @@
      this.initLineChart()
 
     },
+    created(){
+      // console.log(this.data);
+
+    },
     beforeCreate(){
 
 
@@ -270,5 +295,9 @@
     text-align: center;
     font-size: 14px;
     color:#606266 ;
+  }
+
+  .noData{
+    display: none;
   }
 </style>

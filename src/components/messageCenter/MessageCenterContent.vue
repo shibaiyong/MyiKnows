@@ -50,9 +50,9 @@
   import IHeader from '@/components/common/Header'
   import IFooter from '@/components/common/Footer'
   import checkBox from '@/components/common/CheckBox'
-  import dataUtil from '../../assets/js/dataUtlis'
+  import dataUtil from '@/assets/js/dataUtlis'
   import Pagination from "@/components/common/Pagination"
-  import { messagePageList, messageRead, messageDelete } from '../../assets/js/api.js'
+  import { messagePageList, messageRead, messageDelete } from '@/assets/js/api.js'
   import iKnowsUtil from '@/assets/js/iknowsUtil'
 
   export default {

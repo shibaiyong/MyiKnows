@@ -54,13 +54,13 @@
       @cancel-article="handleCancelArticle"></IAddArticle>
     <!-- 保存和取消 -->
     <div class="monitorConfig-btn rzl_bc_white">
-      <button type="button" class="config-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy" @click="saveConfig">保存</button>
+      <button type="button" class="config-btn font16 rzl_fc_white rzl_bc_navy rzl_bd_navy" @click="checkName">保存</button>
       <button type="button" class="config-btn font16 rzl_bc_white rzl_fc_navy rzl_bd_navy" @click="resetConfig">重置</button>
     </div>
   </div>
 </template>
 <script>
-import {planSave, planUpdate} from '../../assets/js/api.js';
+import {planSave, planUpdate,planCheckName} from '@/assets/js/api.js';
 import IConfigSelector from '@/components/common/ConfigSelector';
 import IAddArticle from '@/components/common/AddArticle';
 
@@ -102,6 +102,8 @@ export default{
       flag: false,
       // 防止重复提交
       isSaving: false,
+      //保存原始方案名称
+      kpOriginalName:''
     }
   },
   methods: {
@@ -121,7 +123,7 @@ export default{
 
       })
     },
-    // 新增人物数据
+    // 新增文稿数据
     handleSaveArticle (articleObj) {
       this.isAddArticle = false;
       this.articles.push({
@@ -138,32 +140,93 @@ export default{
     configSelectorParams (obj) {
       this.selectorParams = obj.params;
     },
-    // 保存数据
-    saveConfig(){
+    //验证名称是否重名
+    checkName(){
       if(this.isSaving){
         return;
       }else{
         this.isSaving = true;
       }
+      if(this.kpName.length == 0){
+        this.$message.error(kpNameEmptyText);
+        this.isSaving = false;
+        return;
+      }else if(this.kpName.length > 20){
+        this.$message.error(kpNameEnoughText);
+        this.isSaving = false;
+        return;
+      }
       let id = this.$route.params.id || '';
+      if(id == 'article'){
+        id ='';
+      }
+      if(id == '' || typeof (id) == 'undefined'){
+        let params;
+        params = {
+          name:this.kpName
+        };
+        planCheckName(params).then(response => {
+          if (response.code == 200) {
+            let data = response.data;
+            if (data.repeatable == false){
+              this.saveConfig();
+            } else {
+              this.isSaving = false;
+              this.$message.error(data.msg);
+            }
+          }else {
+
+            this.$message.error(response.message);
+            //this.isAddArticle = true;
+          }
+        }).catch(error => {
+          console.log(error);
+          //this.isAddArticle = true;
+        })
+      }else {
+        let kpName = this.kpName;
+        let kpOriginalName = this.kpOriginalName;
+        if (kpName == kpOriginalName){
+          this.saveConfig();
+        } else {
+          let params;
+          params = {
+            name:this.kpName
+          };
+          planCheckName(params).then(response => {
+            if (response.code == 200) {
+              let data = response.data;
+              if (data.repeatable == false){
+                this.saveConfig();
+              } else {
+                this.isSaving = false;
+                this.$message.error(data.msg);
+              }
+            }else {
+              this.$message.error(response.message);
+              //this.isAddArticle = true;
+            }
+          }).catch(error => {
+            console.log(error);
+            //this.isAddArticle = true;
+          })
+        }
+
+      }
+
+    },
+    // 保存数据
+    saveConfig(){
+      let id = this.$route.params.id || '';
+      if(id == 'article'){
+        id ='';
+      }
       if(id == '' || typeof (id) == 'undefined'){
         // 合并参数
         var params = Object.assign({}, this.selectorParams);
         params.kpType = 4;
         // 方案名称验证
-        params.kpName = '';
-        if(this.kpName.length == 0){
-          this.$message.error(kpNameEmptyText);
-          this.isSaving = false;
-          return;
-        }else if(this.kpName.length > 20){
-          this.$message.error(kpNameEnoughText);
-          this.isSaving = false;
-          return;
-        }else{
-          params.kpName = this.kpName;
-        }
-
+        params.kpName = this.kpName;
         // 文章列表
         params.articles = this.articles || [];
         if(params.articles.length == 0){
@@ -172,18 +235,20 @@ export default{
           return;
         }
 
-        // 日期范围验证
-        if(typeof(params.kpTimeRange) == 'undefined'){
-          params.kpTimeRange = this.selectObj.kpTimeRange;
-        }
-        if(typeof(params.timeSelf) == 'undefined'){
-          params.timeSelf = [];
-        }
-        if(params.kpTimeRange == '5' && params.timeSelf && params.timeSelf.length != 2){
-          this.$message.error(dateTypeWarnText);
-          this.isSaving = false;
-          return;
-        }
+        // 日期范围验证(常规监测移除该功能，给出默认值)
+        // if(typeof(params.kpTimeRange) == 'undefined'){
+        //   params.kpTimeRange = this.selectObj.kpTimeRange;
+        // }
+        // if(typeof(params.timeSelf) == 'undefined'){
+        //   params.timeSelf = [];
+        // }
+        // if(params.kpTimeRange == '5' && params.timeSelf && params.timeSelf.length != 2){
+        //   this.$message.error(dateTypeWarnText);
+        //   this.isSaving = false;
+        //   return;
+        // }
+        params.kpTimeRange = '0';
+        params.timeSelf = [];
 
         // 监控范围验证
         if(typeof(params.kpSiteRange) == 'undefined'){
@@ -216,19 +281,20 @@ export default{
 
         // 周期性简报验证(无)
         // 简报推送方式验证(存在周期性简报时，推送方式不能为空)
-        if(typeof(params.kpRpSendType) == 'undefined'){
-            params.kpRpSendType = this.selectObj.kpRpSendType;
-        }else if(params.kpRpSendType.length == 0){
-            this.$message.error(kpRpSendTypeTypeWarnText);
-            this.isSaving = false;
-            return;
-        }else{
-          let intkpRpSendType = [];
-          params.kpRpSendType.forEach(item => {
-            intkpRpSendType.push(parseInt(item));
-          });
-          params.kpRpSendType = intkpRpSendType;
-        }
+        params.kpRpSendType = [];
+        // if(typeof(params.kpRpSendType) == 'undefined'){
+        //     params.kpRpSendType = this.selectObj.kpRpSendType;
+        // }else if(params.kpRpSendType.length == 0){
+        //     this.$message.error(kpRpSendTypeTypeWarnText);
+        //     this.isSaving = false;
+        //     return;
+        // }else{
+        //   let intkpRpSendType = [];
+        //   params.kpRpSendType.forEach(item => {
+        //     intkpRpSendType.push(parseInt(item));
+        //   });
+        //   params.kpRpSendType = intkpRpSendType;
+        // }
 
         // 额外参数
         // 此方案是否公开(默认)
@@ -239,13 +305,14 @@ export default{
 
         // 保存文稿监测方案
         planSave(params).then(response => {
-          
+
           if(response.code == 200){
             this.$alert('方案保存成功！', '提示：', {
               confirmButtonText: '确定',
               callback: action => {
                 this.isSaving = false;
-                this.$router.push('/monitorcenter');
+                let userName = this.$iknowsUtil.getUserName();
+                this.$router.push('/center/monitorcenter/article/'+userName);
               }
             });
           }else{
@@ -254,49 +321,41 @@ export default{
           }
         }).catch(error => {
           this.isSaving = false;
-          this.$message.error('方案保存失败，请重新偿试！');
+          this.$message.error('方案保存失败，请重新尝试！');
         });
       }else{
+        let _thiz = this;
         this.$mConfirm('是否更新此监测方案?', {
           confirmButtonText: '确认',
           cancelButtonText: '取消',
         }).then(() => {
           var params = {};
           // 方案名称验证
-          params.kpName = '';
-          if(this.kpName.length == 0){
-            this.$message.error(kpNameEmptyText);
-            this.isSaving = false;
-            return;
-          }else if(this.kpName.length > 20){
-            this.$message.error(kpNameEmptyText);
-            this.isSaving = false;
-            return;
-          }else{
-            params.kpName = this.kpName;
-          }
+          params.kpName = _thiz.kpName;
           // 方案模式
           params.kpType = 4;
           // 文章列表
-          params.articles = this.articles;
+          params.articles = _thiz.articles;
 
-          // 日期范围验证
-          if(params.kpTimeRange){
-            if(params.kpTimeRange == '5' && params.timeSelf.length != 2){
-              this.$message.error(kpTimeRangeWarnText);
-              this.isSaving = false;
-              return;
-            }
-          }else{ // 取默认数据
-            params.kpTimeRange = this.selectObj.kpTimeRange;
-            params.timeSelf = this.selectObj.timeSelf;
-          }
+          // 日期范围验证(废弃)
+          params.kpTimeRange = '0';
+          params.timeSelf = [];
+          // if(params.kpTimeRange){
+          //   if(params.kpTimeRange == '5' && params.timeSelf.length != 2){
+          //     _thiz.$message.error(kpTimeRangeWarnText);
+          //     _thiz.isSaving = false;
+          //     return;
+          //   }
+          // }else{ // 取默认数据
+          //   params.kpTimeRange = _thiz.selectObj.kpTimeRange;
+          //   params.timeSelf = _thiz.selectObj.timeSelf;
+          // }
 
           // 监控范围验证(并处理成Int类型数组)
           if(params.kpSiteRange){
             if(params.kpSiteRange.length == 0){
-              this.$message.error(monitorTypeWarnText);
-              this.isSaving = false;
+              _thiz.$message.error(monitorTypeWarnText);
+              _thiz.isSaving = false;
               return;
             }
             let intKpSiteRange = [];
@@ -305,7 +364,7 @@ export default{
             });
             params.kpSiteRange = intKpSiteRange;
           }else{
-            params.kpSiteRange = this.selectObj.kpSiteRange;
+            params.kpSiteRange = _thiz.selectObj.kpSiteRange;
             let intKpSiteRange = [];
             params.kpSiteRange.forEach(item => {
               intKpSiteRange.push(parseInt(item));
@@ -332,31 +391,32 @@ export default{
           }
           // 周期性简报验证(无)
           // 简报推送方式验证(存在周期性简报时，推送方式不能为空)
-          if(params.kpRpType && params.kpRpSendType){
-            if(params.kpRpType.length > 0 && params.kpRpSendType.length == 0){
-              this.$message.error(kpRpSendTypeTypeWarnText);
-              this.isSaving = false;
-              return;
-            }
-            let intkpRpSendType = [];
-            params.kpRpSendType.forEach(item => {
-              intkpRpSendType.push(parseInt(item));
-            });
-            params.kpRpSendType = intkpRpSendType;
-          }else{
-            params.kpRpType = this.selectObj.kpRpType;
-            params.kpRpSendType = this.selectObj.kpRpSendType;
-            let intKpRpType = [];
-            params.kpRpType.forEach(item => {
-              intKpRpType.push(parseInt(item));
-            });
-            params.kpRpType = intKpRpType;
-            let intkpRpSendType = [];
-            params.kpRpSendType.forEach(item => {
-              intkpRpSendType.push(parseInt(item));
-            });
-            params.kpRpSendType = intkpRpSendType;
-          }
+          params.kpRpSendType = [];
+          // if(params.kpRpType && params.kpRpSendType){
+          //   if(params.kpRpType.length > 0 && params.kpRpSendType.length == 0){
+          //     this.$message.error(kpRpSendTypeTypeWarnText);
+          //     this.isSaving = false;
+          //     return;
+          //   }
+          //   let intkpRpSendType = [];
+          //   params.kpRpSendType.forEach(item => {
+          //     intkpRpSendType.push(parseInt(item));
+          //   });
+          //   params.kpRpSendType = intkpRpSendType;
+          // }else{
+          //   params.kpRpType = this.selectObj.kpRpType;
+          //   params.kpRpSendType = this.selectObj.kpRpSendType;
+          //   let intKpRpType = [];
+          //   params.kpRpType.forEach(item => {
+          //     intKpRpType.push(parseInt(item));
+          //   });
+          //   params.kpRpType = intKpRpType;
+          //   let intkpRpSendType = [];
+          //   params.kpRpSendType.forEach(item => {
+          //     intkpRpSendType.push(parseInt(item));
+          //   });
+          //   params.kpRpSendType = intkpRpSendType;
+          // }
 
           // 此方案是否公开(默认)
           params.kpIsPublic = true;
@@ -366,23 +426,24 @@ export default{
           // 更新文稿监测方案
           planUpdate(params).then(response => {
             if(response.code == 200){
-              this.$alert('方案保存成功！', '提示：', {
+              _thiz.$alert('方案保存成功！', '提示：', {
                 confirmButtonText: '确定',
                 callback: action => {
-                  this.isSaving = false;
-                  this.$router.push('/monitorcenter');
+                  _thiz.isSaving = false;
+                  let userName = _thiz.$iknowsUtil.getUserName();
+                  _thiz.$router.push('/center/monitorcenter/article/'+userName);
                 }
               });
             }else{
-              this.isSaving = false;
-              this.$message.error(response.message);
+              _thiz.isSaving = false;
+              _thiz.$message.error(response.message);
             }
           }).catch(error => {
-            this.isSaving = false;
-            this.$message.error('方案保存失败，请重新偿试！');
+            _thiz.isSaving = false;
+            _thiz.$message.error('方案保存失败，请重新尝试！');
           });
         },() => {
-          this.isSaving = false;
+          _thiz.isSaving = false;
         })
 
       }
@@ -395,7 +456,7 @@ export default{
       // 条件选择初始化
       this.selectObj = {
         // 日期范围类型
-        kpTimeRange: '3',
+        kpTimeRange: '-1',
         // 日期控件是否
         disabled: true,
         // 自定义日期范围值
@@ -416,11 +477,11 @@ export default{
   mounted () {
     this.allObj = this.allObjInfo;
     this.kpName = this.allObj.kpName || '';
+    this.kpOriginalName = this.allObj.kpName;
     this.kpType = this.allObj.kpType;
     this.excludeWords = this.allObj.excludeWords || '';
     // 文章列表
     this.articles = this.allObj.articles || [];
-
     // 筛选条件
     this.selectObj = this.allObj.selectObj;
     this.flag = true;

@@ -56,7 +56,7 @@
   </div>
 </template>
 <script>
-import {articleGather, articleSimilar} from '../../assets/js/api.js';
+import {articleGather, articleSimilar} from '@/assets/js/api.js';
 const crawlErrorText = "抓取失败，请您手动输入";
 const urlEmptyText = "文稿url不能为空！";
 const titleEmptyText = "文章标题不能为空!";
@@ -166,13 +166,15 @@ export default {
       // 去掉转义字符
       title = title.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
       // 去掉特殊字符
-      title = title.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
-        // 去除标签
+      title = title.replace(/[\@\#\$\%\^\&\*\(\)\{\}\"\L\<\>\?\[\]]/g, '');
+      // 冒号单独处理成空格
+      title = title.replace(/\:/ig, ' ');
+      // 去除标签
       title = title.replace(/<[^>]+>/g,"");
       // 去掉转义字符
       content = content.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
       // 去掉特殊字符
-      content = content.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/);
+      content = content.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/g,'');
       // 去除标签
       content = content.replace(/<[^>]+>/g,"");
 
@@ -210,11 +212,12 @@ export default {
               this.$message.error('文章相似度不匹配，请重新输入！');
             }
           }else{
-            this.$message.error('保存失败，请重新偿试！');
+            document.getElementById('configMask').style.display= 'block';
+            this.$message.error('保存失败，请重新尝试！');
           }
         }).catch(err => {
-          this.$message.error('系统异常，请重新偿试！');
-          document.getElementById('configMask').style.display= 'none';
+          this.$message.error('系统异常，请重新尝试！');
+          document.getElementById('configMask').style.display= 'block';
           this.articleURL = '';
           this.articleTitle = '';
           this.articleContent = '';

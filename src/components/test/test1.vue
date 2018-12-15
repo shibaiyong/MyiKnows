@@ -1,34 +1,39 @@
 <template>
 
-  <div class="charts_line_test">
-
-    <div class="test_content">
-      <zcBar id="111" :data="lineData" axis="create_time" :category="category"></zcBar>
-    </div>
-
-    <div class="test_content">
-      <zcLine id="222" :data="lineData" axis="create_time" :category="category"></zcLine>
-    </div>
-
-
-
+  <!--<div class="test" v-if="lineData.length">-->
+  <div class="test_content" v-if="lineData.length">
+    <zcLine :data="lineData" axis="create_time" :category="category"></zcLine>
   </div>
+  <div v-else>
+    没有更过数据
+  </div>
+
+
+  <!--</div>-->
+  <!--<div style="width: 100%;">-->
+  <!--<div style="display: flex;justify-content: center;width: calc(100% - 50px);margin: 0 auto;">-->
+
+  <!--<div style="width: 100px;height: 200px;background-color: royalblue;margin-right: 10px"></div>-->
+  <!--<div style="width: 100px;height: 200px;background-color: salmon;"></div>-->
+  <!--<div style="width: 100%;height: 200px;background-color: teal;"></div>-->
+
+  <!--</div>-->
+
+  <!--</div>-->
 
 
 </template>
 <script>
 
-  import zcLine from '@/components/common/ZCChartsLine'
-  import zcBar from '@/components/common/ZCChartsBar'
+  import zcLine from '../common/ZCChartsLine'
 
   export default {
     name: 'test',
-    components: {zcLine,zcBar},
+    components: {zcLine},
     data() {
       return {
         lineData: [],
         category: [],
-        barData:[],
       }
     },
     methods: {},
@@ -42,7 +47,7 @@
             "read_num": 1,
             "trans_num": 2,
             "comment_num": 3,
-            "click_num": 3,
+            "click_num":3,
             "create_time": "01/01"
           },
           {
@@ -50,7 +55,7 @@
             "read_num": 2,
             "trans_num": 3,
             "comment_num": 4,
-            "click_num": 9,
+            "click_num":9,
             "create_time": "01/02"
           },
           {
@@ -58,7 +63,7 @@
             "read_num": 3,
             "trans_num": 4,
             "comment_num": 5,
-            "click_num": 6,
+            "click_num":6,
             "create_time": "01/03"
           },
           {
@@ -66,7 +71,7 @@
             "read_num": 4,
             "trans_num": 5,
             "comment_num": 6,
-            "click_num": 2,
+            "click_num":2,
             "create_time": "01/04"
           },
           {
@@ -74,7 +79,7 @@
             "read_num": 2,
             "trans_num": 3,
             "comment_num": 4,
-            "click_num": 7,
+            "click_num":7,
             "create_time": "01/05"
           },
           {
@@ -82,14 +87,14 @@
             "read_num": 6,
             "trans_num": 7,
             "comment_num": 8,
-            "click_num": 3,
+            "click_num":3,
             "create_time": "01/06"
           },
           {
             "comprehensive_num": 2,
             "read_num": 7,
             "trans_num": 8,
-            "click_num": 10,
+            "click_num":10,
             "comment_num": 9,
             "create_time": "01/07"
           },

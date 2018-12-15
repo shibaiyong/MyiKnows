@@ -5,10 +5,10 @@
       <IHeader></IHeader>
     </div>
     <div class="rzl-contarner top-label " v-show="topLabel.length > 0">
-      <span class="font14 rzl_fc_darkgray">监测中心 ></span>
-      <span class="font14 rzl_fc_darkgray" @click="goPlanList(moniterTitle)">{{ moniterTitle }} > </span>
-      <span class="font14 rzl_fc_darkgray">{{topLabel}}</span>
-    </div>
+        <span class="font14 rzl_fc_darkgray">监测中心 ></span>
+        <span class="font14 rzl_fc_darkgray" @click="goPlanList()">事件监测 > </span>
+        <span class="font14 rzl_fc_darkgray">{{topLabel}}</span>
+      </div>
     <div class="tab-content rzl-contarner rzl_bc_undercoat">
       <ul class="tab-config" v-if="tabList.length >0">
         <li v-for="(tabItem, index) in tabList" :key="index" class="font18"
@@ -16,7 +16,9 @@
           @click="tabChange(tabItem.type)"><span>{{tabItem.value}}</span></li>
       </ul>
     </div>
-    <router-view class="rzl-contarner rzl_bc_undercoat"></router-view>
+    <div class="rzl-contarner rzl_bc_undercoat">
+      <router-view ></router-view>
+    </div>
     <div v-show="show" @click="returnToTopFn" class="f-db backTop">
       <img src="../../assets/up.png"/>
     </div>
@@ -33,7 +35,7 @@
   import iKnowsUtil from '@/assets/js/iknowsUtil';
 
   export default {
-    name: 'i-monitorView',
+    name: 'i-eventView',
     components: {
       ITop,
       IHeader,
@@ -45,21 +47,14 @@
         tabList: [],
         // top-label
         topLabel: '',
-        moniterTitle:'',
         show: false,
         clean: () => {}
       }
     },
     methods: {
-      goPlanList(name){
+      goPlanList(){
         let userName = this.$iknowsUtil.getUserName();
-        if(name == '常规监测'){
-          this.$router.push("/center/monitorcenter/general/"+userName);
-        }else if (name == '人物监测'){
-          this.$router.push("/center/monitorcenter/person/"+userName)
-        } else if (name == '文稿监测'){
-          this.$router.push("/center/monitorcenter/article/"+userName)
-        }
+        this.$router.push("/center/monitorcenter/event/"+userName)
       },
       // tab项切换
       tabChange (type) {
@@ -75,23 +70,24 @@
         let userName = this.$iknowsUtil.getUserName();
         if(id == '' || id == 'undefined'){
           if(type == 'monitorresults'){
-            this.$router.push('/center/monitorresults/'+userName);
-          }else if(type == 'monitoranalysis'){
-            this.$router.push('/center/monitoranalysis/'+userName);
+            this.$router.push('/event/monitorresults/'+userName);
+          }else if(type == 'eventanalysis'){
+            this.$router.push('/event/eventanalysis/'+userName);
           }else if(type =='warninglist'){
-            this.$router.push('/center/warninglist/'+userName);
+            this.$router.push('/event/warninglist/'+userName);
           }else if(type == 'config'){
-            this.$router.push('/center/config/'+userName);
+            this.$router.push('/event/config/'+userName);
           }
         }else{
+
           if(type == 'monitorresults'){
-            this.$router.push('/center/monitorresults/'+id+'/'+userName);
-          }else if(type == 'monitoranalysis'){
-            this.$router.push('/center/monitoranalysis/'+id+'/'+userName);
+            this.$router.push('/event/monitorresults/'+id+'/'+userName);
+          }else if(type == 'eventanalysis'){
+            this.$router.push('/event/eventanalysis/'+id+'/'+userName);
           }else if(type =='warninglist'){
-            this.$router.push('/center/warninglist/'+id+'/'+userName);
+            this.$router.push('/event/warninglist/'+id+'/'+userName);
           }else if(type == 'config'){
-            this.$router.push('/center/config/'+id+'/'+userName);
+            this.$router.push('/event/config/'+id+'/'+userName);
           }
         }
 
@@ -126,9 +122,9 @@
     },
     mounted() {
       let tabList = [
+        {value: '事件分析', isSelected: false, type: 'eventanalysis'},
         {value: '监测结果', isSelected: false, type: 'monitorresults'},
-        {value: '监测分析', isSelected: false, type: 'monitoranalysis'},
-        {value: '预警列表', isSelected: false, type: 'warninglist'},
+        // {value: '预警列表', isSelected: false, type: 'warninglist'},
         {value: '方案配置', isSelected: false, type: 'config' }
       ];
       var pathName = this.$route.name;
@@ -139,9 +135,6 @@
         }
       });
       let id = this.$route.params.id || '';
-      if(id == 'general' || id == 'person' ||id == 'article' ||id == 'event'){
-        id = '';
-      }
       if(id != '' && id != 'undefined'){
         planType(id).then(response => {
           let data = response.data;
@@ -149,13 +142,6 @@
           let kpType = data.kpType;
           if(kpType == 4){
             tabList.splice(2,1);
-            this.moniterTitle = '文稿监测'
-          }else if(kpType == 3){
-            this.moniterTitle = '人物监测'
-          }else if(kpType == 1){
-            this.moniterTitle = '常规监测'
-          }else if(kpType == 2){
-            this.moniterTitle = '常规监测'
           }
           this.tabList = tabList;
         }).catch(err => {

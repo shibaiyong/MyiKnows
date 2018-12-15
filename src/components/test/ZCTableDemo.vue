@@ -23,7 +23,7 @@
 </template>
 <script>
 
-  import zcTable from '../common/ZCTable.vue'
+  import zcTable from '@/components/common/ZCTable.vue'
 
   export default {
     name: 'test',

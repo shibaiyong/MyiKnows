@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div id="iDetails" class="iDetails" v-loading.fullscreen.lock="fullscreenLoading">
+    <div id="iDetails" class="iDetails"  v-loading.fullscreen.lock="fullscreenLoading">
       <div class="article-content">
-        <h1 class="title font24 rzl_fc_darkgray">{{articleDate.title}}</h1>
+        <h1 class="title font24 rzl_fc_darkgray" v-html ="heightLightShow(articleDate.title)">{{articleDate.title}}</h1>
         <div class="article-describe font14">
           <div>
             <div class="describe">
@@ -53,8 +53,8 @@
         <div class="abstract-box font14 rzl_bc_undercoat"><span>【机器摘要】</span>
           {{articleDate.summary}}
         </div>
-        <div class="content-box" :class="contentFontSize" v-html="articleDate.content">
-
+        <div id="content-box" class="content-box" :class="contentFontSize" v-html ="heightLightShow(articleDate.content)">
+            <div v-html="articleDate.content"></div>
         </div>
         <div class="content-footer-box rzl_bc_undercoat rzl_fc_darkgray">
           <div class="footer-left">
@@ -76,8 +76,8 @@
             <titleLabel :title="key"/>
           </div>
           <div class="item-label rzl_fc_white font14">
-          <span v-for="item1 in item" :class="{redLabel:item1=='负面'}">
-             {{item1}}<i class="el-icon-close" v-if="false"></i>
+          <span v-for="item1 in item" :class="{activeLabel:item1.status==1}" @click="goBaidu(item1.url)">
+             {{item1.title}}<i class="el-icon-close" v-if="false"></i>
           </span>
           </div>
           <!--<div class="add-model" v-if="item.titleLabel=='舆情类型'">-->
@@ -98,9 +98,9 @@
         <!--</div>-->
         <!--</div>-->
       </div>
-      <div class="go-top" v-if="showGoTop" @click="goTop">
-        <img src="../../assets/up.png"/>
-      </div>
+      <!--<div class="go-top" v-if="showGoTop" @click="goTop">-->
+        <!--<img src="../../assets/up.png"/>-->
+      <!--</div>-->
     </div>
   </div>
 
@@ -110,8 +110,8 @@
   import iTop from '@/components/common/Top'
   import iHeader from '@/components/common/Header'
   import titleLabel from '@/components/common/TitleLabel'
-  import dataUtil from '../../assets/js/dataUtlis'
-  import {detail} from '../../assets/js/api.js';
+  import dataUtil from '@/assets/js/dataUtlis'
+  import {detail,getWeixinUrl,detailLabels} from '@/assets/js/api.js';
 
   export default {
     name: "article-details-content",
@@ -141,7 +141,11 @@
         tags: [],
         webpageCode: "",
         releaseDatetime: 0,
-        fullscreenLoading: false
+        planId: "",
+        keyWords: "",
+        fullscreenLoading: false,
+        highlightWords:[],
+        sentimentTags:''
       }
     },
     filters: {
@@ -167,7 +171,7 @@
         if(minutes < 10){
           minutes = '0' + minutes;
         }
-        
+
         return year+'-'+month+'-'+day+' '+hour+':'+minutes;
       },
     },
@@ -177,6 +181,7 @@
       fontSizeMouseover(event) {
         this.showChooseFontSize = true
       },
+      // 回到顶部
       goTop() {
         var app = document.getElementById("app");
         var code = setInterval(function () {
@@ -187,67 +192,139 @@
           }
         }, 3)
       },
+      // 跳转百度词条
+      goBaidu(val){
+        if (val && val != ''){
+          window.open(val);
+        }
+      },
       fontSizeMouseout(event) {
         this.showChooseFontSize = false
       },
+      // 修改文字大小
       changeFontSize(fontSize) {
         this.contentFontSize = fontSize
       },
+      // 原文链接
       jumpSource() {
-        window.open(this.articleDate.webpageUrl)
+        if (this.articleDate.weixinFlag === true){
+          var params = {
+            weixinNumber: this.articleDate.metaInfoKey,
+            wechatName:this.articleDate.wechatName,
+            title:this.articleDate.title,
+            releaseDatetime:this.articleDate.releaseDatetime,
+            webpageUrl:this.articleDate.webpageUrl,
+            crawlDatetime:this.articleDate.crawlDatetime
+          };
+          getWeixinUrl({params: params}).then(response => {
+            if (response.code == 200) {
+                let url = response.data;
+                if (url !=''){
+                  window.open(url);
+                } else {
+                  this.$message.error('原文已删除！');
+                }
+
+            }else {
+                this.$message.error('原文已删除！');
+            }
+          }).catch(error => {
+              console.log(error);
+          })
+        } else {
+              window.open(this.articleDate.webpageUrl)
+        }
+
       },
+      // 获取详情内容
       loadDetail() {
-        var _this = this
+        var _this = this;
         var params = {
           webpageCode: this.webpageCode,
-          releaseDatetime: this.releaseDatetime
+          releaseDatetime: this.releaseDatetime,
+          planId:this.planId,
+          searchWords:this.keyWords
         }
         this.fullscreenLoading = true;
         detail({params: params}).then(response => {
 
           if (response.code == 200) {
-            _this.articleDate = response.data
-
-            this.fullscreenLoading = false;
-
-            _this.tags = response.data.tags
+            _this.articleDate = response.data;
+            this.highlightWords = _this.articleDate.highlightWords;
+            let tags = response.data.tags;
+            _this.detailLabel(tags);
+            // this.highlightWords = ['阿根廷','习近平','彭丽媛'];
+            _this.tags = response.data.tags;
             if (response.data.sentiment <= 0.7 && response.data.sentiment >= 0.3) {
-              _this.tags.情感标签 = ["中性"]
+              _this.tags.情感标签 = [{title:"中性"}];
+              _this.sentimentTags =  [{title:"中性"}];
             } else if (response.data.sentiment < 0.3) {
-              _this.tags.情感标签 = ["负面"]
+              _this.tags.情感标签 = [{title:"负面"}];
+              _this.sentimentTags =  [{title:"负面"}];
             } else {
-              _this.tags.情感标签 = ["正面"]
-            }
+              _this.tags.情感标签 = [{title:"正面"}];
+              _this.sentimentTags =   [{title:"正面"}];
+            };
+            this.fullscreenLoading = false;
+          }
+        }).catch(error => {
+          console.log(error);
+        })
+      },
+      //词条是否可以跳转百度
+      detailLabel(tags){
+        var _this = this;
+        detailLabels(tags).then(response => {
+          if (response.code == 200) {
+            _this.tags = response.data;
+            _this.tags.情感标签 = _this.sentimentTags;
           }
         }).catch(error => {
           console.log(error);
         })
       },
       openFullScreen() {
-
-        this.fullscreenLoading = true;
+          this.fullscreenLoading = true;
         setTimeout(() => {
           this.fullscreenLoading = false;
         }, 2000);
-      }
+      },
+      // 关键词高亮
+      heightLightShow( val ){
+        var html = val;
+        if (html != null){
+          var arr = this.highlightWords;
+          if (arr != ''&&arr){
+            for (var i = 0; i<arr.length; i++){
+              html = html.replace(new RegExp(arr[i],'g'),"<span class='highlightWords'>"+ arr[i] +"</span>");
+            }
+            return html
+          }
+          return html
+        }else {
+          return
+        }
+      },
     },
     mounted() {
-      this.webpageCode = this.$route.query.webpageCode
-      this.releaseDatetime = this.$route.query.releaseDatetime
+      this.webpageCode = this.$route.query.webpageCode;
+      this.releaseDatetime = this.$route.query.releaseDatetime;
+      this.planId = this.$route.query.planId;
+      this.keyWords = this.$route.query.keyWords;
       if (!this.webpageCode || !this.releaseDatetime || this.webpageCode == "" || this.releaseDatetime == 0) {
-        alert("参数传递错误")
+        alert("参数传递错误");
         return
       }
-      this.loadDetail()
-      var app = document.getElementById("app");
-      var thiz = this;
-      app.addEventListener("scroll", function (e) {
-        if (window.innerHeight - app.scrollTop < 0) {
-          thiz.showGoTop = true
-        } else {
-          thiz.showGoTop = false
-        }
-      })
+      this.loadDetail();
+      // var app = document.getElementById("app");
+      // var thiz = this;
+      // app.addEventListener("scroll", function (e) {
+      //   if (window.innerHeight - app.scrollTop < 0) {
+      //     thiz.showGoTop = true
+      //   } else {
+      //     thiz.showGoTop = false
+      //   }
+      // })
     }
   }
 </script>
@@ -257,6 +334,7 @@
     position: relative;
     text-align: left;
     display: -webkit-flex; /* Safari */
+    display: flex; /* Safari */
     /*display: flex;*/
     /*flex-direction: row;*/
     /*justify-content: center;*/
@@ -349,9 +427,6 @@
     text-align: right;
     padding-right: 0;
   }
-  .iDetails .item-label .redLabel {
-    background: #D62828;
-  }
 
   .iDetails .item-label span {
     margin-bottom: 10px;
@@ -359,12 +434,24 @@
     line-height: 20px;
     padding-left: 8px;
     padding-right: 8px;
-    background: #1DD1EF;
+    border: 1px solid #e4e4e4;
+    color: #999;
     border-radius: 4px;
     vertical-align: middle;
     margin-right: 20px;
     user-select: none;
   }
+  .iDetails .item-label .activeLabel {
+    border: 1px solid #1DD1EF;
+    color: #1DD1EF;
+    cursor: pointer;
+  }
+  .iDetails .item-label .activeLabel:hover {
+    background: #1DD1EF;
+    color: #ffffff;
+    cursor: pointer;
+  }
+
 
   .iDetails .item-label i {
     height: 20px;
@@ -395,6 +482,11 @@
 
   .iDetails .content-box p {
     margin-bottom: 17px;
+  }
+  .iDetails .content-box>>> img {
+    width: 100%;
+    height: auto;
+    display: block;
   }
 
   .iDetails .content-footer-box {
