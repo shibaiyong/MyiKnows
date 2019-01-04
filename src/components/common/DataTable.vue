@@ -36,7 +36,7 @@
 <script>
     import axios from "axios";
     import CheckBox from "@/components/common/CheckBox"
-    import { deleteAllBulletinList, eventBus, downloadBulletinList, url } from "@/assets/js/api.js"
+    // import { deleteAllBulletinList, eventBus, downloadBulletinList, url } from "@/assets/js/api.js"
     export default {
         name:'dataTables',
         props:['data','transformData'],
