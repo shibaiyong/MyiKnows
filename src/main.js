@@ -86,11 +86,11 @@ axios.interceptors.response.use(response => {
 router.beforeEach((to, from, next) => {
   let pathName = window.location.pathname;  
   let userName = '';  //console.log(to,from)
-  if(pathName.indexOf('login') == -1){    
-    let list = pathName.split('/') || [];    
+  if(pathName.indexOf('login') == -1){
+    let list = pathName.split('/') || [];
     if(list && list.length > 0){      
-      userName = list[list.length-1] || '';    
-    }  
+      userName = list[list.length-1] || '';
+    }
   }  
   let token = localStorage.getItem('iKnows'+userName+'Token');
   if ( (token == '' || token == 'undefined') && to.path != '/login') {

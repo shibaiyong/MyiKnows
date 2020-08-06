@@ -145,8 +145,8 @@ export default {
     },
     rememberMe() {
       //记住密码
-      let userInfoStr = JSON.stringify(this.userInfo);
-      let userInfo = JSON.parse(userInfoStr);
+      let userInfoStr = JSON.stringify(this.userInfo)
+      let userInfo = JSON.parse(userInfoStr)
       if (userInfo.userName == "" || userInfo.passWord == "") {
         this.showMessageBox({
           title: "",
@@ -322,13 +322,13 @@ export default {
   watch: {
     dataArr(val) {
       if (val.length) {
-        this.rememberMe();
+        this.rememberMe()
       } else {
-        this.forgotMe();
+        this.forgotMe()
       }
     },
     numberEnd() {
-      this.changeNumber(5, 1500);
+      this.changeNumber(5, 1500)
     }
   },
   components: {
