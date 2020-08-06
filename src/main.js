@@ -2,7 +2,6 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from 'axios'
-require ('babel-polyfill')
 
 // vue对象挂载的属性或方法(慎用)
 import base from './assets/js/base'

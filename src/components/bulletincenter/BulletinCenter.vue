@@ -11,9 +11,18 @@
       <div class="paginationContainer" :style="{'visibility':hidden}"><Pagination :totalNum="total" @currentChange="getBulletinList"></Pagination></div>
     </div>
   </div>
+
+
+  <Selectt v-model="val" :datas="datas">
+    <!-- <div class="placeholder">请选择数</div> -->
+  </Selectt>
+
+
   <div class="footercontainer" ref='bottomHeight'>
     <iFooter/>
   </div>
+
+  
 </div>
 </template>
 
@@ -25,7 +34,7 @@
   import iFooter from "@/components/common/Footer"
   import iTop from '@/components/common/Top'
   import { deleteBulletinList, viewBulletinList, getBulletinList, eventBus } from '@/assets/js/api.js'
-
+  import Selectt from "@/components/common/select"
   export default {
     name: "BulletinCenter",
     data() {
@@ -34,10 +43,18 @@
         total:100,
         defaultPageIndex:1,
         pageSize:10,
-        contentHeight:814
+        contentHeight:814,
+        val:1,
+        datas:[
+          {id:1,text:'一'},
+          {id:2,text:'二'},
+          {id:3,text:'三'},
+          {id:4,text:'四'}
+        ]
       }
     },
     updated(){
+      console.log(this.val);
     },
     created() {
       eventBus.$on('getBulletinList',params => {
@@ -124,7 +141,8 @@
       Pagination,
       iHeader,
       iFooter,
-      iTop
+      iTop,
+      Selectt
     }
   }
 </script>
