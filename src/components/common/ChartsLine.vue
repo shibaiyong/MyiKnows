@@ -294,12 +294,12 @@
         if (!this.chartData) {
           return
         }
-        var dataArray = this.chartData.valueArr;
+        var checklistay = this.chartData.valueArr;
         var magnitudesArray = [];
         var maxLevel = 0
         //计算每组数据的数量级（先计算平均数 小于平均数一个数量级的数据 删除掉再次重新计算）
-        for (var i = 0; i < dataArray.length; i++) {
-          var array = dataArray[i].value.concat()
+        for (var i = 0; i < checklistay.length; i++) {
+          var array = checklistay[i].value.concat()
           var menu = 0
           var level = 0
           //计算平均数
@@ -330,7 +330,7 @@
             level++
           }
           maxLevel = maxLevel < level ? level : maxLevel
-          magnitudesArray.push({name: dataArray[i].name, level: level})
+          magnitudesArray.push({name: checklistay[i].name, level: level})
         }
         var levelArray = []
         //根据数量及分组 一个数量级一组
@@ -356,17 +356,17 @@
         // //this.zc_log(this.levelIndex)
         var levelIndex = this.levelArray.length - (this.levelIndex % this.levelArray.length) - 1;
         for (var i = 0; i < this.levelArray.length; i++) {
-          var levelDataArray = this.levelArray[i]
-          for (var j = 0; j < levelDataArray.length; j++) {
+          var levelchecklistay = this.levelArray[i]
+          for (var j = 0; j < levelchecklistay.length; j++) {
             if (i == levelIndex) {
               this.eChartsObj.dispatchAction({
                 type: 'legendSelect',
-                name: levelDataArray[j].name
+                name: levelchecklistay[j].name
               })
             } else {
               this.eChartsObj.dispatchAction({
                 type: 'legendUnSelect',
-                name: levelDataArray[j].name
+                name: levelchecklistay[j].name
               })
             }
           }
@@ -380,11 +380,11 @@
       stopLoopShow() {
         if (this.setTimeCode != -1) {
           for (var i = 0; i < this.levelArray.length; i++) {
-            var levelDataArray = this.levelArray[i]
-            for (var j = 0; j < levelDataArray.length; j++) {
+            var levelchecklistay = this.levelArray[i]
+            for (var j = 0; j < levelchecklistay.length; j++) {
               this.eChartsObj.dispatchAction({
                 type: 'legendSelect',
-                name: levelDataArray[j].name
+                name: levelchecklistay[j].name
               })
             }
           }

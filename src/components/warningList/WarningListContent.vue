@@ -243,7 +243,7 @@
             })
           },
           // //全选
-          // allSelect(rowIndex){
+          // allisselect(rowIndex){
           //   this.isRead = rowIndex;
           // },
           // //全部标记为已读

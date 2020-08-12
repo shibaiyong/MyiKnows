@@ -134,12 +134,12 @@ export default {
     direactionStatusToRight () {
       if(this.notLimitButton.notLimitCity || this.notLimitButton.notLimitDistrict){
         if( this.notLimitButton.notLimitCity){
-          this.removeAllSelected(this.cityList);
-          this.removeAllSelected(this.districList);
+          this.removeallisselected(this.cityList);
+          this.removeallisselected(this.districList);
           return false;
         }else{
           if(this.notLimitButton.notLimitDistrict){
-            this.removeAllSelected(this.districList);
+            this.removeallisselected(this.districList);
             return false;
           }
         }
@@ -196,8 +196,8 @@ export default {
       };
       this.selectItem.city = {};
       this.selectItem.distric = {};
-      this.removeAllSelected(this.cityList || []); // 清除选中状态
-      this.removeAllSelected(this.districList); //清除选中状态
+      this.removeallisselected(this.cityList || []); // 清除选中状态
+      this.removeallisselected(this.districList); //清除选中状态
       this.cityList = [];
       this.districList = [];
     },  
@@ -215,7 +215,7 @@ export default {
     getDistricList (item) {
       this.leftData = []; // 清空需要转移的数组
       this.notLimitButton.notLimitDistrict = false; // 重置按钮状态
-      this.removeAllSelected(this.districList); // 清除选中状态
+      this.removeallisselected(this.districList); // 清除选中状态
       this.selectItem.distric = {};
       this.districList = [];
       if(item){
@@ -255,7 +255,7 @@ export default {
     cityNotLimit (item) {
       this.leftData = [];
       this.selectItem.distric = {};
-      this.removeAllSelected(this.districList);
+      this.removeallisselected(this.districList);
       this.notLimitButton.notLimitCity = !this.notLimitButton.notLimitCity; // 不限制按钮状态
       this.leftData.push({ 
         regionName: this.selectItem.province.regionName + '-不限-不限', 
@@ -369,7 +369,7 @@ export default {
     // 已选中区域的全选和反选
     selectedAllArea () {
       if(this.selectedAllButtonStatus) {
-        this.removeAllSelected(this.rightDataList);
+        this.removeallisselected(this.rightDataList);
         this.rightData = [];
       }else{
         this.rightDataList.map( item => {
@@ -391,7 +391,7 @@ export default {
       }
     },
     // 清空选中状态
-    removeAllSelected (list) {
+    removeallisselected (list) {
       list.map( item => this.$delete(item, 'selected'));
     } 
   },

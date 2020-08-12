@@ -4,7 +4,7 @@
         <table class="inews-table">
             <thead>
                 <tr>
-                    <th :style="{'width':'72px'}"><span :style="{'width':'72px'}"><CheckBox :totalSelect="isTotal" :allSelect="hasTotal"/><i class="allcheck">全选</i></span></th>
+                    <th :style="{'width':'72px'}"><span :style="{'width':'72px'}"><CheckBox :selectall="isTotal" :allisselect="hasTotal"/><i class="allcheck">全选</i></span></th>
                     <th :style="{'width':'270px'}">报告生成时间</th>
                     <th :style="{'width':'150px'}">方案类型</th>
                     <th :style="{'width':'150px'}">报告类型</th>
@@ -16,7 +16,7 @@
             <tbody>
                 <tr v-for='item in data' :key="item.reportId">
 
-                    <td><span><CheckBox :label="item.reportId" :dataArr="dataArr" :all="checkAll" /></span></td>
+                    <td><span><CheckBox :label="item.reportId" :checklist="checklist" :all="checkAll" /></span></td>
                     <td>{{ item.reportTime }}</td>
                     <td>{{ item.planType | formatType }}</td>
                     <td>{{ item.reportTypeName }}</td>
@@ -46,7 +46,7 @@
                 right:true,
                 id:'',
                 checkAll:'',
-                dataArr:[]
+                checklist:[]
             }
         },
         created(){
@@ -95,7 +95,7 @@
             },
             //批量删除简报中心的数据
             deleteAllBulletinList(){
-                if(this.dataArr.length == 0){
+                if(this.checklist.length == 0){
                     this.$mAlert('你未选择需要删除的监测方案.')
                     return false
                 }
@@ -104,7 +104,7 @@
                     cancelButtonText: '取消',
                 }).then(() => {
                     var _this = this
-                    deleteAllBulletinList( { reportIds:this.dataArr } ).then( res => {
+                    deleteAllBulletinList( { reportIds:this.checklist } ).then( res => {
                     if(res.code == '200'){
                         this.isTotal()
                         //删除成功后重新更新列表
@@ -120,7 +120,7 @@
         },
         computed:{
             hasTotal(){//当各个复选框被选中时,全选框也被选中
-                return this.dataArr.length == this.data.length
+                return this.checklist.length == this.data.length
             }
         },
         filters:{

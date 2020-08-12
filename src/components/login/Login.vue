@@ -31,7 +31,7 @@
           <span v-show="errorPassWordShow"><img src="../../assets/error.png"/>&nbsp;{{ errorPassWordMessage }}</span>
         </li>
         <li class="remeberme">
-          <CheckBox :label="'选中'" :dataArr="dataArr" :all="isChecked"><a href="javascript:void(0)" class="font14">记住密码</a></CheckBox>
+          <CheckBox :label="'选中'" :checklist="checklist" :all="isChecked"><a href="javascript:void(0)" class="font14">记住密码</a></CheckBox>
 
         </li>
         <li><button class="font16" @click="gotoLogin($event)">登录</button></li>
@@ -77,7 +77,7 @@ export default {
       errorPassWordShowAcive:false,
       errorUserNameMessage: "",
       errorPassWordMessage: "",
-      dataArr: [],
+      checklist: [],
       isChecked: "",
       totalTimer:''
     };
@@ -320,7 +320,7 @@ export default {
     clearInterval( this.totalTimer )
   },
   watch: {
-    dataArr(val) {
+    checklist(val) {
       if (val.length) {
         this.rememberMe()
       } else {

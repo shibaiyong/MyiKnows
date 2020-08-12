@@ -9,8 +9,8 @@
         <div class="list-title font14 rzl_fc_darkgray">
           <span class="title-checkAll">
              <checkBox
-               :allSelect="allSelect"
-               :totalSelect="totalSelect"/>&nbsp; 全选</span>
+               :allisselect="allisselect"
+               :selectall="selectall"/>&nbsp; 全选</span>
           <span class="title-date">日期</span>
           <span class="title-type">类型</span>
           <span class="title-content">消息内容</span>
@@ -21,7 +21,7 @@
           <div class="item-checkAll">
             <checkBox
               :label="item.id"
-              :dataArr="dataArr"
+              :checklist="checklist"
               :all="checkAll"
             />
           </div>
@@ -62,7 +62,7 @@
     data() {
       return {
         searchTitle: "",
-        dataArr: [],
+        checklist: [],
         checkAll: "",
         total: 0,
         page: 1,
@@ -82,8 +82,8 @@
       }
     },
     computed: {
-      allSelect() {
-        return this.dataArr.length == this.listData.length
+      allisselect() {
+        return this.checklist.length == this.listData.length
       }
     },
     methods: {
@@ -152,7 +152,7 @@
       },
       deleteList() {
         var _this = this
-        if (this.dataArr.length < 1) {
+        if (this.checklist.length < 1) {
           this.$mAlert('请至少勾选一条消息后再进行批量删除.')
           return
         }
@@ -161,8 +161,8 @@
           cancelButtonText: '取消',
         }).then(() => {
           var str = ""
-          for (var i = 0; i < _this.dataArr.length; i++) {
-            str = str + _this.dataArr + ","
+          for (var i = 0; i < _this.checklist.length; i++) {
+            str = str + _this.checklist + ","
           }
           str = str.substr(0, str.length - 1);
           var params = new URLSearchParams();
@@ -174,7 +174,7 @@
           })
         })
       },
-      totalSelect(params) {
+      selectall(params) {
         console.log(params);
         this.checkAll = params
       },

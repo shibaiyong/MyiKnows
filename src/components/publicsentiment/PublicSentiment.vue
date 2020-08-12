@@ -3,7 +3,7 @@
     <table class="inews-table">
       <thead>
         <tr>
-          <!--<th :style="{'width':'174px'}"><CheckBox :totalSelect="isTotal" :allSelect="hasTotal"/><span class="allcheck">全选</span></th>-->
+          <!--<th :style="{'width':'174px'}"><CheckBox :selectall="isTotal" :allisselect="hasTotal"/><span class="allcheck">全选</span></th>-->
           <th>监控任务名称</th>
           <th></th>
           <th></th>
@@ -11,7 +11,7 @@
       </thead>
       <tbody>
         <tr v-for='item in tableData'> 
-          <!-- <td><CheckBox :label="item.id" :dataArr="dataArr" :all="checkAll"/></td> -->
+          <!-- <td><CheckBox :label="item.id" :checklist="checklist" :all="checkAll"/></td> -->
           <td>
             <div class="publicdetail">
 

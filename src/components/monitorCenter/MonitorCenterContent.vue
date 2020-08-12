@@ -31,7 +31,7 @@
                :key="item.id">
             <div class="item-title">
               <div class="left-title font16 rzl_fc_darkgray">
-                <checkBox :label="item.id" :dataArr="dataArr" :all="checkAll" v-show="hadStop"/>
+                <checkBox :label="item.id" :checklist="checklist" :all="checkAll" v-show="hadStop"/>
                 {{item.kpName}}
               </div>
               <div class="right-title font14">
@@ -197,7 +197,7 @@
         disabled: true,
         statusData: [],
         listData: [],
-        dataArr: [],
+        checklist: [],
         checkAll: "",
         total: 0,
         pageSize: 10,
@@ -395,7 +395,7 @@
       },
       stopList() {
         var _this = this
-        if (this.dataArr.length < 1) {
+        if (this.checklist.length < 1) {
           this.$mAlert('你未选择需要停止的监测方案')
           return
         }
@@ -404,8 +404,8 @@
           cancelButtonText: '取消',
         }).then(() => {
           var str = ""
-          for (var i = 0; i < _this.dataArr.length; i++) {
-            str = str + _this.dataArr[i] + ","
+          for (var i = 0; i < _this.checklist.length; i++) {
+            str = str + _this.checklist[i] + ","
           }
           str = str.substr(0, str.length - 1);
           var params = {id: str}

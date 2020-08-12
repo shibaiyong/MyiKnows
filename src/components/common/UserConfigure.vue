@@ -387,17 +387,17 @@
       /*判断是否包含子元素*/
       hasChildren(type, id) {
 
-        let result = [], dataArr = [];
+        let result = [], checklist = [];
 
         if (type === 0) {
-          dataArr = this.RSData;
+          checklist = this.RSData;
         } else if (type === 1) {
-          dataArr = this.RAData;
+          checklist = this.RAData;
         } else {
-          dataArr = this.LAData;
+          checklist = this.LAData;
         }
 
-        dataArr.forEach(function (item) {
+        checklist.forEach(function (item) {
           if (item.parentId === id) {
             result.push(item);
           }

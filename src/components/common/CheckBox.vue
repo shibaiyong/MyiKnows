@@ -18,7 +18,7 @@
           default:''
         },
         
-        dataArr:{
+        checklist:{
           type:Array,
           default: function () {
             return []
@@ -30,11 +30,11 @@
           default:''
         },
 
-        totalSelect:{
+        selectall:{
           type:Function
         },
 
-        allSelect:{
+        allisselect:{
           type:Boolean,
           default:false
         }
@@ -43,8 +43,6 @@
       data(){
           return {
               isChecked:false,
-              outValue:'',
-              flagAll:''
           }
       },
       created(){
@@ -56,26 +54,25 @@
       methods:{
         selected(event){
           if(event){//组件内部的点击操作才执行
-            event.preventDefault();
             this.isChecked = !this.isChecked;
-            if(this.totalSelect){//判断是否为全选复选框。如果是则return
+            if(this.selectall){//判断是否为全选复选框。如果是则return
               if(this.isChecked){
-                this.totalSelect((Math.random()+1)+'');
+                this.selectall((Math.random()+1)+'');
               }else{
-                this.totalSelect('allEmpty');
+                this.selectall('');
               }
               return false;
             }
           }
-          var index = this.dataArr.indexOf(this.label);
+          var index = this.checklist.indexOf(this.label);
 
           if(this.isChecked){//直接调用执行的代码
             if(index == -1){//防止点击全选的时候，往数组里重复添加。
-              this.dataArr.push(this.label);
+              this.checklist.push(this.label);
             }            
           }else{           
             if(index != -1){//取消选择时，删除对应的值
-              this.dataArr.splice(index,1);
+              this.checklist.splice(index,1);
             }
           }
         } 
@@ -85,16 +82,14 @@
       },
       watch:{
         all(val) {//全选框控制的属性
-          if( val == 'allEmpty' ){
-            this.isChecked = false;
-          }else if( val != '' ){
+         if( val != '' ){
             this.isChecked = true;
           }else{
             this.isChecked = false;
           }
           this.selected();
         },
-        allSelect(val){//各个复选框都处于选中状态时。该值为真。
+        allisselect(val){//各个复选框都处于选中状态时。该值为真。
           this.isChecked = val ? true : false
         }
       }
