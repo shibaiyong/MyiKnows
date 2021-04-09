@@ -1,6 +1,7 @@
 <template>
   <div id="login">
 
+    <Calender :format=" 'yyyy 年 MM 月 dd 日' " :format-value="'yyyy-MM-dd'" v-model="dateValue"/>
 
     <div class="loginleft">
 
@@ -48,6 +49,7 @@ import iknowsUtil from "@/assets/js/iknowsUtil";
 import messageBox from "@/components/common/MessageBox";
 import CheckBox from "@/components/common/CheckBox";
 import { login, getTotalData} from "@/assets/js/api.js";
+import Calender from "@/components/common/Calender";
 import sha256 from "js-sha256";
 
 export default {
@@ -79,7 +81,8 @@ export default {
       errorPassWordMessage: "",
       checklist: [],
       isChecked: "",
-      totalTimer:''
+      totalTimer:'',
+      dateValue:''
     };
   },
   created() {
@@ -333,7 +336,8 @@ export default {
   },
   components: {
     messageBox,
-    CheckBox
+    CheckBox,
+    Calender
   }
 };
 </script>

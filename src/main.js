@@ -18,6 +18,23 @@ Vue.config.productionTip = false;
 Vue.use(ElementUI);
 Vue.use(base);
 Vue.prototype.$iknowsUtil = iknowsUtil
+
+Vue.prototype.runCountDown = (start, end, rate, total, cb1, cb2) => {
+  let allcount = end -start
+  let frequency = total/rate
+  let step = allcount/frequency
+  let countDownTimer = setInterval(()=>{
+    start = start + step
+    cb1(Math.round(start))
+    if(start >= end && allcount >= 0){
+      clearInterval(countDownTimer)
+      cb2(end)
+    }else if(start <= end && allcount <0){
+      clearInterval(countDownTimer)
+      cb2(end)
+    }
+  },rate)
+}
 // 超时时间
 // axios.defaults.timeout = 5000
 // 携带cookie
